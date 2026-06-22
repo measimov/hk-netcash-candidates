@@ -18,22 +18,34 @@ a.button { text-decoration:none; color:#fff; background:var(--accent); padding:8
 .card-head { display:flex; align-items:center; justify-content:space-between; gap:10px; font-size:16px; }
 .rank { color:var(--muted); margin-right:4px; }
 .score { min-width:48px; text-align:right; font-weight:700; color:var(--accent); }
-.grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px; margin-top:10px; }
-.grid div { background:#f3f6f8; border-radius:6px; padding:8px; min-width:0; }
+.grid,.detail-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px; margin-top:10px; }
+.grid div,.detail-grid div { background:#f3f6f8; border-radius:6px; padding:8px; min-width:0; }
 label { display:block; color:var(--muted); font-size:12px; margin-bottom:3px; }
-strong { font-size:14px; }
+strong { font-size:14px; overflow-wrap:anywhere; }
 .tags { display:flex; flex-wrap:wrap; gap:6px; margin-top:10px; }
 .tag { border:1px solid #c8d7df; color:#315463; background:#eef6f8; border-radius:999px; padding:3px 7px; font-size:12px; }
 .tag.danger { border-color:#e0b6b6; color:var(--danger); background:#fff1f1; }
-details { margin-top:8px; color:var(--muted); font-size:13px; }
-.small { word-break:break-word; }
+.detail { margin-top:10px; border-top:1px solid var(--line); padding-top:8px; }
+.detail summary { cursor:pointer; width:max-content; max-width:100%; color:var(--accent); font-size:13px; font-weight:700; list-style:none; user-select:none; }
+.detail summary::-webkit-details-marker { display:none; }
+.detail summary::before { content:"+"; display:inline-block; width:16px; color:var(--accent); }
+.detail[open] summary::before { content:"-"; }
+.detail .open-label { display:none; }
+.detail[open] .open-label { display:inline; }
+.detail[open] .closed-label { display:none; }
+.detail-body { margin-top:8px; background:#fbfcfd; border:1px solid #e5ebf0; border-radius:8px; padding:10px; }
+.notice-title { color:var(--muted); font-size:12px; margin:10px 0 4px; }
+.notices { margin:0; padding-left:18px; color:#3d4a5c; font-size:13px; line-height:1.45; }
+.notices li { margin:5px 0; overflow-wrap:anywhere; }
+.muted { color:var(--muted); font-size:13px; line-height:1.45; margin:8px 0 0; }
 .table-wrap { overflow:auto; background:var(--panel); border:1px solid var(--line); border-radius:8px; margin-top:18px; }
 table { width:100%; border-collapse:collapse; font-size:13px; min-width:860px; }
 th,td { padding:8px; border-bottom:1px solid var(--line); text-align:right; white-space:nowrap; }
-th:nth-child(2),th:nth-child(3),td:nth-child(2),td:nth-child(3) { text-align:left; }
+th:nth-child(1),th:nth-child(2),td:nth-child(1),td:nth-child(2),th:last-child,td:last-child { text-align:left; }
+th:last-child,td:last-child { white-space:normal; min-width:220px; }
 th { position:sticky; top:0; background:#eef2f5; }
 section h2 { font-size:17px; margin:22px 0 8px; }
-@media (min-width:760px) { .grid { grid-template-columns:repeat(4,minmax(0,1fr)); } .cards { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; } .card { margin:0; } }
+@media (min-width:760px) { .grid { grid-template-columns:repeat(4,minmax(0,1fr)); } .detail-grid { grid-template-columns:repeat(3,minmax(0,1fr)); } .cards { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; } .card { margin:0; } }
 </style>
 </head>
 <body>
@@ -46,11 +58,10 @@ section h2 { font-size:17px; margin:22px 0 8px; }
     <a class="button" href="secondary_validation_top20.html">前20二次检验</a>
     <a class="button" href="expanded_quality_candidates.html">宽口径合并榜</a>
     <a class="button" href="governance_risk_overlay.html">治理风险过滤</a>
-    <a class="button" href="hk_supplemental_candidates.csv">新增宽筛 CSV</a>
-    <a class="button" href="hk_ranked_candidates.csv">排序 CSV</a>
+    <a class="button" href="governance_filtered_candidates.csv">治理过滤CSV</a>
+    <a class="button" href="hk_ranked_candidates.csv">主榜CSV</a>
     <a class="button" href="hk_ranked_candidates.md">Markdown</a>
     <a class="button" href="top25_tushare_dividend_trends.csv">分红趋势</a>
-    <a class="button" href="top20_hkex_announcement_titles.csv">披露易标题</a>
   </div>
   <section>
     <h2>前 40 候选卡片</h2>
@@ -71,10 +82,21 @@ section h2 { font-size:17px; margin:22px 0 8px; }
         <div><label>CFO/利润</label><strong>393.1%</strong></div>
       </div>
       <div class="tags"><span class="tag">现金类资产&gt;总负债</span><span class="tag">近年盈利稳定</span><span class="tag">经营现金流稳定</span><span class="tag">股东回报率较高</span></div>
-      <details>
-        <summary>更多</summary>
-        <p>最新报告期: 20251231; 最近一年利润: 0.24亿; 一次性/其他收益占比: -2.3%; 近4年派息年数: 3.0; 最近派息/利润: 152.6%</p>
-        <p class="small">披露易标题: 08/06/2026 16:42: POLL RESULTS OF THE ANNUAL GENERAL MEETING HELD ON 8 JUNE 2026 || 03/06/2026 17:18: MONTHLY RETURN OF EQUITY ISSUER ON MOVEMENTS IN SECURITIES FOR THE MONTH ENDED 31 MAY 2026 || 01/06/2026 16:30: CONNECTED TRANSACTION IN RELATION TO RENEWAL OF TENANCY AGREEMENTS || 26/05/2026 17:01: JOINT ANNOUNCEMENT - DELAY IN DESPATCH OF COMPOSITE DOCUMENT RELATING TO MANDATORY UNCONDITIONAL CASH OFFERS BY RAINBOW CAPITAL (HK) LIMITED FOR AND ON BEHALF OF L.V.E.P. HOLDINGS LIMITED TO ACQUIRE ALL THE ISSUED SHARES OF, AND TO CANCEL ALL THE OUTSTANDING OPTIONS OF, MS GROUP HOLDINGS LIMITED (OTHER THAN THE EXCLUDED SHARES AND THE EXCLUDED OPTIONS)</p>
+      <details class="detail">
+        <summary><span class="closed-label">展开详情</span><span class="open-label">收起详情</span></summary>
+        <div class="detail-body">
+          <div class="detail-grid">
+            <div><label>最新报告期</label><strong>20251231</strong></div>
+            <div><label>最近一年利润</label><strong>0.24亿</strong></div>
+            <div><label>一次性/其他收益占比</label><strong>-2.3%</strong></div>
+            <div><label>最近派息/利润</label><strong>152.6%</strong></div>
+            <div><label>DPS估算收益率</label><strong></strong></div>
+            <div><label>流动性</label><strong>极低</strong></div>
+          </div>
+          
+          <div class="notice-title">近期披露易标题</div>
+          <ul class="notices"><li>08/06/2026 16:42: POLL RESULTS OF THE ANNUAL GENERAL MEETING HELD ON 8 JUNE 2026</li><li>03/06/2026 17:18: MONTHLY RETURN OF EQUITY ISSUER ON MOVEMENTS IN SECURITIES FOR THE MONTH ENDED 31 MAY 2026</li><li>01/06/2026 16:30: CONNECTED TRANSACTION IN RELATION TO RENEWAL OF TENANCY AGREEMENTS</li><li>26/05/2026 17:01: JOINT ANNOUNCEMENT - DELAY IN DESPATCH OF COMPOSITE DOCUMENT RELATING TO MANDATORY UNCONDITIONAL CASH OFFERS BY RAINBOW CAPITAL (HK) LIMITED FOR AND ON BEHALF...</li></ul>
+        </div>
       </details>
     </article>
     
@@ -94,10 +116,21 @@ section h2 { font-size:17px; margin:22px 0 8px; }
         <div><label>CFO/利润</label><strong>173.1%</strong></div>
       </div>
       <div class="tags"><span class="tag">现金类资产&gt;总负债</span><span class="tag">近年盈利稳定</span><span class="tag">经营现金流稳定</span><span class="tag">股东回报率较高</span></div>
-      <details>
-        <summary>更多</summary>
-        <p>最新报告期: 20251231; 最近一年利润: 6.81亿; 一次性/其他收益占比: 12.1%; 近4年派息年数: 4.0; 最近派息/利润: 70.3%</p>
-        <p class="small">披露易标题: 01/06/2026 18:09: MONTHLY RETURN OF EQUITY ISSUER ON MOVEMENTS IN SECURITIES FOR THE MONTH ENDED 31 MAY 2026</p>
+      <details class="detail">
+        <summary><span class="closed-label">展开详情</span><span class="open-label">收起详情</span></summary>
+        <div class="detail-body">
+          <div class="detail-grid">
+            <div><label>最新报告期</label><strong>20251231</strong></div>
+            <div><label>最近一年利润</label><strong>6.81亿</strong></div>
+            <div><label>一次性/其他收益占比</label><strong>12.1%</strong></div>
+            <div><label>最近派息/利润</label><strong>70.3%</strong></div>
+            <div><label>DPS估算收益率</label><strong></strong></div>
+            <div><label>流动性</label><strong>中低</strong></div>
+          </div>
+          
+          <div class="notice-title">近期披露易标题</div>
+          <ul class="notices"><li>01/06/2026 18:09: MONTHLY RETURN OF EQUITY ISSUER ON MOVEMENTS IN SECURITIES FOR THE MONTH ENDED 31 MAY 2026</li></ul>
+        </div>
       </details>
     </article>
     
@@ -117,19 +150,61 @@ section h2 { font-size:17px; margin:22px 0 8px; }
         <div><label>CFO/利润</label><strong>145.6%</strong></div>
       </div>
       <div class="tags"><span class="tag">现金类资产&gt;总负债</span><span class="tag">近年盈利稳定</span><span class="tag">经营现金流稳定</span><span class="tag">股东回报率较高</span></div>
-      <details>
-        <summary>更多</summary>
-        <p>最新报告期: 20251231; 最近一年利润: 1.07亿; 一次性/其他收益占比: -15.5%; 近4年派息年数: 4.0; 最近派息/利润: 67.8%</p>
-        <p class="small">披露易标题: 12/06/2026 20:02: Articles of Association || 12/06/2026 19:59: (UPDATED) Final Dividend for the Year Ended 31 December 2025 || 12/06/2026 19:57: POLL RESULTS OF THE ANNUAL GENERAL MEETING
-HELD ON 12 JUNE 2026&amp;#x3b;
-DISTRIBUTION OF ANNUAL DIVIDEND&amp;#x3b; AND
-AMENDMENTS TO THE ARTICLES OF ASSOCIATION || 03/06/2026 17:50: Monthly Return of Equity Issuer on Movements in Securities for the month ended 31 May 2026</p>
+      <details class="detail">
+        <summary><span class="closed-label">展开详情</span><span class="open-label">收起详情</span></summary>
+        <div class="detail-body">
+          <div class="detail-grid">
+            <div><label>最新报告期</label><strong>20251231</strong></div>
+            <div><label>最近一年利润</label><strong>1.07亿</strong></div>
+            <div><label>一次性/其他收益占比</label><strong>-15.5%</strong></div>
+            <div><label>最近派息/利润</label><strong>67.8%</strong></div>
+            <div><label>DPS估算收益率</label><strong></strong></div>
+            <div><label>流动性</label><strong>低</strong></div>
+          </div>
+          
+          <div class="notice-title">近期披露易标题</div>
+          <ul class="notices"><li>12/06/2026 20:02: Articles of Association</li><li>12/06/2026 19:59: (UPDATED) Final Dividend for the Year Ended 31 December 2025</li><li>12/06/2026 19:57: POLL RESULTS OF THE ANNUAL GENERAL MEETING HELD ON 12 JUNE 2026; DISTRIBUTION OF ANNUAL DIVIDEND; AND AMENDMENTS TO THE ARTICLES OF ASSOCIATION</li><li>03/06/2026 17:50: Monthly Return of Equity Issuer on Movements in Securities for the month ended 31 May 2026</li></ul>
+        </div>
       </details>
     </article>
     
     <article class="card">
       <div class="card-head">
-        <div><span class="rank">#4</span> <b>06826.HK</b> <span>昊海生物科技</span></div>
+        <div><span class="rank">#4</span> <b>02518.HK</b> <span>汽车之家-S</span></div>
+        <div class="score">127.5</div>
+      </div>
+      <div class="grid">
+        <div><label>市值</label><strong>176.25亿</strong></div>
+        <div><label>成交额</label><strong>0.01亿</strong></div>
+        <div><label>PB/PE</label><strong>0.68 / 13.98</strong></div>
+        <div><label>现金/负债</label><strong>479.4%</strong></div>
+        <div><label>净现金/市值</label><strong>86.4%</strong></div>
+        <div><label>股东回报率</label><strong>14.4%</strong></div>
+        <div><label>近4年盈利</label><strong>4/4</strong></div>
+        <div><label>CFO/利润</label><strong>61.6%</strong></div>
+      </div>
+      <div class="tags"><span class="tag">现金类资产&gt;总负债</span><span class="tag">近年盈利稳定</span><span class="tag">经营现金流稳定</span><span class="tag">股东回报率较高</span></div>
+      <details class="detail">
+        <summary><span class="closed-label">展开详情</span><span class="open-label">收起详情</span></summary>
+        <div class="detail-body">
+          <div class="detail-grid">
+            <div><label>最新报告期</label><strong>20251231</strong></div>
+            <div><label>最近一年利润</label><strong>14.43亿</strong></div>
+            <div><label>一次性/其他收益占比</label><strong>14.0%</strong></div>
+            <div><label>最近派息/利润</label><strong>102.7%</strong></div>
+            <div><label>DPS估算收益率</label><strong></strong></div>
+            <div><label>流动性</label><strong>低</strong></div>
+          </div>
+          
+          <div class="notice-title">近期披露易标题</div>
+          <ul class="notices"><li>29/05/2026 20:05: OVERSEAS REGULATORY ANNOUNCEMENT</li><li>29/05/2026 19:05: INSIDE INFORMATION ADOPTION OF THE 2026 SHARE INCENTIVE PLAN</li><li>28/05/2026 18:51: PROXY FORM FOR ANNUAL GENERAL MEETING</li><li>28/05/2026 18:45: NOTICE OF ANNUAL GENERAL MEETING</li></ul>
+        </div>
+      </details>
+    </article>
+    
+    <article class="card">
+      <div class="card-head">
+        <div><span class="rank">#5</span> <b>06826.HK</b> <span>昊海生物科技</span></div>
         <div class="score">126.3</div>
       </div>
       <div class="grid">
@@ -142,17 +217,28 @@ AMENDMENTS TO THE ARTICLES OF ASSOCIATION || 03/06/2026 17:50: Monthly Return of
         <div><label>近4年盈利</label><strong>4/4</strong></div>
         <div><label>CFO/利润</label><strong>195.6%</strong></div>
       </div>
-      <div class="tags"><span class="tag">现金类资产&gt;总负债</span><span class="tag">近年盈利稳定</span><span class="tag">经营现金流稳定</span><span class="tag">一次性/其他收益占比较高</span><span class="tag">股东回报率较高</span><span class="tag danger">一次性/其他收益占比高</span></div>
-      <details>
-        <summary>更多</summary>
-        <p>最新报告期: 20251231; 最近一年利润: 2.51亿; 一次性/其他收益占比: 81.3%; 近4年派息年数: 4.0; 最近派息/利润: 112.5%</p>
-        <p class="small">披露易标题: 10/06/2026 20:34: An announcement has just been published by the issuer in the Chinese section of this website, a corresponding version of which may or may not be published in this section || 10/06/2026 20:29: An announcement has just been published by the issuer in the Chinese section of this website, a corresponding version of which may or may not be published in this section || 02/06/2026 20:36: An announcement has just been published by the issuer in the Chinese section of this website, a corresponding version of which may or may not be published in this section || 02/06/2026 15:36: Monthly Return of Equity Issuer on Movements in Securities for the Month ended 31 May 2026 || 01/06/2026 20:54: An announcement has just been published by the issuer in the Chinese section of this website, a corresponding version of which may or may not be published in this section || 29/05/2026 22:29: An announcement has just been published by the issuer in the Chinese section of this website, a corresponding version of which may or may not be published in this section || 29/05/2026 22:27: An announcement has just been published by the issuer in the Chinese section of this website, a corresponding version of which may or may not be published in this section || 29/05/2026 22:25: An announcement has just been published by the issuer in the Chinese section of this website, a corresponding version of which may or may not be published in this section</p>
+      <div class="tags"><span class="tag">现金类资产&gt;总负债</span><span class="tag">近年盈利稳定</span><span class="tag">经营现金流稳定</span><span class="tag danger">一次性/其他收益占比较高</span><span class="tag">股东回报率较高</span></div>
+      <details class="detail">
+        <summary><span class="closed-label">展开详情</span><span class="open-label">收起详情</span></summary>
+        <div class="detail-body">
+          <div class="detail-grid">
+            <div><label>最新报告期</label><strong>20251231</strong></div>
+            <div><label>最近一年利润</label><strong>2.51亿</strong></div>
+            <div><label>一次性/其他收益占比</label><strong>81.3%</strong></div>
+            <div><label>最近派息/利润</label><strong>112.5%</strong></div>
+            <div><label>DPS估算收益率</label><strong></strong></div>
+            <div><label>流动性</label><strong>中低</strong></div>
+          </div>
+          
+          <div class="notice-title">近期披露易标题</div>
+          <ul class="notices"><li>中文区公告 7 条，英文页未同步标题</li><li>02/06/2026 15:36: Monthly Return of Equity Issuer on Movements in Securities for the Month ended 31 May 2026</li></ul>
+        </div>
       </details>
     </article>
     
     <article class="card">
       <div class="card-head">
-        <div><span class="rank">#5</span> <b>00623.HK</b> <span>中视金桥</span></div>
+        <div><span class="rank">#6</span> <b>00623.HK</b> <span>中视金桥</span></div>
         <div class="score">126.2</div>
       </div>
       <div class="grid">
@@ -166,16 +252,27 @@ AMENDMENTS TO THE ARTICLES OF ASSOCIATION || 03/06/2026 17:50: Monthly Return of
         <div><label>CFO/利润</label><strong>49.3%</strong></div>
       </div>
       <div class="tags"><span class="tag">现金类资产&gt;总负债</span><span class="tag">近年盈利稳定</span><span class="tag">经营现金流稳定</span><span class="tag">股东回报率较高</span></div>
-      <details>
-        <summary>更多</summary>
-        <p>最新报告期: 20251231; 最近一年利润: 0.80亿; 一次性/其他收益占比: 5.7%; 近4年派息年数: 4.0; 最近派息/利润: 187.3%</p>
-        <p class="small">披露易标题: 18/06/2026 17:06: Next Day Disclosure Return || 17/06/2026 18:07: Next Day Disclosure Return || 16/06/2026 17:36: Next Day Disclosure Return || 15/06/2026 16:56: Next Day Disclosure Return || 12/06/2026 19:06: Next Day Disclosure Return || 11/06/2026 18:24: POLL RESULTS AT THE ANNUAL GENERAL MEETING HELD ON 11 JUNE 2026 || 11/06/2026 16:57: Next Day Disclosure Return || 10/06/2026 17:40: Next Day Disclosure Return</p>
+      <details class="detail">
+        <summary><span class="closed-label">展开详情</span><span class="open-label">收起详情</span></summary>
+        <div class="detail-body">
+          <div class="detail-grid">
+            <div><label>最新报告期</label><strong>20251231</strong></div>
+            <div><label>最近一年利润</label><strong>0.80亿</strong></div>
+            <div><label>一次性/其他收益占比</label><strong>5.7%</strong></div>
+            <div><label>最近派息/利润</label><strong>187.3%</strong></div>
+            <div><label>DPS估算收益率</label><strong></strong></div>
+            <div><label>流动性</label><strong>极低</strong></div>
+          </div>
+          
+          <div class="notice-title">近期披露易标题</div>
+          <ul class="notices"><li>18/06/2026 17:06: Next Day Disclosure Return</li><li>17/06/2026 18:07: Next Day Disclosure Return</li><li>16/06/2026 17:36: Next Day Disclosure Return</li><li>15/06/2026 16:56: Next Day Disclosure Return</li></ul>
+        </div>
       </details>
     </article>
     
     <article class="card">
       <div class="card-head">
-        <div><span class="rank">#6</span> <b>01180.HK</b> <span>汇彩控股</span></div>
+        <div><span class="rank">#7</span> <b>01180.HK</b> <span>汇彩控股</span></div>
         <div class="score">123.6</div>
       </div>
       <div class="grid">
@@ -189,17 +286,27 @@ AMENDMENTS TO THE ARTICLES OF ASSOCIATION || 03/06/2026 17:50: Monthly Return of
         <div><label>CFO/利润</label><strong>179.1%</strong></div>
       </div>
       <div class="tags"><span class="tag">现金类资产&gt;总负债</span><span class="tag">近年盈利稳定</span><span class="tag">经营现金流稳定</span><span class="tag">股东回报率较高</span></div>
-      <details>
-        <summary>更多</summary>
-        <p>最新报告期: 20251231; 最近一年利润: 1.28亿; 一次性/其他收益占比: 18.6%; 近4年派息年数: 2.0; 最近派息/利润: 140.4%</p>
-        <p class="small">披露易标题: 12/06/2026 19:35: LIST OF DIRECTORS AND THEIR ROLE AND FUNCTION || 12/06/2026 19:33: APPOINTMENT OF INDEPENDENT NON-EXECUTIVE DIRECTOR AND
-MEMBER OF AUDIT COMMITTEE || 01/06/2026 16:46: Monthly Return of Equity Issuer on Movements in Securities for the month ended 31 May 2026</p>
+      <details class="detail">
+        <summary><span class="closed-label">展开详情</span><span class="open-label">收起详情</span></summary>
+        <div class="detail-body">
+          <div class="detail-grid">
+            <div><label>最新报告期</label><strong>20251231</strong></div>
+            <div><label>最近一年利润</label><strong>1.28亿</strong></div>
+            <div><label>一次性/其他收益占比</label><strong>18.6%</strong></div>
+            <div><label>最近派息/利润</label><strong>140.4%</strong></div>
+            <div><label>DPS估算收益率</label><strong></strong></div>
+            <div><label>流动性</label><strong>极低</strong></div>
+          </div>
+          
+          <div class="notice-title">近期披露易标题</div>
+          <ul class="notices"><li>12/06/2026 19:35: LIST OF DIRECTORS AND THEIR ROLE AND FUNCTION</li><li>12/06/2026 19:33: APPOINTMENT OF INDEPENDENT NON-EXECUTIVE DIRECTOR AND MEMBER OF AUDIT COMMITTEE</li><li>01/06/2026 16:46: Monthly Return of Equity Issuer on Movements in Securities for the month ended 31 May 2026</li></ul>
+        </div>
       </details>
     </article>
     
     <article class="card">
       <div class="card-head">
-        <div><span class="rank">#7</span> <b>03315.HK</b> <span>金邦达宝嘉</span></div>
+        <div><span class="rank">#8</span> <b>03315.HK</b> <span>金邦达宝嘉</span></div>
         <div class="score">121.8</div>
       </div>
       <div class="grid">
@@ -212,17 +319,62 @@ MEMBER OF AUDIT COMMITTEE || 01/06/2026 16:46: Monthly Return of Equity Issuer o
         <div><label>近4年盈利</label><strong>4/4</strong></div>
         <div><label>CFO/利润</label><strong>399.7%</strong></div>
       </div>
-      <div class="tags"><span class="tag">现金类资产&gt;总负债</span><span class="tag">近年盈利稳定</span><span class="tag">经营现金流稳定</span><span class="tag">一次性/其他收益占比较高</span><span class="tag">股东回报率较高</span><span class="tag danger">披露易: Profit warning</span><span class="tag danger">披露易: Inside information</span><span class="tag danger">一次性/其他收益占比高</span></div>
-      <details>
-        <summary>更多</summary>
-        <p>最新报告期: 20251231; 最近一年利润: 0.40亿; 一次性/其他收益占比: 87.4%; 近4年派息年数: 4.0; 最近派息/利润: 100.1%</p>
-        <p class="small">披露易标题: 04/06/2026 16:36: MONTHLY RETURN OF EQUITY ISSUER ON MOVEMENTS IN SECURITIES FOR THE MONTH ENDED 31 MAY 2026 || 25/05/2026 18:46: PROFIT WARNING</p>
+      <div class="tags"><span class="tag">现金类资产&gt;总负债</span><span class="tag">近年盈利稳定</span><span class="tag">经营现金流稳定</span><span class="tag danger">一次性/其他收益占比较高</span><span class="tag">股东回报率较高</span></div>
+      <details class="detail">
+        <summary><span class="closed-label">展开详情</span><span class="open-label">收起详情</span></summary>
+        <div class="detail-body">
+          <div class="detail-grid">
+            <div><label>最新报告期</label><strong>20251231</strong></div>
+            <div><label>最近一年利润</label><strong>0.40亿</strong></div>
+            <div><label>一次性/其他收益占比</label><strong>87.4%</strong></div>
+            <div><label>最近派息/利润</label><strong>100.1%</strong></div>
+            <div><label>DPS估算收益率</label><strong></strong></div>
+            <div><label>流动性</label><strong>低</strong></div>
+          </div>
+          
+          <div class="notice-title">近期披露易标题</div>
+          <ul class="notices"><li>04/06/2026 16:36: MONTHLY RETURN OF EQUITY ISSUER ON MOVEMENTS IN SECURITIES FOR THE MONTH ENDED 31 MAY 2026</li><li>25/05/2026 18:46: PROFIT WARNING</li></ul>
+        </div>
       </details>
     </article>
     
     <article class="card">
       <div class="card-head">
-        <div><span class="rank">#8</span> <b>01778.HK</b> <span>彩生活</span></div>
+        <div><span class="rank">#9</span> <b>02877.HK</b> <span>神威药业</span></div>
+        <div class="score">121.5</div>
+      </div>
+      <div class="grid">
+        <div><label>市值</label><strong>61.86亿</strong></div>
+        <div><label>成交额</label><strong>0.10亿</strong></div>
+        <div><label>PB/PE</label><strong>0.69 / 5.88</strong></div>
+        <div><label>现金/负债</label><strong>543.4%</strong></div>
+        <div><label>净现金/市值</label><strong>194.6%</strong></div>
+        <div><label>股东回报率</label><strong>5.7%</strong></div>
+        <div><label>近4年盈利</label><strong>4/4</strong></div>
+        <div><label>CFO/利润</label><strong>123.4%</strong></div>
+      </div>
+      <div class="tags"><span class="tag">现金类资产&gt;总负债</span><span class="tag">近年盈利稳定</span><span class="tag">经营现金流稳定</span><span class="tag danger">一次性/其他收益占比较高</span><span class="tag">股东回报率较高</span></div>
+      <details class="detail">
+        <summary><span class="closed-label">展开详情</span><span class="open-label">收起详情</span></summary>
+        <div class="detail-body">
+          <div class="detail-grid">
+            <div><label>最新报告期</label><strong>20251231</strong></div>
+            <div><label>最近一年利润</label><strong>9.50亿</strong></div>
+            <div><label>一次性/其他收益占比</label><strong>62.4%</strong></div>
+            <div><label>最近派息/利润</label><strong>37.4%</strong></div>
+            <div><label>DPS估算收益率</label><strong></strong></div>
+            <div><label>流动性</label><strong>中低</strong></div>
+          </div>
+          
+          <div class="notice-title">近期披露易标题</div>
+          <ul class="notices"><li>01/06/2026 10:35: Monthly Return of Equity Issuer on Movements in Securities for the month ended 31 May 2026</li><li>28/05/2026 17:12: POLL RESULTS OF THE ANNUAL GENERAL MEETING HELD ON 28 MAY 2026</li><li>07/05/2026 17:12: TURNOVER FOR THE FIRST QUARTER OF 2026</li><li>30/04/2026 16:32: Monthly Return of Equity Issuer on Movements in Securities for the month ended 30 April 2026</li></ul>
+        </div>
+      </details>
+    </article>
+    
+    <article class="card">
+      <div class="card-head">
+        <div><span class="rank">#10</span> <b>01778.HK</b> <span>彩生活</span></div>
         <div class="score">121.3</div>
       </div>
       <div class="grid">
@@ -236,21 +388,61 @@ MEMBER OF AUDIT COMMITTEE || 01/06/2026 16:46: Monthly Return of Equity Issuer o
         <div><label>CFO/利润</label><strong>510.5%</strong></div>
       </div>
       <div class="tags"><span class="tag">现金类资产&gt;总负债</span><span class="tag">近年盈利稳定</span><span class="tag">经营现金流稳定</span><span class="tag">股东回报率较高</span></div>
-      <details>
-        <summary>更多</summary>
-        <p>最新报告期: 20251231; 最近一年利润: 0.24亿; 一次性/其他收益占比: 18.8%; 近4年派息年数: 4.0; 最近派息/利润: 71.9%</p>
-        <p class="small">披露易标题: 18/06/2026 18:56: LIST OF DIRECTORS AND THEIR ROLES AND FUNCTIONS || 18/06/2026 18:54: APPOINTMENT OF NON-EXECUTIVE DIRECTORS || 16/06/2026 19:18: POLL RESULTS OF THE ANNUAL GENERAL MEETING
-HELD ON 16 JUNE 2026 || 15/06/2026 19:04: LIST OF DIRECTORS AND THEIR ROLES AND FUNCTIONS || 15/06/2026 19:02: RESIGNATION OF NON-EXECUTIVE DIRECTOR
-AND
-WITHDRAWAL OF RESOLUTION AT THE
-ANNUAL GENERAL MEETING TO BE
-HELD ON TUESDAY, 16 JUNE 2026 || 08/06/2026 10:55: Monthly Return of Equity Issuer on Movements in Securities for the month ended 31 May 2026</p>
+      <details class="detail">
+        <summary><span class="closed-label">展开详情</span><span class="open-label">收起详情</span></summary>
+        <div class="detail-body">
+          <div class="detail-grid">
+            <div><label>最新报告期</label><strong>20251231</strong></div>
+            <div><label>最近一年利润</label><strong>0.24亿</strong></div>
+            <div><label>一次性/其他收益占比</label><strong>18.8%</strong></div>
+            <div><label>最近派息/利润</label><strong>71.9%</strong></div>
+            <div><label>DPS估算收益率</label><strong></strong></div>
+            <div><label>流动性</label><strong>极低</strong></div>
+          </div>
+          
+          <div class="notice-title">近期披露易标题</div>
+          <ul class="notices"><li>18/06/2026 18:56: LIST OF DIRECTORS AND THEIR ROLES AND FUNCTIONS</li><li>18/06/2026 18:54: APPOINTMENT OF NON-EXECUTIVE DIRECTORS</li><li>16/06/2026 19:18: POLL RESULTS OF THE ANNUAL GENERAL MEETING HELD ON 16 JUNE 2026</li><li>15/06/2026 19:04: LIST OF DIRECTORS AND THEIR ROLES AND FUNCTIONS</li></ul>
+        </div>
       </details>
     </article>
     
     <article class="card">
       <div class="card-head">
-        <div><span class="rank">#9</span> <b>02469.HK</b> <span>粉笔</span></div>
+        <div><span class="rank">#11</span> <b>02555.HK</b> <span>茶百道</span></div>
+        <div class="score">120.6</div>
+      </div>
+      <div class="grid">
+        <div><label>市值</label><strong>70.34亿</strong></div>
+        <div><label>成交额</label><strong>0.07亿</strong></div>
+        <div><label>PB/PE</label><strong>1.60 / 7.89</strong></div>
+        <div><label>现金/负债</label><strong>382.4%</strong></div>
+        <div><label>净现金/市值</label><strong>32.5%</strong></div>
+        <div><label>股东回报率</label><strong>15.5%</strong></div>
+        <div><label>近4年盈利</label><strong>4/4</strong></div>
+        <div><label>CFO/利润</label><strong>84.5%</strong></div>
+      </div>
+      <div class="tags"><span class="tag">现金类资产&gt;总负债</span><span class="tag">近年盈利稳定</span><span class="tag">经营现金流稳定</span><span class="tag">股东回报率较高</span></div>
+      <details class="detail">
+        <summary><span class="closed-label">展开详情</span><span class="open-label">收起详情</span></summary>
+        <div class="detail-body">
+          <div class="detail-grid">
+            <div><label>最新报告期</label><strong>20251231</strong></div>
+            <div><label>最近一年利润</label><strong>8.05亿</strong></div>
+            <div><label>一次性/其他收益占比</label><strong>18.6%</strong></div>
+            <div><label>最近派息/利润</label><strong>135.8%</strong></div>
+            <div><label>DPS估算收益率</label><strong></strong></div>
+            <div><label>流动性</label><strong>中低</strong></div>
+          </div>
+          
+          <div class="notice-title">近期披露易标题</div>
+          <ul class="notices"><li>03/06/2026 16:37: Monthly Return of Equity Issuer on Movements in Securities for the Month Ended 31 May 2026</li><li>21/05/2026 21:58: Articles of Association</li><li>21/05/2026 21:50: LIST OF DIRECTORS AND THEIR ROLES AND FUNCTIONS</li><li>21/05/2026 21:42: FINAL DIVIDEND FOR THE YEAR ENDED 31 DECEMBER 2025 (UPDATED)</li></ul>
+        </div>
+      </details>
+    </article>
+    
+    <article class="card">
+      <div class="card-head">
+        <div><span class="rank">#12</span> <b>02469.HK</b> <span>粉笔</span></div>
         <div class="score">120.5</div>
       </div>
       <div class="grid">
@@ -263,17 +455,28 @@ HELD ON TUESDAY, 16 JUNE 2026 || 08/06/2026 10:55: Monthly Return of Equity Issu
         <div><label>近4年盈利</label><strong>3/4</strong></div>
         <div><label>CFO/利润</label><strong>114.2%</strong></div>
       </div>
-      <div class="tags"><span class="tag">现金类资产&gt;总负债</span><span class="tag">近年盈利稳定</span><span class="tag">经营现金流稳定</span><span class="tag">股东回报率较高</span><span class="tag danger">披露易: Inside information</span></div>
-      <details>
-        <summary>更多</summary>
-        <p>最新报告期: 20251231; 最近一年利润: 1.98亿; 一次性/其他收益占比: 14.4%; 近4年派息年数: 0.0; 最近派息/利润: </p>
-        <p class="small">披露易标题: 04/06/2026 16:40: Monthly Return of Equity Issuer on Movements in Securities for the month ended 31 May 2026 || 02/06/2026 18:20: SUPPLEMENTARY ANNOUNCEMENT IN RELATION TO CHANGE OF CONCERT PARTY ARRANGEMENT</p>
+      <div class="tags"><span class="tag">现金类资产&gt;总负债</span><span class="tag">近年盈利稳定</span><span class="tag">经营现金流稳定</span><span class="tag">股东回报率较高</span></div>
+      <details class="detail">
+        <summary><span class="closed-label">展开详情</span><span class="open-label">收起详情</span></summary>
+        <div class="detail-body">
+          <div class="detail-grid">
+            <div><label>最新报告期</label><strong>20251231</strong></div>
+            <div><label>最近一年利润</label><strong>1.98亿</strong></div>
+            <div><label>一次性/其他收益占比</label><strong>14.4%</strong></div>
+            <div><label>最近派息/利润</label><strong></strong></div>
+            <div><label>DPS估算收益率</label><strong></strong></div>
+            <div><label>流动性</label><strong>低</strong></div>
+          </div>
+          
+          <div class="notice-title">近期披露易标题</div>
+          <ul class="notices"><li>04/06/2026 16:40: Monthly Return of Equity Issuer on Movements in Securities for the month ended 31 May 2026</li><li>02/06/2026 18:20: SUPPLEMENTARY ANNOUNCEMENT IN RELATION TO CHANGE OF CONCERT PARTY ARRANGEMENT</li></ul>
+        </div>
       </details>
     </article>
     
     <article class="card">
       <div class="card-head">
-        <div><span class="rank">#10</span> <b>00239.HK</b> <span>白花油</span></div>
+        <div><span class="rank">#13</span> <b>00239.HK</b> <span>白花油</span></div>
         <div class="score">119.6</div>
       </div>
       <div class="grid">
@@ -287,16 +490,27 @@ HELD ON TUESDAY, 16 JUNE 2026 || 08/06/2026 10:55: Monthly Return of Equity Issu
         <div><label>CFO/利润</label><strong>123.5%</strong></div>
       </div>
       <div class="tags"><span class="tag">现金类资产&gt;总负债</span><span class="tag">近年盈利稳定</span><span class="tag">经营现金流稳定</span><span class="tag">股东回报率较高</span></div>
-      <details>
-        <summary>更多</summary>
-        <p>最新报告期: 20251231; 最近一年利润: 0.83亿; 一次性/其他收益占比: -1.6%; 近4年派息年数: 4.0; 最近派息/利润: 63.1%</p>
-        <p class="small">披露易标题: 02/06/2026 17:26: Memorandum of Association and Bye-laws (as amended by special resolution passed on 2 June 2026) || 02/06/2026 17:07: POLL RESULTS OF ANNUAL GENERAL MEETING HELD ON 2 JUNE 2026 || 01/06/2026 15:21: MONTHLY RETURN OF EQUITY ISSUER ON MOVEMENTS IN SECURITIES FOR THE MONTH ENDED 31 MAY 2026</p>
+      <details class="detail">
+        <summary><span class="closed-label">展开详情</span><span class="open-label">收起详情</span></summary>
+        <div class="detail-body">
+          <div class="detail-grid">
+            <div><label>最新报告期</label><strong>20251231</strong></div>
+            <div><label>最近一年利润</label><strong>0.83亿</strong></div>
+            <div><label>一次性/其他收益占比</label><strong>-1.6%</strong></div>
+            <div><label>最近派息/利润</label><strong>63.1%</strong></div>
+            <div><label>DPS估算收益率</label><strong></strong></div>
+            <div><label>流动性</label><strong>极低</strong></div>
+          </div>
+          
+          <div class="notice-title">近期披露易标题</div>
+          <ul class="notices"><li>02/06/2026 17:26: Memorandum of Association and Bye-laws (as amended by special resolution passed on 2 June 2026)</li><li>02/06/2026 17:07: POLL RESULTS OF ANNUAL GENERAL MEETING HELD ON 2 JUNE 2026</li><li>01/06/2026 15:21: MONTHLY RETURN OF EQUITY ISSUER ON MOVEMENTS IN SECURITIES FOR THE MONTH ENDED 31 MAY 2026</li></ul>
+        </div>
       </details>
     </article>
     
     <article class="card">
       <div class="card-head">
-        <div><span class="rank">#11</span> <b>01425.HK</b> <span>捷隆控股</span></div>
+        <div><span class="rank">#14</span> <b>01425.HK</b> <span>捷隆控股</span></div>
         <div class="score">119.5</div>
       </div>
       <div class="grid">
@@ -310,16 +524,27 @@ HELD ON TUESDAY, 16 JUNE 2026 || 08/06/2026 10:55: Monthly Return of Equity Issu
         <div><label>CFO/利润</label><strong>108.3%</strong></div>
       </div>
       <div class="tags"><span class="tag">现金类资产&gt;总负债</span><span class="tag">近年盈利稳定</span><span class="tag">经营现金流稳定</span><span class="tag">股东回报率较高</span></div>
-      <details>
-        <summary>更多</summary>
-        <p>最新报告期: 20251231; 最近一年利润: 1.51亿; 一次性/其他收益占比: 17.7%; 近4年派息年数: 4.0; 最近派息/利润: 42.0%</p>
-        <p class="small">披露易标题: 02/06/2026 15:43: MONTHLY RETURN OF EQUITY ISSUER ON MOVEMENTS IN SECURITIES FOR THE MONTH ENDED 31 MAY 2026</p>
+      <details class="detail">
+        <summary><span class="closed-label">展开详情</span><span class="open-label">收起详情</span></summary>
+        <div class="detail-body">
+          <div class="detail-grid">
+            <div><label>最新报告期</label><strong>20251231</strong></div>
+            <div><label>最近一年利润</label><strong>1.51亿</strong></div>
+            <div><label>一次性/其他收益占比</label><strong>17.7%</strong></div>
+            <div><label>最近派息/利润</label><strong>42.0%</strong></div>
+            <div><label>DPS估算收益率</label><strong></strong></div>
+            <div><label>流动性</label><strong>极低</strong></div>
+          </div>
+          
+          <div class="notice-title">近期披露易标题</div>
+          <ul class="notices"><li>02/06/2026 15:43: MONTHLY RETURN OF EQUITY ISSUER ON MOVEMENTS IN SECURITIES FOR THE MONTH ENDED 31 MAY 2026</li></ul>
+        </div>
       </details>
     </article>
     
     <article class="card">
       <div class="card-head">
-        <div><span class="rank">#12</span> <b>01669.HK</b> <span>环球信贷集团</span></div>
+        <div><span class="rank">#15</span> <b>01669.HK</b> <span>环球信贷集团</span></div>
         <div class="score">119.3</div>
       </div>
       <div class="grid">
@@ -333,16 +558,27 @@ HELD ON TUESDAY, 16 JUNE 2026 || 08/06/2026 10:55: Monthly Return of Equity Issu
         <div><label>CFO/利润</label><strong>533.0%</strong></div>
       </div>
       <div class="tags"><span class="tag">现金类资产&gt;总负债</span><span class="tag">近年盈利稳定</span><span class="tag">经营现金流稳定</span><span class="tag">股东回报率较高</span></div>
-      <details>
-        <summary>更多</summary>
-        <p>最新报告期: 20251231; 最近一年利润: 0.47亿; 一次性/其他收益占比: 14.0%; 近4年派息年数: 4.0; 最近派息/利润: 91.9%</p>
-        <p class="small">披露易标题: 01/06/2026 18:40: Monthly Return of Equity Issuer on Movements in Securities for the month ended 31 May 2026 || 01/06/2026 18:37: List of Directors and their Roles and Functions || 01/06/2026 18:35: Retirement and Appointment of Independent Non-Executive Director and Change in Composition of Board Committees || 01/06/2026 18:32: Fourth Amended and Restated Memorandum and Articles of Association || 01/06/2026 18:29: Poll Results of Annual General Meeting Held on 1 June 2026 and Payment of Final Dividend and Special Final Dividend</p>
+      <details class="detail">
+        <summary><span class="closed-label">展开详情</span><span class="open-label">收起详情</span></summary>
+        <div class="detail-body">
+          <div class="detail-grid">
+            <div><label>最新报告期</label><strong>20251231</strong></div>
+            <div><label>最近一年利润</label><strong>0.47亿</strong></div>
+            <div><label>一次性/其他收益占比</label><strong>14.0%</strong></div>
+            <div><label>最近派息/利润</label><strong>91.9%</strong></div>
+            <div><label>DPS估算收益率</label><strong></strong></div>
+            <div><label>流动性</label><strong>低</strong></div>
+          </div>
+          
+          <div class="notice-title">近期披露易标题</div>
+          <ul class="notices"><li>01/06/2026 18:40: Monthly Return of Equity Issuer on Movements in Securities for the month ended 31 May 2026</li><li>01/06/2026 18:37: List of Directors and their Roles and Functions</li><li>01/06/2026 18:35: Retirement and Appointment of Independent Non-Executive Director and Change in Composition of Board Committees</li><li>01/06/2026 18:32: Fourth Amended and Restated Memorandum and Articles of Association</li></ul>
+        </div>
       </details>
     </article>
     
     <article class="card">
       <div class="card-head">
-        <div><span class="rank">#13</span> <b>01666.HK</b> <span>同仁堂科技</span></div>
+        <div><span class="rank">#16</span> <b>01666.HK</b> <span>同仁堂科技</span></div>
         <div class="score">118.7</div>
       </div>
       <div class="grid">
@@ -356,16 +592,61 @@ HELD ON TUESDAY, 16 JUNE 2026 || 08/06/2026 10:55: Monthly Return of Equity Issu
         <div><label>CFO/利润</label><strong>394.3%</strong></div>
       </div>
       <div class="tags"><span class="tag">现金类资产&gt;总负债</span><span class="tag">近年盈利稳定</span><span class="tag">经营现金流稳定</span><span class="tag">股东回报率较高</span></div>
-      <details>
-        <summary>更多</summary>
-        <p>最新报告期: 20251231; 最近一年利润: 3.96亿; 一次性/其他收益占比: -0.9%; 近4年派息年数: 4.0; 最近派息/利润: 120.0%</p>
-        <p class="small">披露易标题: 12/06/2026 17:41: (Updated) FINAL DIVIDEND FOR THE YEAR ENDED 31 DECEMBER 2025 || 12/06/2026 17:36: The Articles of Association || 12/06/2026 17:33: POLL RESULTS OF 2025 ANNUAL GENERAL MEETING HELD ON FRIDAY, 12 JUNE 2026 AND PAYMENT OF THE FINAL DIVIDEND || 01/06/2026 08:45: Monthly Return for the month ended 31 May 2026 || 26/05/2026 17:54: VOLUNTARY ANNOUNCEMENT RECEIVING THE CERTIFICATE OF REGISTRATION OF PROPRIETARY CHINESE MEDICINE</p>
+      <details class="detail">
+        <summary><span class="closed-label">展开详情</span><span class="open-label">收起详情</span></summary>
+        <div class="detail-body">
+          <div class="detail-grid">
+            <div><label>最新报告期</label><strong>20251231</strong></div>
+            <div><label>最近一年利润</label><strong>3.96亿</strong></div>
+            <div><label>一次性/其他收益占比</label><strong>-0.9%</strong></div>
+            <div><label>最近派息/利润</label><strong>120.0%</strong></div>
+            <div><label>DPS估算收益率</label><strong></strong></div>
+            <div><label>流动性</label><strong>中低</strong></div>
+          </div>
+          
+          <div class="notice-title">近期披露易标题</div>
+          <ul class="notices"><li>12/06/2026 17:41: (Updated) FINAL DIVIDEND FOR THE YEAR ENDED 31 DECEMBER 2025</li><li>12/06/2026 17:36: The Articles of Association</li><li>12/06/2026 17:33: POLL RESULTS OF 2025 ANNUAL GENERAL MEETING HELD ON FRIDAY, 12 JUNE 2026 AND PAYMENT OF THE FINAL DIVIDEND</li><li>01/06/2026 08:45: Monthly Return for the month ended 31 May 2026</li></ul>
+        </div>
       </details>
     </article>
     
     <article class="card">
       <div class="card-head">
-        <div><span class="rank">#14</span> <b>02348.HK</b> <span>东瑞制药</span></div>
+        <div><span class="rank">#17</span> <b>00639.HK</b> <span>首钢资源</span></div>
+        <div class="score">118.3</div>
+      </div>
+      <div class="grid">
+        <div><label>市值</label><strong>121.68亿</strong></div>
+        <div><label>成交额</label><strong>0.18亿</strong></div>
+        <div><label>PB/PE</label><strong>0.74 / 19.24</strong></div>
+        <div><label>现金/负债</label><strong>210.1%</strong></div>
+        <div><label>净现金/市值</label><strong>31.1%</strong></div>
+        <div><label>股东回报率</label><strong>15.5%</strong></div>
+        <div><label>近4年盈利</label><strong>4/4</strong></div>
+        <div><label>CFO/利润</label><strong>145.0%</strong></div>
+      </div>
+      <div class="tags"><span class="tag">现金类资产&gt;总负债</span><span class="tag">近年盈利稳定</span><span class="tag">经营现金流稳定</span><span class="tag">股东回报率较高</span></div>
+      <details class="detail">
+        <summary><span class="closed-label">展开详情</span><span class="open-label">收起详情</span></summary>
+        <div class="detail-body">
+          <div class="detail-grid">
+            <div><label>最新报告期</label><strong>20251231</strong></div>
+            <div><label>最近一年利润</label><strong>5.71亿</strong></div>
+            <div><label>一次性/其他收益占比</label><strong>22.2%</strong></div>
+            <div><label>最近派息/利润</label><strong>329.4%</strong></div>
+            <div><label>DPS估算收益率</label><strong></strong></div>
+            <div><label>流动性</label><strong>中</strong></div>
+          </div>
+          
+          <div class="notice-title">近期披露易标题</div>
+          <ul class="notices"><li>03/06/2026 17:02: Monthly Return of Equity Issuer on Movements in Securities for the month ended 31/05/2026</li><li>04/05/2026 17:14: Monthly Return of Equity Issuer on Movements in Securities for the month ended 30/04/2026</li><li>30/04/2026 12:13: FORM OF PROXY FOR THE ANNUAL GENERAL MEETING TO BE HELD ON 25 JUNE 2026 AND ANY ADJOURNMENT THEREOF</li><li>30/04/2026 12:11: NOTICE OF ANNUAL GENERAL MEETING</li></ul>
+        </div>
+      </details>
+    </article>
+    
+    <article class="card">
+      <div class="card-head">
+        <div><span class="rank">#18</span> <b>02348.HK</b> <span>东瑞制药</span></div>
         <div class="score">118.0</div>
       </div>
       <div class="grid">
@@ -379,16 +660,27 @@ HELD ON TUESDAY, 16 JUNE 2026 || 08/06/2026 10:55: Monthly Return of Equity Issu
         <div><label>CFO/利润</label><strong>166.1%</strong></div>
       </div>
       <div class="tags"><span class="tag">现金类资产&gt;总负债</span><span class="tag">近年盈利稳定</span><span class="tag">经营现金流稳定</span><span class="tag">股东回报率较高</span></div>
-      <details>
-        <summary>更多</summary>
-        <p>最新报告期: 20251231; 最近一年利润: 2.14亿; 一次性/其他收益占比: 27.8%; 近4年派息年数: 4.0; 最近派息/利润: 62.1%</p>
-        <p class="small">披露易标题: 18/06/2026 22:37: DISCLOSEABLE TRANSACTION - INVESTMENT IN A LIMITED PARTNERSHIP || 02/06/2026 18:17: Monthly Return of Equity Issuer on Movements in Securities for the month ended 31 May 2026 || 29/05/2026 16:40: VOLUNTARY ANNOUNCEMENT - UPDATE ON PRODUCT DEVELOPMENT || 27/05/2026 16:31: VOLUNTARY ANNOUNCEMENT - UPDATE ON PRODUCT DEVELOPMENT || 22/05/2026 19:17: POLL RESULTS OF THE ANNUAL GENERAL MEETING HELD ON 22 MAY 2026</p>
+      <details class="detail">
+        <summary><span class="closed-label">展开详情</span><span class="open-label">收起详情</span></summary>
+        <div class="detail-body">
+          <div class="detail-grid">
+            <div><label>最新报告期</label><strong>20251231</strong></div>
+            <div><label>最近一年利润</label><strong>2.14亿</strong></div>
+            <div><label>一次性/其他收益占比</label><strong>27.8%</strong></div>
+            <div><label>最近派息/利润</label><strong>62.1%</strong></div>
+            <div><label>DPS估算收益率</label><strong></strong></div>
+            <div><label>流动性</label><strong>极低</strong></div>
+          </div>
+          
+          <div class="notice-title">近期披露易标题</div>
+          <ul class="notices"><li>18/06/2026 22:37: DISCLOSEABLE TRANSACTION - INVESTMENT IN A LIMITED PARTNERSHIP</li><li>02/06/2026 18:17: Monthly Return of Equity Issuer on Movements in Securities for the month ended 31 May 2026</li><li>29/05/2026 16:40: VOLUNTARY ANNOUNCEMENT - UPDATE ON PRODUCT DEVELOPMENT</li><li>27/05/2026 16:31: VOLUNTARY ANNOUNCEMENT - UPDATE ON PRODUCT DEVELOPMENT</li></ul>
+        </div>
       </details>
     </article>
     
     <article class="card">
       <div class="card-head">
-        <div><span class="rank">#15</span> <b>00046.HK</b> <span>科联系统</span></div>
+        <div><span class="rank">#19</span> <b>00046.HK</b> <span>科联系统</span></div>
         <div class="score">117.9</div>
       </div>
       <div class="grid">
@@ -402,16 +694,61 @@ HELD ON TUESDAY, 16 JUNE 2026 || 08/06/2026 10:55: Monthly Return of Equity Issu
         <div><label>CFO/利润</label><strong>197.5%</strong></div>
       </div>
       <div class="tags"><span class="tag">现金类资产&gt;总负债</span><span class="tag">近年盈利稳定</span><span class="tag">经营现金流稳定</span><span class="tag">股东回报率较高</span></div>
-      <details>
-        <summary>更多</summary>
-        <p>最新报告期: 20251231; 最近一年利润: 0.17亿; 一次性/其他收益占比: 11.4%; 近4年派息年数: 4.0; 最近派息/利润: 144.9%</p>
-        <p class="small">披露易标题: 18/06/2026 12:01: Bye-Laws || 17/06/2026 19:05: Poll Results of the Annual General Meeting || 01/06/2026 13:15: Monthly Return for the month ended 31 May 2026 || 27/05/2026 17:10: Resignation of Chief Executive Officer</p>
+      <details class="detail">
+        <summary><span class="closed-label">展开详情</span><span class="open-label">收起详情</span></summary>
+        <div class="detail-body">
+          <div class="detail-grid">
+            <div><label>最新报告期</label><strong>20251231</strong></div>
+            <div><label>最近一年利润</label><strong>0.17亿</strong></div>
+            <div><label>一次性/其他收益占比</label><strong>11.4%</strong></div>
+            <div><label>最近派息/利润</label><strong>144.9%</strong></div>
+            <div><label>DPS估算收益率</label><strong></strong></div>
+            <div><label>流动性</label><strong>极低</strong></div>
+          </div>
+          
+          <div class="notice-title">近期披露易标题</div>
+          <ul class="notices"><li>18/06/2026 12:01: Bye-Laws</li><li>17/06/2026 19:05: Poll Results of the Annual General Meeting</li><li>01/06/2026 13:15: Monthly Return for the month ended 31 May 2026</li><li>27/05/2026 17:10: Resignation of Chief Executive Officer</li></ul>
+        </div>
       </details>
     </article>
     
     <article class="card">
       <div class="card-head">
-        <div><span class="rank">#16</span> <b>03686.HK</b> <span>祈福生活服务</span></div>
+        <div><span class="rank">#20</span> <b>01571.HK</b> <span>信邦控股</span></div>
+        <div class="score">117.5</div>
+      </div>
+      <div class="grid">
+        <div><label>市值</label><strong>37.70亿</strong></div>
+        <div><label>成交额</label><strong>0.05亿</strong></div>
+        <div><label>PB/PE</label><strong>0.92 / 6.43</strong></div>
+        <div><label>现金/负债</label><strong>137.8%</strong></div>
+        <div><label>净现金/市值</label><strong>7.8%</strong></div>
+        <div><label>股东回报率</label><strong>12.3%</strong></div>
+        <div><label>近4年盈利</label><strong>4/4</strong></div>
+        <div><label>CFO/利润</label><strong>199.9%</strong></div>
+      </div>
+      <div class="tags"><span class="tag">现金类资产&gt;总负债</span><span class="tag">近年盈利稳定</span><span class="tag">经营现金流稳定</span><span class="tag">股东回报率较高</span></div>
+      <details class="detail">
+        <summary><span class="closed-label">展开详情</span><span class="open-label">收起详情</span></summary>
+        <div class="detail-body">
+          <div class="detail-grid">
+            <div><label>最新报告期</label><strong>20251231</strong></div>
+            <div><label>最近一年利润</label><strong>5.29亿</strong></div>
+            <div><label>一次性/其他收益占比</label><strong>16.7%</strong></div>
+            <div><label>最近派息/利润</label><strong>87.4%</strong></div>
+            <div><label>DPS估算收益率</label><strong></strong></div>
+            <div><label>流动性</label><strong>中低</strong></div>
+          </div>
+          
+          <div class="notice-title">近期披露易标题</div>
+          <ul class="notices"><li>18/06/2026 20:00: VOLUNTARY ANNOUNCEMENT - RECENT VEHICLE RECALL MADE BY A CUSTOMER</li><li>04/06/2026 20:08: AMENDED AND RESTATED MEMORANDUM AND ARTICLES OF ASSOCIATION</li><li>04/06/2026 20:07: POLL RESULTS OF THE ANNUAL GENERAL MEETING HELD ON 4 JUNE 2026</li><li>02/06/2026 20:17: Monthly Return of Equity Issuer on Movements in Securities for the month ended 31 May 2026</li></ul>
+        </div>
+      </details>
+    </article>
+    
+    <article class="card">
+      <div class="card-head">
+        <div><span class="rank">#21</span> <b>03686.HK</b> <span>祈福生活服务</span></div>
         <div class="score">117.0</div>
       </div>
       <div class="grid">
@@ -424,18 +761,62 @@ HELD ON TUESDAY, 16 JUNE 2026 || 08/06/2026 10:55: Monthly Return of Equity Issu
         <div><label>近4年盈利</label><strong>4/4</strong></div>
         <div><label>CFO/利润</label><strong>28.7%</strong></div>
       </div>
-      <div class="tags"><span class="tag">现金类资产&gt;总负债</span><span class="tag">近年盈利稳定</span><span class="tag">经营现金流稳定</span><span class="tag">一次性/其他收益占比较高</span><span class="tag">股东回报率较高</span><span class="tag danger">一次性/其他收益占比高</span></div>
-      <details>
-        <summary>更多</summary>
-        <p>最新报告期: 20251231; 最近一年利润: 2.85亿; 一次性/其他收益占比: 73.1%; 近4年派息年数: 4.0; 最近派息/利润: 36.9%</p>
-        <p class="small">披露易标题: 11/06/2026 20:42: DISCLOSEABLE TRANSACTION: FURTHER INVESTMENT IN PRECIOUS METALS || 01/06/2026 21:40: DISCLOSEABLE TRANSACTION:
-FURTHER INVESTMENT IN PRECIOUS METALS || 01/06/2026 15:29: MONTHLY RETURN OF EQUITY ISSUER ON MOVEMENTS IN SECURITIES FOR THE MONTH ENDED 31 MAY 2026</p>
+      <div class="tags"><span class="tag">现金类资产&gt;总负债</span><span class="tag">近年盈利稳定</span><span class="tag">经营现金流稳定</span><span class="tag danger">一次性/其他收益占比较高</span><span class="tag">股东回报率较高</span></div>
+      <details class="detail">
+        <summary><span class="closed-label">展开详情</span><span class="open-label">收起详情</span></summary>
+        <div class="detail-body">
+          <div class="detail-grid">
+            <div><label>最新报告期</label><strong>20251231</strong></div>
+            <div><label>最近一年利润</label><strong>2.85亿</strong></div>
+            <div><label>一次性/其他收益占比</label><strong>73.1%</strong></div>
+            <div><label>最近派息/利润</label><strong>36.9%</strong></div>
+            <div><label>DPS估算收益率</label><strong></strong></div>
+            <div><label>流动性</label><strong>极低</strong></div>
+          </div>
+          
+          <div class="notice-title">近期披露易标题</div>
+          <ul class="notices"><li>11/06/2026 20:42: DISCLOSEABLE TRANSACTION: FURTHER INVESTMENT IN PRECIOUS METALS</li><li>01/06/2026 21:40: DISCLOSEABLE TRANSACTION: FURTHER INVESTMENT IN PRECIOUS METALS</li><li>01/06/2026 15:29: MONTHLY RETURN OF EQUITY ISSUER ON MOVEMENTS IN SECURITIES FOR THE MONTH ENDED 31 MAY 2026</li></ul>
+        </div>
       </details>
     </article>
     
     <article class="card">
       <div class="card-head">
-        <div><span class="rank">#17</span> <b>03662.HK</b> <span>星悦康旅</span></div>
+        <div><span class="rank">#22</span> <b>06186.HK</b> <span>中国飞鹤</span></div>
+        <div class="score">116.8</div>
+      </div>
+      <div class="grid">
+        <div><label>市值</label><strong>261.59亿</strong></div>
+        <div><label>成交额</label><strong>0.43亿</strong></div>
+        <div><label>PB/PE</label><strong>0.97 / 12.18</strong></div>
+        <div><label>现金/负债</label><strong>204.3%</strong></div>
+        <div><label>净现金/市值</label><strong>31.6%</strong></div>
+        <div><label>股东回报率</label><strong>12.5%</strong></div>
+        <div><label>近4年盈利</label><strong>4/4</strong></div>
+        <div><label>CFO/利润</label><strong>114.1%</strong></div>
+      </div>
+      <div class="tags"><span class="tag">现金类资产&gt;总负债</span><span class="tag">近年盈利稳定</span><span class="tag">经营现金流稳定</span><span class="tag">股东回报率较高</span></div>
+      <details class="detail">
+        <summary><span class="closed-label">展开详情</span><span class="open-label">收起详情</span></summary>
+        <div class="detail-body">
+          <div class="detail-grid">
+            <div><label>最新报告期</label><strong>20251231</strong></div>
+            <div><label>最近一年利润</label><strong>19.39亿</strong></div>
+            <div><label>一次性/其他收益占比</label><strong>33.8%</strong></div>
+            <div><label>最近派息/利润</label><strong>115.9%</strong></div>
+            <div><label>DPS估算收益率</label><strong></strong></div>
+            <div><label>流动性</label><strong>中</strong></div>
+          </div>
+          
+          <div class="notice-title">近期披露易标题</div>
+          <ul class="notices"><li>12/06/2026 16:36: DISCLOSEABLE TRANSACTION SUBSCRIPTION OF FINANCIAL PRODUCT</li><li>05/06/2026 20:02: DISCLOSEABLE TRANSACTION SUBSCRIPTION OF FINANCIAL PRODUCTS</li><li>05/06/2026 20:02: POLL RESULTS OF THE ANNUAL GENERAL MEETING HELD ON 5 JUNE 2026</li><li>03/06/2026 16:53: Monthly Return of Equity Issuer on Movements in Securities for the month ended 31 May 2026</li></ul>
+        </div>
+      </details>
+    </article>
+    
+    <article class="card">
+      <div class="card-head">
+        <div><span class="rank">#23</span> <b>03662.HK</b> <span>星悦康旅</span></div>
         <div class="score">116.3</div>
       </div>
       <div class="grid">
@@ -449,16 +830,95 @@ FURTHER INVESTMENT IN PRECIOUS METALS || 01/06/2026 15:29: MONTHLY RETURN OF EQU
         <div><label>CFO/利润</label><strong>43.0%</strong></div>
       </div>
       <div class="tags"><span class="tag">现金类资产&gt;总负债</span><span class="tag">近年盈利稳定</span><span class="tag">经营现金流稳定</span><span class="tag">股东回报率较高</span></div>
-      <details>
-        <summary>更多</summary>
-        <p>最新报告期: 20251231; 最近一年利润: 0.52亿; 一次性/其他收益占比: -12.8%; 近4年派息年数: 3.0; 最近派息/利润: 37.7%</p>
-        <p class="small">披露易标题: 01/06/2026 16:29: Monthly Return of Equity Issuer on Movements in Securities for the month ended 31 May 2026 || 22/05/2026 16:37: POLL RESULTS OF ANNUAL GENERAL MEETING HELD ON 22 MAY 2026</p>
+      <details class="detail">
+        <summary><span class="closed-label">展开详情</span><span class="open-label">收起详情</span></summary>
+        <div class="detail-body">
+          <div class="detail-grid">
+            <div><label>最新报告期</label><strong>20251231</strong></div>
+            <div><label>最近一年利润</label><strong>0.52亿</strong></div>
+            <div><label>一次性/其他收益占比</label><strong>-12.8%</strong></div>
+            <div><label>最近派息/利润</label><strong>37.7%</strong></div>
+            <div><label>DPS估算收益率</label><strong></strong></div>
+            <div><label>流动性</label><strong>极低</strong></div>
+          </div>
+          
+          <div class="notice-title">近期披露易标题</div>
+          <ul class="notices"><li>01/06/2026 16:29: Monthly Return of Equity Issuer on Movements in Securities for the month ended 31 May 2026</li><li>22/05/2026 16:37: POLL RESULTS OF ANNUAL GENERAL MEETING HELD ON 22 MAY 2026</li></ul>
+        </div>
       </details>
     </article>
     
     <article class="card">
       <div class="card-head">
-        <div><span class="rank">#18</span> <b>06100.HK</b> <span>同道猎聘</span></div>
+        <div><span class="rank">#24</span> <b>03983.HK</b> <span>中海石油化学</span></div>
+        <div class="score">116.2</div>
+      </div>
+      <div class="grid">
+        <div><label>市值</label><strong>96.35亿</strong></div>
+        <div><label>成交额</label><strong>0.13亿</strong></div>
+        <div><label>PB/PE</label><strong>0.46 / 8.93</strong></div>
+        <div><label>现金/负债</label><strong>287.5%</strong></div>
+        <div><label>净现金/市值</label><strong>94.8%</strong></div>
+        <div><label>股东回报率</label><strong>6.9%</strong></div>
+        <div><label>近4年盈利</label><strong>4/4</strong></div>
+        <div><label>CFO/利润</label><strong>141.5%</strong></div>
+      </div>
+      <div class="tags"><span class="tag">现金类资产&gt;总负债</span><span class="tag">近年盈利稳定</span><span class="tag">经营现金流稳定</span><span class="tag">股东回报率较高</span></div>
+      <details class="detail">
+        <summary><span class="closed-label">展开详情</span><span class="open-label">收起详情</span></summary>
+        <div class="detail-body">
+          <div class="detail-grid">
+            <div><label>最新报告期</label><strong>20251231</strong></div>
+            <div><label>最近一年利润</label><strong>9.74亿</strong></div>
+            <div><label>一次性/其他收益占比</label><strong>30.5%</strong></div>
+            <div><label>最近派息/利润</label><strong>67.9%</strong></div>
+            <div><label>DPS估算收益率</label><strong></strong></div>
+            <div><label>流动性</label><strong>中</strong></div>
+          </div>
+          
+          <div class="notice-title">近期披露易标题</div>
+          <ul class="notices"><li>03/06/2026 17:07: Monthly Return of Equity Issuer on Movements in Securities for the month ended 31 May 2026</li><li>28/05/2026 20:49: RESULTS OF 2025 ANNUAL GENERAL MEETING, H SHAREHOLDERS&#x27; CLASS MEETING AND DOMESTIC SHAREHOLDERS&#x27; CLASS MEETING AND FURTHER INFORMATION ON THE PAYMENT OF FINAL...</li><li>28/05/2026 18:16: (Updated) Final Dividend for the Year Ended 31 December 2025</li><li>21/05/2026 20:32: CHANGE OF VENUE OF THE ANNUAL GENERAL MEETING, H SHAREHOLDERS&#x27; CLASS MEETING AND DOMESTIC SHAREHOLDERS&#x27; CLASS MEETING TO BE HELD ON 28 MAY 2026</li></ul>
+        </div>
+      </details>
+    </article>
+    
+    <article class="card">
+      <div class="card-head">
+        <div><span class="rank">#25</span> <b>06601.HK</b> <span>朝云集团</span></div>
+        <div class="score">116.0</div>
+      </div>
+      <div class="grid">
+        <div><label>市值</label><strong>28.67亿</strong></div>
+        <div><label>成交额</label><strong>0.01亿</strong></div>
+        <div><label>PB/PE</label><strong>0.86 / 11.58</strong></div>
+        <div><label>现金/负债</label><strong>340.8%</strong></div>
+        <div><label>净现金/市值</label><strong>72.5%</strong></div>
+        <div><label>股东回报率</label><strong>5.6%</strong></div>
+        <div><label>近4年盈利</label><strong>4/4</strong></div>
+        <div><label>CFO/利润</label><strong>119.8%</strong></div>
+      </div>
+      <div class="tags"><span class="tag">现金类资产&gt;总负债</span><span class="tag">近年盈利稳定</span><span class="tag">经营现金流稳定</span><span class="tag">股东回报率较高</span></div>
+      <details class="detail">
+        <summary><span class="closed-label">展开详情</span><span class="open-label">收起详情</span></summary>
+        <div class="detail-body">
+          <div class="detail-grid">
+            <div><label>最新报告期</label><strong>20251231</strong></div>
+            <div><label>最近一年利润</label><strong>2.24亿</strong></div>
+            <div><label>一次性/其他收益占比</label><strong>49.8%</strong></div>
+            <div><label>最近派息/利润</label><strong>71.7%</strong></div>
+            <div><label>DPS估算收益率</label><strong></strong></div>
+            <div><label>流动性</label><strong>中低</strong></div>
+          </div>
+          
+          <div class="notice-title">近期披露易标题</div>
+          <ul class="notices"><li>17/06/2026 19:54: THIRD AMENDED AND RESTATED ARTICLES OF ASSOCIATION</li><li>17/06/2026 19:52: POLL RESULTS OF ANNUAL GENERAL MEETING HELD ON 17 JUNE 2026</li><li>01/06/2026 14:33: Monthly Return of Equity Issuer on Movements in Securities for the Month Ended 31 May 2026</li><li>06/05/2026 10:17: Monthly Return of Equity Issuer on Movements in Securities for the Month Ended 30 April 2026</li></ul>
+        </div>
+      </details>
+    </article>
+    
+    <article class="card">
+      <div class="card-head">
+        <div><span class="rank">#26</span> <b>06100.HK</b> <span>同道猎聘</span></div>
         <div class="score">114.2</div>
       </div>
       <div class="grid">
@@ -471,17 +931,130 @@ FURTHER INVESTMENT IN PRECIOUS METALS || 01/06/2026 15:29: MONTHLY RETURN OF EQU
         <div><label>近4年盈利</label><strong>4/4</strong></div>
         <div><label>CFO/利润</label><strong>223.1%</strong></div>
       </div>
-      <div class="tags"><span class="tag">现金类资产&gt;总负债</span><span class="tag">近年盈利稳定</span><span class="tag">经营现金流稳定</span><span class="tag">一次性/其他收益占比较高</span><span class="tag">股东回报率较高</span><span class="tag danger">一次性/其他收益占比高</span></div>
-      <details>
-        <summary>更多</summary>
-        <p>最新报告期: 20251231; 最近一年利润: 1.03亿; 一次性/其他收益占比: 89.0%; 近4年派息年数: 4.0; 最近派息/利润: 71.6%</p>
-        <p class="small">披露易标题: 04/06/2026 06:13: SIXTH AMENDED AND RESTATED MEMORANDUM AND ARTICLES OF ASSOCIATION || 03/06/2026 21:54: POLL RESULTS OF THE ANNUAL GENERAL MEETING HELD ON WEDNESDAY, 3 JUNE 2026 AND ADOPTION OF THE AMENDED MEMORANDUM AND ARTICLES OF ASSOCIATION || 02/06/2026 16:37: Monthly Return of Equity Issuer on Movements in Securities for the month ended 31 May 2026</p>
+      <div class="tags"><span class="tag">现金类资产&gt;总负债</span><span class="tag">近年盈利稳定</span><span class="tag">经营现金流稳定</span><span class="tag danger">一次性/其他收益占比较高</span><span class="tag">股东回报率较高</span></div>
+      <details class="detail">
+        <summary><span class="closed-label">展开详情</span><span class="open-label">收起详情</span></summary>
+        <div class="detail-body">
+          <div class="detail-grid">
+            <div><label>最新报告期</label><strong>20251231</strong></div>
+            <div><label>最近一年利润</label><strong>1.03亿</strong></div>
+            <div><label>一次性/其他收益占比</label><strong>89.0%</strong></div>
+            <div><label>最近派息/利润</label><strong>71.6%</strong></div>
+            <div><label>DPS估算收益率</label><strong></strong></div>
+            <div><label>流动性</label><strong>低</strong></div>
+          </div>
+          
+          <div class="notice-title">近期披露易标题</div>
+          <ul class="notices"><li>04/06/2026 06:13: SIXTH AMENDED AND RESTATED MEMORANDUM AND ARTICLES OF ASSOCIATION</li><li>03/06/2026 21:54: POLL RESULTS OF THE ANNUAL GENERAL MEETING HELD ON WEDNESDAY, 3 JUNE 2026 AND ADOPTION OF THE AMENDED MEMORANDUM AND ARTICLES OF ASSOCIATION</li><li>02/06/2026 16:37: Monthly Return of Equity Issuer on Movements in Securities for the month ended 31 May 2026</li></ul>
+        </div>
       </details>
     </article>
     
     <article class="card">
       <div class="card-head">
-        <div><span class="rank">#19</span> <b>03658.HK</b> <span>新希望服务</span></div>
+        <div><span class="rank">#27</span> <b>00517.HK</b> <span>中远海运国际</span></div>
+        <div class="score">114.1</div>
+      </div>
+      <div class="grid">
+        <div><label>市值</label><strong>85.76亿</strong></div>
+        <div><label>成交额</label><strong>0.18亿</strong></div>
+        <div><label>PB/PE</label><strong>1.08 / 11.12</strong></div>
+        <div><label>现金/负债</label><strong>387.0%</strong></div>
+        <div><label>净现金/市值</label><strong>37.4%</strong></div>
+        <div><label>股东回报率</label><strong>8.5%</strong></div>
+        <div><label>近4年盈利</label><strong>4/4</strong></div>
+        <div><label>CFO/利润</label><strong>33.3%</strong></div>
+      </div>
+      <div class="tags"><span class="tag">现金类资产&gt;总负债</span><span class="tag">近年盈利稳定</span><span class="tag">经营现金流稳定</span><span class="tag">股东回报率较高</span></div>
+      <details class="detail">
+        <summary><span class="closed-label">展开详情</span><span class="open-label">收起详情</span></summary>
+        <div class="detail-body">
+          <div class="detail-grid">
+            <div><label>最新报告期</label><strong>20251231</strong></div>
+            <div><label>最近一年利润</label><strong>6.96亿</strong></div>
+            <div><label>一次性/其他收益占比</label><strong>18.6%</strong></div>
+            <div><label>最近派息/利润</label><strong>104.6%</strong></div>
+            <div><label>DPS估算收益率</label><strong></strong></div>
+            <div><label>流动性</label><strong>中</strong></div>
+          </div>
+          
+          <div class="notice-title">近期披露易标题</div>
+          <ul class="notices"><li>01/06/2026 17:57: Monthly Return of Equity Issuer on Movements in Securities for the month ended 31 May 2026</li><li>29/05/2026 12:17: Poll Results of 2026 Annual General Meeting</li><li>04/05/2026 18:28: Monthly Return of Equity Issuer on Movements in Securities for the month ended 30 April 2026</li><li>24/04/2026 16:39: Notification Letter to Non-registered Shareholders and Request Form - Notice of Publication of Annual Report 2025, Circular, Notice of Annual General Meeting a...</li></ul>
+        </div>
+      </details>
+    </article>
+    
+    <article class="card">
+      <div class="card-head">
+        <div><span class="rank">#28</span> <b>02460.HK</b> <span>华润饮料</span></div>
+        <div class="score">113.9</div>
+      </div>
+      <div class="grid">
+        <div><label>市值</label><strong>176.51亿</strong></div>
+        <div><label>成交额</label><strong>0.07亿</strong></div>
+        <div><label>PB/PE</label><strong>1.49 / 16.18</strong></div>
+        <div><label>现金/负债</label><strong>156.9%</strong></div>
+        <div><label>净现金/市值</label><strong>13.1%</strong></div>
+        <div><label>股东回报率</label><strong>21.6%</strong></div>
+        <div><label>近4年盈利</label><strong>4/4</strong></div>
+        <div><label>CFO/利润</label><strong>153.4%</strong></div>
+      </div>
+      <div class="tags"><span class="tag">现金类资产&gt;总负债</span><span class="tag">近年盈利稳定</span><span class="tag">经营现金流稳定</span><span class="tag">股东回报率较高</span></div>
+      <details class="detail">
+        <summary><span class="closed-label">展开详情</span><span class="open-label">收起详情</span></summary>
+        <div class="detail-body">
+          <div class="detail-grid">
+            <div><label>最新报告期</label><strong>20251231</strong></div>
+            <div><label>最近一年利润</label><strong>9.85亿</strong></div>
+            <div><label>一次性/其他收益占比</label><strong>39.2%</strong></div>
+            <div><label>最近派息/利润</label><strong>386.6%</strong></div>
+            <div><label>DPS估算收益率</label><strong></strong></div>
+            <div><label>流动性</label><strong>中低</strong></div>
+          </div>
+          
+          <div class="notice-title">近期披露易标题</div>
+          <ul class="notices"><li>03/06/2026 17:15: Monthly Return of Equity Issuer on Movements in Securities for the month ended 31 May 2026</li><li>01/06/2026 18:29: CHANGE OF PRINCIPAL PLACE OF BUSINESS IN HONG KONG</li><li>01/06/2026 18:28: Declaration of Special Dividend (Update)</li><li>01/06/2026 18:27: Final Dividend for the Year Ended 31 December 2025 (Update)</li></ul>
+        </div>
+      </details>
+    </article>
+    
+    <article class="card">
+      <div class="card-head">
+        <div><span class="rank">#29</span> <b>02610.HK</b> <span>南山铝业国际</span></div>
+        <div class="score">110.9</div>
+      </div>
+      <div class="grid">
+        <div><label>市值</label><strong>182.04亿</strong></div>
+        <div><label>成交额</label><strong>0.17亿</strong></div>
+        <div><label>PB/PE</label><strong>1.19 / 5.73</strong></div>
+        <div><label>现金/负债</label><strong>114.0%</strong></div>
+        <div><label>净现金/市值</label><strong>1.9%</strong></div>
+        <div><label>股东回报率</label><strong>12.2%</strong></div>
+        <div><label>近4年盈利</label><strong>4/4</strong></div>
+        <div><label>CFO/利润</label><strong>88.1%</strong></div>
+      </div>
+      <div class="tags"><span class="tag">现金类资产&gt;总负债</span><span class="tag">近年盈利稳定</span><span class="tag">经营现金流稳定</span><span class="tag">股东回报率较高</span></div>
+      <details class="detail">
+        <summary><span class="closed-label">展开详情</span><span class="open-label">收起详情</span></summary>
+        <div class="detail-body">
+          <div class="detail-grid">
+            <div><label>最新报告期</label><strong>20251231</strong></div>
+            <div><label>最近一年利润</label><strong>28.71亿</strong></div>
+            <div><label>一次性/其他收益占比</label><strong>8.0%</strong></div>
+            <div><label>最近派息/利润</label><strong>77.4%</strong></div>
+            <div><label>DPS估算收益率</label><strong></strong></div>
+            <div><label>流动性</label><strong>中</strong></div>
+          </div>
+          
+          <div class="notice-title">近期披露易标题</div>
+          <ul class="notices"><li>05/06/2026 18:32: SECOND AMENDED AND RESTATED ARTICLES OF ASSOCIATION</li><li>05/06/2026 18:28: (1) POLL RESULTS OF THE ANNUAL GENERAL MEETING HELD ON 5 JUNE 2026; (2) PAYMENT OF FINAL DIVIDEND; AND (3) ADOPTION OF NEW ARTICLES OF ASSOCIATION</li><li>01/06/2026 18:30: MONTHLY RETURN OF EQUITY ISSUER ON MOVEMENTS IN SECURITIES FOR THE MONTH ENDED 31 MAY 2026</li><li>28/05/2026 20:26: INSIDE INFORMATION - UNAUDITED REPORT OF THE SUBSTANTIAL SHAREHOLDER, PRESS METAL, FOR THE THREE MONTHS ENDED 31 MARCH 2026</li></ul>
+        </div>
+      </details>
+    </article>
+    
+    <article class="card">
+      <div class="card-head">
+        <div><span class="rank">#30</span> <b>03658.HK</b> <span>新希望服务</span></div>
         <div class="score">109.5</div>
       </div>
       <div class="grid">
@@ -495,17 +1068,27 @@ FURTHER INVESTMENT IN PRECIOUS METALS || 01/06/2026 15:29: MONTHLY RETURN OF EQU
         <div><label>CFO/利润</label><strong>98.0%</strong></div>
       </div>
       <div class="tags"><span class="tag">现金类资产&gt;总负债</span><span class="tag">近年盈利稳定</span><span class="tag">经营现金流稳定</span><span class="tag">股东回报率较高</span></div>
-      <details>
-        <summary>更多</summary>
-        <p>最新报告期: 20251231; 最近一年利润: 2.16亿; 一次性/其他收益占比: 0.0%; 近4年派息年数: 4.0; 最近派息/利润: 76.9%</p>
-        <p class="small">披露易标题: 16/06/2026 20:03: AMENDED AND RESTATED MEMORANDUM AND ARTICLES OF ASSOCIATION || 16/06/2026 18:36: Final Dividend for the year ended 31 December 2025 (Updated) || 16/06/2026 18:34: POLL RESULTS OF THE ANNUAL GENERAL MEETING HELD ON 16 JUNE 2026 || 01/06/2026 16:41: Monthly Return of Equity Issuer on Movements in Securities for the month ended 31 May 2026 || 29/05/2026 17:38: SUPPLEMENTAL ANNOUNCEMENT OF
-DISCLOSEABLE AND CONNECTED TRANSACTION || 22/05/2026 17:26: FORM OF PROXY FOR USE AT ANNUAL GENERAL MEETING TO BE HELD ON 16 JUNE 2026 || 22/05/2026 17:25: NOTICE OF ANNUAL GENERAL MEETING || 22/05/2026 17:23: DECLARATION OF FINAL DIVIDEND&amp;#x3b; RE-ELECTION OF RETIRING DIRECTORS&amp;#x3b; RE-APPOINTMENT OF AUDITOR&amp;#x3b; GENERAL MANDATE AND BUYBACK MANDATE&amp;#x3b; PROPOSED AMENDMENTS TO THE MEMORANDUM AND ARTICLES OF ASSOCIATION AND NOTICE OF ANNUAL GENERAL MEETING</p>
+      <details class="detail">
+        <summary><span class="closed-label">展开详情</span><span class="open-label">收起详情</span></summary>
+        <div class="detail-body">
+          <div class="detail-grid">
+            <div><label>最新报告期</label><strong>20251231</strong></div>
+            <div><label>最近一年利润</label><strong>2.16亿</strong></div>
+            <div><label>一次性/其他收益占比</label><strong>0.0%</strong></div>
+            <div><label>最近派息/利润</label><strong>76.9%</strong></div>
+            <div><label>DPS估算收益率</label><strong></strong></div>
+            <div><label>流动性</label><strong>极低</strong></div>
+          </div>
+          
+          <div class="notice-title">近期披露易标题</div>
+          <ul class="notices"><li>16/06/2026 20:03: AMENDED AND RESTATED MEMORANDUM AND ARTICLES OF ASSOCIATION</li><li>16/06/2026 18:36: Final Dividend for the year ended 31 December 2025 (Updated)</li><li>16/06/2026 18:34: POLL RESULTS OF THE ANNUAL GENERAL MEETING HELD ON 16 JUNE 2026</li><li>01/06/2026 16:41: Monthly Return of Equity Issuer on Movements in Securities for the month ended 31 May 2026</li></ul>
+        </div>
       </details>
     </article>
     
     <article class="card">
       <div class="card-head">
-        <div><span class="rank">#20</span> <b>06929.HK</b> <span>业聚医疗</span></div>
+        <div><span class="rank">#31</span> <b>06929.HK</b> <span>业聚医疗</span></div>
         <div class="score">109.2</div>
       </div>
       <div class="grid">
@@ -519,16 +1102,27 @@ DISCLOSEABLE AND CONNECTED TRANSACTION || 22/05/2026 17:26: FORM OF PROXY FOR US
         <div><label>CFO/利润</label><strong>46.6%</strong></div>
       </div>
       <div class="tags"><span class="tag">现金类资产&gt;总负债</span><span class="tag">近年盈利稳定</span><span class="tag">经营现金流稳定</span><span class="tag">股东回报率较高</span></div>
-      <details>
-        <summary>更多</summary>
-        <p>最新报告期: 20251231; 最近一年利润: 2.94亿; 一次性/其他收益占比: 2.6%; 近4年派息年数: 2.0; 最近派息/利润: 63.4%</p>
-        <p class="small">披露易标题: 08/06/2026 17:08: (1) Poll Results of The Annual General Meeting Held on June 8, 2026 and (2) Payment of Final Dividend || 03/06/2026 09:46: Monthly Return of Equity Issuer on Movements in Securities for the month ended 31 May 2026</p>
+      <details class="detail">
+        <summary><span class="closed-label">展开详情</span><span class="open-label">收起详情</span></summary>
+        <div class="detail-body">
+          <div class="detail-grid">
+            <div><label>最新报告期</label><strong>20251231</strong></div>
+            <div><label>最近一年利润</label><strong>2.94亿</strong></div>
+            <div><label>一次性/其他收益占比</label><strong>2.6%</strong></div>
+            <div><label>最近派息/利润</label><strong>63.4%</strong></div>
+            <div><label>DPS估算收益率</label><strong></strong></div>
+            <div><label>流动性</label><strong>极低</strong></div>
+          </div>
+          
+          <div class="notice-title">近期披露易标题</div>
+          <ul class="notices"><li>08/06/2026 17:08: (1) Poll Results of The Annual General Meeting Held on June 8, 2026 and (2) Payment of Final Dividend</li><li>03/06/2026 09:46: Monthly Return of Equity Issuer on Movements in Securities for the month ended 31 May 2026</li></ul>
+        </div>
       </details>
     </article>
     
     <article class="card">
       <div class="card-head">
-        <div><span class="rank">#21</span> <b>01260.HK</b> <span>皓天财经集团</span></div>
+        <div><span class="rank">#32</span> <b>01260.HK</b> <span>皓天财经集团</span></div>
         <div class="score">107.8</div>
       </div>
       <div class="grid">
@@ -541,17 +1135,28 @@ DISCLOSEABLE AND CONNECTED TRANSACTION || 22/05/2026 17:26: FORM OF PROXY FOR US
         <div><label>近4年盈利</label><strong>4/4</strong></div>
         <div><label>CFO/利润</label><strong>115.0%</strong></div>
       </div>
-      <div class="tags"><span class="tag">现金类资产&gt;总负债</span><span class="tag">近年盈利稳定</span><span class="tag">经营现金流稳定</span><span class="tag">一次性/其他收益占比较高</span><span class="tag danger">一次性/其他收益占比高</span></div>
-      <details>
-        <summary>更多</summary>
-        <p>最新报告期: 20250930; 最近一年利润: 0.52亿; 一次性/其他收益占比: 66.3%; 近4年派息年数: 0.0; 最近派息/利润: </p>
-        <p class="small">披露易标题: </p>
+      <div class="tags"><span class="tag">现金类资产&gt;总负债</span><span class="tag">近年盈利稳定</span><span class="tag">经营现金流稳定</span><span class="tag danger">一次性/其他收益占比较高</span></div>
+      <details class="detail">
+        <summary><span class="closed-label">展开详情</span><span class="open-label">收起详情</span></summary>
+        <div class="detail-body">
+          <div class="detail-grid">
+            <div><label>最新报告期</label><strong>20250930</strong></div>
+            <div><label>最近一年利润</label><strong>0.52亿</strong></div>
+            <div><label>一次性/其他收益占比</label><strong>66.3%</strong></div>
+            <div><label>最近派息/利润</label><strong></strong></div>
+            <div><label>DPS估算收益率</label><strong></strong></div>
+            <div><label>流动性</label><strong>极低</strong></div>
+          </div>
+          
+          <div class="notice-title">近期披露易标题</div>
+          <ul class="notices"><li>15/06/2026 17:35: NOTICE OF BOARD MEETING</li><li>09/06/2026 22:47: DISCLOSEABLE TRANSACTION IN RELATION TO ACQUISITION OF NOTE</li><li>01/06/2026 14:54: Monthly Return of Equity Issuer on Movements in Securities for the month ended 31 May 2026</li><li>04/05/2026 10:40: Monthly Return of Equity Issuer on Movements in Securities for the month ended 30 April 2026</li></ul>
+        </div>
       </details>
     </article>
     
     <article class="card">
       <div class="card-head">
-        <div><span class="rank">#22</span> <b>00934.HK</b> <span>中石化冠德</span></div>
+        <div><span class="rank">#33</span> <b>00934.HK</b> <span>中石化冠德</span></div>
         <div class="score">107.8</div>
       </div>
       <div class="grid">
@@ -565,16 +1170,27 @@ DISCLOSEABLE AND CONNECTED TRANSACTION || 22/05/2026 17:26: FORM OF PROXY FOR US
         <div><label>CFO/利润</label><strong>24.5%</strong></div>
       </div>
       <div class="tags"><span class="tag">现金类资产&gt;总负债</span><span class="tag">近年盈利稳定</span><span class="tag">经营现金流稳定</span><span class="tag">股东回报率较高</span></div>
-      <details>
-        <summary>更多</summary>
-        <p>最新报告期: 20251231; 最近一年利润: 9.29亿; 一次性/其他收益占比: 7.3%; 近4年派息年数: 4.0; 最近派息/利润: 60.4%</p>
-        <p class="small">披露易标题: </p>
+      <details class="detail">
+        <summary><span class="closed-label">展开详情</span><span class="open-label">收起详情</span></summary>
+        <div class="detail-body">
+          <div class="detail-grid">
+            <div><label>最新报告期</label><strong>20251231</strong></div>
+            <div><label>最近一年利润</label><strong>9.29亿</strong></div>
+            <div><label>一次性/其他收益占比</label><strong>7.3%</strong></div>
+            <div><label>最近派息/利润</label><strong>60.4%</strong></div>
+            <div><label>DPS估算收益率</label><strong></strong></div>
+            <div><label>流动性</label><strong>中低</strong></div>
+          </div>
+          
+          <div class="notice-title">近期披露易标题</div>
+          <ul class="notices"><li>03/06/2026 17:23: POLL RESULTS OF ANNUAL GENERAL MEETING HELD ON 3 JUNE 2026</li><li>01/06/2026 14:47: Monthly Return for May 2026</li><li>30/04/2026 17:32: Monthly Return for April 2026</li><li>17/04/2026 17:25: 2025 Environmental, Social and Governance Report</li></ul>
+        </div>
       </details>
     </article>
     
     <article class="card">
       <div class="card-head">
-        <div><span class="rank">#23</span> <b>02219.HK</b> <span>朝聚眼科</span></div>
+        <div><span class="rank">#34</span> <b>02219.HK</b> <span>朝聚眼科</span></div>
         <div class="score">107.6</div>
       </div>
       <div class="grid">
@@ -588,16 +1204,27 @@ DISCLOSEABLE AND CONNECTED TRANSACTION || 22/05/2026 17:26: FORM OF PROXY FOR US
         <div><label>CFO/利润</label><strong>185.0%</strong></div>
       </div>
       <div class="tags"><span class="tag">现金类资产&gt;总负债</span><span class="tag">近年盈利稳定</span><span class="tag">经营现金流稳定</span><span class="tag">股东回报率较高</span></div>
-      <details>
-        <summary>更多</summary>
-        <p>最新报告期: 20251231; 最近一年利润: 1.83亿; 一次性/其他收益占比: 40.2%; 近4年派息年数: 4.0; 最近派息/利润: 41.4%</p>
-        <p class="small">披露易标题: </p>
+      <details class="detail">
+        <summary><span class="closed-label">展开详情</span><span class="open-label">收起详情</span></summary>
+        <div class="detail-body">
+          <div class="detail-grid">
+            <div><label>最新报告期</label><strong>20251231</strong></div>
+            <div><label>最近一年利润</label><strong>1.83亿</strong></div>
+            <div><label>一次性/其他收益占比</label><strong>40.2%</strong></div>
+            <div><label>最近派息/利润</label><strong>41.4%</strong></div>
+            <div><label>DPS估算收益率</label><strong></strong></div>
+            <div><label>流动性</label><strong>低</strong></div>
+          </div>
+          
+          <div class="notice-title">近期披露易标题</div>
+          <ul class="notices"><li>18/06/2026 17:38: Next Day Disclosure Return</li><li>16/06/2026 17:46: Next Day Disclosure Return</li><li>11/06/2026 19:29: Next Day Disclosure Return</li><li>10/06/2026 19:14: DISCLOSEABLE TRANSACTION - SUBSCRIPTION OF STRUCTURED DEPOSIT PRODUCT</li></ul>
+        </div>
       </details>
     </article>
     
     <article class="card">
       <div class="card-head">
-        <div><span class="rank">#24</span> <b>01731.HK</b> <span>其利工业集团</span></div>
+        <div><span class="rank">#35</span> <b>01731.HK</b> <span>其利工业集团</span></div>
         <div class="score">107.4</div>
       </div>
       <div class="grid">
@@ -611,16 +1238,27 @@ DISCLOSEABLE AND CONNECTED TRANSACTION || 22/05/2026 17:26: FORM OF PROXY FOR US
         <div><label>CFO/利润</label><strong>100.5%</strong></div>
       </div>
       <div class="tags"><span class="tag">现金类资产&gt;总负债</span><span class="tag">近年盈利稳定</span><span class="tag">经营现金流稳定</span><span class="tag">股东回报率较高</span></div>
-      <details>
-        <summary>更多</summary>
-        <p>最新报告期: 20251231; 最近一年利润: 1.73亿; 一次性/其他收益占比: 21.1%; 近4年派息年数: 4.0; 最近派息/利润: 40.7%</p>
-        <p class="small">披露易标题: </p>
+      <details class="detail">
+        <summary><span class="closed-label">展开详情</span><span class="open-label">收起详情</span></summary>
+        <div class="detail-body">
+          <div class="detail-grid">
+            <div><label>最新报告期</label><strong>20251231</strong></div>
+            <div><label>最近一年利润</label><strong>1.73亿</strong></div>
+            <div><label>一次性/其他收益占比</label><strong>21.1%</strong></div>
+            <div><label>最近派息/利润</label><strong>40.7%</strong></div>
+            <div><label>DPS估算收益率</label><strong></strong></div>
+            <div><label>流动性</label><strong>低</strong></div>
+          </div>
+          
+          <div class="notice-title">近期披露易标题</div>
+          <ul class="notices"><li>17/06/2026 16:37: POLL RESULTS OF THE ANNUAL GENERAL MEETING HELD ON 17 JUNE 2026</li><li>02/06/2026 17:35: Monthly Return of Equity Issuer on Movements in Securities for the month ended 31 May 2026</li><li>21/05/2026 19:16: Notification Letter and Request Form to Non-registered Holders</li><li>21/05/2026 19:15: Notification Letter and Reply Form to Shareholders</li></ul>
+        </div>
       </details>
     </article>
     
     <article class="card">
       <div class="card-head">
-        <div><span class="rank">#25</span> <b>02283.HK</b> <span>东江集团控股</span></div>
+        <div><span class="rank">#36</span> <b>02283.HK</b> <span>东江集团控股</span></div>
         <div class="score">107.4</div>
       </div>
       <div class="grid">
@@ -634,16 +1272,95 @@ DISCLOSEABLE AND CONNECTED TRANSACTION || 22/05/2026 17:26: FORM OF PROXY FOR US
         <div><label>CFO/利润</label><strong>179.5%</strong></div>
       </div>
       <div class="tags"><span class="tag">现金类资产&gt;总负债</span><span class="tag">近年盈利稳定</span><span class="tag">经营现金流稳定</span><span class="tag">股东回报率较高</span></div>
-      <details>
-        <summary>更多</summary>
-        <p>最新报告期: 20251231; 最近一年利润: 1.97亿; 一次性/其他收益占比: 12.7%; 近4年派息年数: 4.0; 最近派息/利润: 88.3%</p>
-        <p class="small">披露易标题: </p>
+      <details class="detail">
+        <summary><span class="closed-label">展开详情</span><span class="open-label">收起详情</span></summary>
+        <div class="detail-body">
+          <div class="detail-grid">
+            <div><label>最新报告期</label><strong>20251231</strong></div>
+            <div><label>最近一年利润</label><strong>1.97亿</strong></div>
+            <div><label>一次性/其他收益占比</label><strong>12.7%</strong></div>
+            <div><label>最近派息/利润</label><strong>88.3%</strong></div>
+            <div><label>DPS估算收益率</label><strong></strong></div>
+            <div><label>流动性</label><strong>低</strong></div>
+          </div>
+          
+          <div class="notice-title">近期披露易标题</div>
+          <ul class="notices"><li>01/06/2026 11:09: Monthly Return of Equity Issuer on Movements in Securities for the month ended 31 May 2026</li><li>21/05/2026 20:30: THIRD AMENDED AND RESTATED MEMORANDUM AND ARTICLES OF ASSOCIATION</li><li>21/05/2026 20:22: POLL RESULTS OF THE ANNUAL GENERAL MEETING HELD ON 21 MAY 2026</li><li>30/04/2026 18:54: Monthly Return of Equity Issuer on Movements in Securities for the month ended 30 April 2026</li></ul>
+        </div>
       </details>
     </article>
     
     <article class="card">
       <div class="card-head">
-        <div><span class="rank">#26</span> <b>01568.HK</b> <span>承达集团</span></div>
+        <div><span class="rank">#37</span> <b>02651.HK</b> <span>大众口腔</span></div>
+        <div class="score">107.2</div>
+      </div>
+      <div class="grid">
+        <div><label>市值</label><strong>5.93亿</strong></div>
+        <div><label>成交额</label><strong>0.00亿</strong></div>
+        <div><label>PB/PE</label><strong>1.67 / 19.00</strong></div>
+        <div><label>现金/负债</label><strong>203.2%</strong></div>
+        <div><label>净现金/市值</label><strong>24.5%</strong></div>
+        <div><label>股东回报率</label><strong>5.5%</strong></div>
+        <div><label>近4年盈利</label><strong>4/4</strong></div>
+        <div><label>CFO/利润</label><strong>333.6%</strong></div>
+      </div>
+      <div class="tags"><span class="tag">现金类资产&gt;总负债</span><span class="tag">近年盈利稳定</span><span class="tag">经营现金流稳定</span><span class="tag">股东回报率较高</span></div>
+      <details class="detail">
+        <summary><span class="closed-label">展开详情</span><span class="open-label">收起详情</span></summary>
+        <div class="detail-body">
+          <div class="detail-grid">
+            <div><label>最新报告期</label><strong>20251231</strong></div>
+            <div><label>最近一年利润</label><strong>0.28亿</strong></div>
+            <div><label>一次性/其他收益占比</label><strong>20.0%</strong></div>
+            <div><label>最近派息/利润</label><strong>114.9%</strong></div>
+            <div><label>DPS估算收益率</label><strong></strong></div>
+            <div><label>流动性</label><strong>低</strong></div>
+          </div>
+          
+          <div class="notice-title">近期披露易标题</div>
+          <ul class="notices"><li>11/06/2026 20:05: CHANGE OF THE ADDRESS OF PRINCIPAL PLACE OF BUSINESS IN HONG KONG</li><li>11/06/2026 20:00: CHANGE OF JOINT COMPANY SECRETARY, AUTHORIZED REPRESENTATIVE AND PROCESS AGENT AND WAIVER FROM STRICT COMPLIANCE WITH RULES 3.28 AND 8.17 OF THE LISTING RULES</li><li>03/06/2026 17:09: MONTHLY RETURN OF EQUITY ISSUER ON MOVEMENTS IN SECURITIES FOR THE MONTH ENDED MAY 31, 2026</li><li>29/05/2026 20:01: FINAL DIVIDEND FOR THE YEAR ENDED 31 DECEMBER 2025 (UPDATED)</li></ul>
+        </div>
+      </details>
+    </article>
+    
+    <article class="card">
+      <div class="card-head">
+        <div><span class="rank">#38</span> <b>01836.HK</b> <span>九兴控股</span></div>
+        <div class="score">107.2</div>
+      </div>
+      <div class="grid">
+        <div><label>市值</label><strong>103.81亿</strong></div>
+        <div><label>成交额</label><strong>0.11亿</strong></div>
+        <div><label>PB/PE</label><strong>1.21 / 9.67</strong></div>
+        <div><label>现金/负债</label><strong>113.3%</strong></div>
+        <div><label>净现金/市值</label><strong>3.0%</strong></div>
+        <div><label>股东回报率</label><strong>11.5%</strong></div>
+        <div><label>近4年盈利</label><strong>4/4</strong></div>
+        <div><label>CFO/利润</label><strong>141.1%</strong></div>
+      </div>
+      <div class="tags"><span class="tag">现金类资产&gt;总负债</span><span class="tag">近年盈利稳定</span><span class="tag">经营现金流稳定</span><span class="tag">股东回报率较高</span></div>
+      <details class="detail">
+        <summary><span class="closed-label">展开详情</span><span class="open-label">收起详情</span></summary>
+        <div class="detail-body">
+          <div class="detail-grid">
+            <div><label>最新报告期</label><strong>20251231</strong></div>
+            <div><label>最近一年利润</label><strong>9.70亿</strong></div>
+            <div><label>一次性/其他收益占比</label><strong>4.0%</strong></div>
+            <div><label>最近派息/利润</label><strong>122.6%</strong></div>
+            <div><label>DPS估算收益率</label><strong></strong></div>
+            <div><label>流动性</label><strong>中</strong></div>
+          </div>
+          
+          <div class="notice-title">近期披露易标题</div>
+          <ul class="notices"><li>04/06/2026 16:06: Monthly Return of Equity Issuer on Movements in Securities for the month ended 31 May 2026</li><li>14/05/2026 18:25: Poll Results of Annual General Meeting held on 14 May 2026</li><li>07/05/2026 14:42: Monthly Return of Equity Issuer on Movements in Securities for the month ended 30 April 2026</li><li>27/04/2026 18:44: Next Day Disclosure Return</li></ul>
+        </div>
+      </details>
+    </article>
+    
+    <article class="card">
+      <div class="card-head">
+        <div><span class="rank">#39</span> <b>01568.HK</b> <span>承达集团</span></div>
         <div class="score">106.1</div>
       </div>
       <div class="grid">
@@ -657,16 +1374,27 @@ DISCLOSEABLE AND CONNECTED TRANSACTION || 22/05/2026 17:26: FORM OF PROXY FOR US
         <div><label>CFO/利润</label><strong>69.0%</strong></div>
       </div>
       <div class="tags"><span class="tag">现金类资产&gt;总负债</span><span class="tag">近年盈利稳定</span><span class="tag">经营现金流稳定</span><span class="tag">股东回报率较高</span></div>
-      <details>
-        <summary>更多</summary>
-        <p>最新报告期: 20251231; 最近一年利润: 2.41亿; 一次性/其他收益占比: 14.2%; 近4年派息年数: ; 最近派息/利润: </p>
-        <p class="small">披露易标题: </p>
+      <details class="detail">
+        <summary><span class="closed-label">展开详情</span><span class="open-label">收起详情</span></summary>
+        <div class="detail-body">
+          <div class="detail-grid">
+            <div><label>最新报告期</label><strong>20251231</strong></div>
+            <div><label>最近一年利润</label><strong>2.41亿</strong></div>
+            <div><label>一次性/其他收益占比</label><strong>14.2%</strong></div>
+            <div><label>最近派息/利润</label><strong>161.5%</strong></div>
+            <div><label>DPS估算收益率</label><strong></strong></div>
+            <div><label>流动性</label><strong>低</strong></div>
+          </div>
+          
+          <div class="notice-title">近期披露易标题</div>
+          <ul class="notices"><li>18/06/2026 16:31: COMPANY INFORMATION SHEET</li><li>03/06/2026 16:33: THIRD AMENDED AND RESTATED ARTICLES OF ASSOCIATION</li><li>02/06/2026 17:48: (REVISED) MONTHLY RETURN OF EQUITY ISSUER ON MOVEMENTS IN SECURITIES FOR THE MONTH ENDED 31 May 2026</li><li>02/06/2026 14:37: MONTHLY RETURN OF EQUITY ISSUER ON MOVEMENTS IN SECURITIES FOR THE MONTH ENDED 31 MAY 2026</li></ul>
+        </div>
       </details>
     </article>
     
     <article class="card">
       <div class="card-head">
-        <div><span class="rank">#27</span> <b>00887.HK</b> <span>英皇钟表珠宝</span></div>
+        <div><span class="rank">#40</span> <b>00887.HK</b> <span>英皇钟表珠宝</span></div>
         <div class="score">106.0</div>
       </div>
       <div class="grid">
@@ -680,559 +1408,1491 @@ DISCLOSEABLE AND CONNECTED TRANSACTION || 22/05/2026 17:26: FORM OF PROXY FOR US
         <div><label>CFO/利润</label><strong>239.2%</strong></div>
       </div>
       <div class="tags"><span class="tag">现金类资产&gt;总负债</span><span class="tag">近年盈利稳定</span><span class="tag">经营现金流稳定</span></div>
-      <details>
-        <summary>更多</summary>
-        <p>最新报告期: 20251231; 最近一年利润: 4.14亿; 一次性/其他收益占比: -12.3%; 近4年派息年数: ; 最近派息/利润: </p>
-        <p class="small">披露易标题: </p>
-      </details>
-    </article>
-    
-    <article class="card">
-      <div class="card-head">
-        <div><span class="rank">#28</span> <b>00420.HK</b> <span>福田实业</span></div>
-        <div class="score">105.3</div>
-      </div>
-      <div class="grid">
-        <div><label>市值</label><strong>8.09亿</strong></div>
-        <div><label>成交额</label><strong>0.00亿</strong></div>
-        <div><label>PB/PE</label><strong>0.25 / 11.34</strong></div>
-        <div><label>现金/负债</label><strong>148.3%</strong></div>
-        <div><label>净现金/市值</label><strong>56.3%</strong></div>
-        <div><label>股东回报率</label><strong>7.5%</strong></div>
-        <div><label>近4年盈利</label><strong>3/4</strong></div>
-        <div><label>CFO/利润</label><strong>522.7%</strong></div>
-      </div>
-      <div class="tags"><span class="tag">现金类资产&gt;总负债</span><span class="tag">近年盈利稳定</span><span class="tag">经营现金流稳定</span><span class="tag">股东回报率较高</span></div>
-      <details>
-        <summary>更多</summary>
-        <p>最新报告期: 20251231; 最近一年利润: 0.64亿; 一次性/其他收益占比: 33.4%; 近4年派息年数: ; 最近派息/利润: </p>
-        <p class="small">披露易标题: </p>
-      </details>
-    </article>
-    
-    <article class="card">
-      <div class="card-head">
-        <div><span class="rank">#29</span> <b>09909.HK</b> <span>宝龙商业</span></div>
-        <div class="score">104.8</div>
-      </div>
-      <div class="grid">
-        <div><label>市值</label><strong>14.79亿</strong></div>
-        <div><label>成交额</label><strong>0.00亿</strong></div>
-        <div><label>PB/PE</label><strong>0.39 / 5.72</strong></div>
-        <div><label>现金/负债</label><strong>190.1%</strong></div>
-        <div><label>净现金/市值</label><strong>143.6%</strong></div>
-        <div><label>股东回报率</label><strong>0.6%</strong></div>
-        <div><label>近4年盈利</label><strong>4/4</strong></div>
-        <div><label>CFO/利润</label><strong>181.9%</strong></div>
-      </div>
-      <div class="tags"><span class="tag">现金类资产&gt;总负债</span><span class="tag">近年盈利稳定</span><span class="tag">经营现金流稳定</span></div>
-      <details>
-        <summary>更多</summary>
-        <p>最新报告期: 20251231; 最近一年利润: 2.34亿; 一次性/其他收益占比: 40.7%; 近4年派息年数: ; 最近派息/利润: </p>
-        <p class="small">披露易标题: </p>
-      </details>
-    </article>
-    
-    <article class="card">
-      <div class="card-head">
-        <div><span class="rank">#30</span> <b>06668.HK</b> <span>星盛商业</span></div>
-        <div class="score">104.6</div>
-      </div>
-      <div class="grid">
-        <div><label>市值</label><strong>12.48亿</strong></div>
-        <div><label>成交额</label><strong>0.00亿</strong></div>
-        <div><label>PB/PE</label><strong>0.89 / 7.90</strong></div>
-        <div><label>现金/负债</label><strong>132.4%</strong></div>
-        <div><label>净现金/市值</label><strong>26.3%</strong></div>
-        <div><label>股东回报率</label><strong>9.9%</strong></div>
-        <div><label>近4年盈利</label><strong>4/4</strong></div>
-        <div><label>CFO/利润</label><strong>121.8%</strong></div>
-      </div>
-      <div class="tags"><span class="tag">现金类资产&gt;总负债</span><span class="tag">近年盈利稳定</span><span class="tag">经营现金流稳定</span><span class="tag">股东回报率较高</span></div>
-      <details>
-        <summary>更多</summary>
-        <p>最新报告期: 20251231; 最近一年利润: 1.43亿; 一次性/其他收益占比: 19.2%; 近4年派息年数: ; 最近派息/利润: </p>
-        <p class="small">披露易标题: </p>
-      </details>
-    </article>
-    
-    <article class="card">
-      <div class="card-head">
-        <div><span class="rank">#31</span> <b>01045.HK</b> <span>亚太卫星</span></div>
-        <div class="score">103.1</div>
-      </div>
-      <div class="grid">
-        <div><label>市值</label><strong>22.75亿</strong></div>
-        <div><label>成交额</label><strong>0.05亿</strong></div>
-        <div><label>PB/PE</label><strong>0.37 / 16.09</strong></div>
-        <div><label>现金/负债</label><strong>350.7%</strong></div>
-        <div><label>净现金/市值</label><strong>77.6%</strong></div>
-        <div><label>股东回报率</label><strong>3.3%</strong></div>
-        <div><label>近4年盈利</label><strong>4/4</strong></div>
-        <div><label>CFO/利润</label><strong>241.8%</strong></div>
-      </div>
-      <div class="tags"><span class="tag">现金类资产&gt;总负债</span><span class="tag">近年盈利稳定</span><span class="tag">经营现金流稳定</span><span class="tag">一次性/其他收益占比较高</span><span class="tag danger">一次性/其他收益占比高</span></div>
-      <details>
-        <summary>更多</summary>
-        <p>最新报告期: 20251231; 最近一年利润: 1.28亿; 一次性/其他收益占比: 67.8%; 近4年派息年数: ; 最近派息/利润: </p>
-        <p class="small">披露易标题: </p>
-      </details>
-    </article>
-    
-    <article class="card">
-      <div class="card-head">
-        <div><span class="rank">#32</span> <b>02489.HK</b> <span>集海黄金</span></div>
-        <div class="score">102.9</div>
-      </div>
-      <div class="grid">
-        <div><label>市值</label><strong>16.08亿</strong></div>
-        <div><label>成交额</label><strong>0.01亿</strong></div>
-        <div><label>PB/PE</label><strong>1.02 / 11.92</strong></div>
-        <div><label>现金/负债</label><strong>157.8%</strong></div>
-        <div><label>净现金/市值</label><strong>24.9%</strong></div>
-        <div><label>股东回报率</label><strong>5.0%</strong></div>
-        <div><label>近4年盈利</label><strong>4/4</strong></div>
-        <div><label>CFO/利润</label><strong>195.1%</strong></div>
-      </div>
-      <div class="tags"><span class="tag">现金类资产&gt;总负债</span><span class="tag">近年盈利稳定</span><span class="tag">经营现金流稳定</span><span class="tag">股东回报率较高</span></div>
-      <details>
-        <summary>更多</summary>
-        <p>最新报告期: 20251231; 最近一年利润: 1.11亿; 一次性/其他收益占比: 16.6%; 近4年派息年数: ; 最近派息/利润: </p>
-        <p class="small">披露易标题: </p>
-      </details>
-    </article>
-    
-    <article class="card">
-      <div class="card-head">
-        <div><span class="rank">#33</span> <b>06626.HK</b> <span>越秀服务</span></div>
-        <div class="score">101.6</div>
-      </div>
-      <div class="grid">
-        <div><label>市值</label><strong>24.34亿</strong></div>
-        <div><label>成交额</label><strong>0.00亿</strong></div>
-        <div><label>PB/PE</label><strong>0.63 / 8.03</strong></div>
-        <div><label>现金/负债</label><strong>106.1%</strong></div>
-        <div><label>净现金/市值</label><strong>8.4%</strong></div>
-        <div><label>股东回报率</label><strong>11.1%</strong></div>
-        <div><label>近4年盈利</label><strong>4/4</strong></div>
-        <div><label>CFO/利润</label><strong>185.9%</strong></div>
-      </div>
-      <div class="tags"><span class="tag">现金类资产&gt;总负债</span><span class="tag">近年盈利稳定</span><span class="tag">经营现金流稳定</span><span class="tag">股东回报率较高</span></div>
-      <details>
-        <summary>更多</summary>
-        <p>最新报告期: 20251231; 最近一年利润: 2.74亿; 一次性/其他收益占比: 38.0%; 近4年派息年数: ; 最近派息/利润: </p>
-        <p class="small">披露易标题: </p>
-      </details>
-    </article>
-    
-    <article class="card">
-      <div class="card-head">
-        <div><span class="rank">#34</span> <b>00640.HK</b> <span>星谦发展</span></div>
-        <div class="score">100.2</div>
-      </div>
-      <div class="grid">
-        <div><label>市值</label><strong>7.73亿</strong></div>
-        <div><label>成交额</label><strong>0.00亿</strong></div>
-        <div><label>PB/PE</label><strong>1.12 / 6.75</strong></div>
-        <div><label>现金/负债</label><strong>177.7%</strong></div>
-        <div><label>净现金/市值</label><strong>21.3%</strong></div>
-        <div><label>股东回报率</label><strong>7.0%</strong></div>
-        <div><label>近4年盈利</label><strong>4/4</strong></div>
-        <div><label>CFO/利润</label><strong>113.1%</strong></div>
-      </div>
-      <div class="tags"><span class="tag">现金类资产&gt;总负债</span><span class="tag">近年盈利稳定</span><span class="tag">经营现金流稳定</span><span class="tag">股东回报率较高</span></div>
-      <details>
-        <summary>更多</summary>
-        <p>最新报告期: 20260331; 最近一年利润: 1.12亿; 一次性/其他收益占比: 13.0%; 近4年派息年数: ; 最近派息/利润: </p>
-        <p class="small">披露易标题: </p>
-      </details>
-    </article>
-    
-    <article class="card">
-      <div class="card-head">
-        <div><span class="rank">#35</span> <b>01970.HK</b> <span>IMAX CHINA</span></div>
-        <div class="score">99.7</div>
-      </div>
-      <div class="grid">
-        <div><label>市值</label><strong>28.55亿</strong></div>
-        <div><label>成交额</label><strong>0.00亿</strong></div>
-        <div><label>PB/PE</label><strong>1.16 / 9.74</strong></div>
-        <div><label>现金/负债</label><strong>209.8%</strong></div>
-        <div><label>净现金/市值</label><strong>16.7%</strong></div>
-        <div><label>股东回报率</label><strong>0.4%</strong></div>
-        <div><label>近4年盈利</label><strong>4/4</strong></div>
-        <div><label>CFO/利润</label><strong>153.5%</strong></div>
-      </div>
-      <div class="tags"><span class="tag">现金类资产&gt;总负债</span><span class="tag">近年盈利稳定</span><span class="tag">经营现金流稳定</span></div>
-      <details>
-        <summary>更多</summary>
-        <p>最新报告期: 20251231; 最近一年利润: 2.65亿; 一次性/其他收益占比: 2.9%; 近4年派息年数: ; 最近派息/利润: </p>
-        <p class="small">披露易标题: </p>
-      </details>
-    </article>
-    
-    <article class="card">
-      <div class="card-head">
-        <div><span class="rank">#36</span> <b>00717.HK</b> <span>英皇资本</span></div>
-        <div class="score">97.5</div>
-      </div>
-      <div class="grid">
-        <div><label>市值</label><strong>4.52亿</strong></div>
-        <div><label>成交额</label><strong>0.00亿</strong></div>
-        <div><label>PB/PE</label><strong>0.12 / 3.48</strong></div>
-        <div><label>现金/负债</label><strong>210.7%</strong></div>
-        <div><label>净现金/市值</label><strong>465.4%</strong></div>
-        <div><label>股东回报率</label><strong>0.0%</strong></div>
-        <div><label>近4年盈利</label><strong>2/4</strong></div>
-        <div><label>CFO/利润</label><strong>293.3%</strong></div>
-      </div>
-      <div class="tags"><span class="tag">现金类资产&gt;总负债</span></div>
-      <details>
-        <summary>更多</summary>
-        <p>最新报告期: 20260331; 最近一年利润: 0.19亿; 一次性/其他收益占比: 9.9%; 近4年派息年数: ; 最近派息/利润: </p>
-        <p class="small">披露易标题: </p>
-      </details>
-    </article>
-    
-    <article class="card">
-      <div class="card-head">
-        <div><span class="rank">#37</span> <b>01767.HK</b> <span>TS WONDERS</span></div>
-        <div class="score">97.4</div>
-      </div>
-      <div class="grid">
-        <div><label>市值</label><strong>3.20亿</strong></div>
-        <div><label>成交额</label><strong>0.00亿</strong></div>
-        <div><label>PB/PE</label><strong>0.60 / 17.86</strong></div>
-        <div><label>现金/负债</label><strong>654.9%</strong></div>
-        <div><label>净现金/市值</label><strong>111.6%</strong></div>
-        <div><label>股东回报率</label><strong>0.6%</strong></div>
-        <div><label>近4年盈利</label><strong>4/4</strong></div>
-        <div><label>CFO/利润</label><strong>85.4%</strong></div>
-      </div>
-      <div class="tags"><span class="tag">现金类资产&gt;总负债</span><span class="tag">近年盈利稳定</span><span class="tag">经营现金流稳定</span></div>
-      <details>
-        <summary>更多</summary>
-        <p>最新报告期: 20251231; 最近一年利润: 0.16亿; 一次性/其他收益占比: 12.1%; 近4年派息年数: ; 最近派息/利润: </p>
-        <p class="small">披露易标题: </p>
-      </details>
-    </article>
-    
-    <article class="card">
-      <div class="card-head">
-        <div><span class="rank">#38</span> <b>01712.HK</b> <span>龙资源</span></div>
-        <div class="score">93.1</div>
-      </div>
-      <div class="grid">
-        <div><label>市值</label><strong>9.62亿</strong></div>
-        <div><label>成交额</label><strong>0.04亿</strong></div>
-        <div><label>PB/PE</label><strong>1.01 / 3.08</strong></div>
-        <div><label>现金/负债</label><strong>176.0%</strong></div>
-        <div><label>净现金/市值</label><strong>23.4%</strong></div>
-        <div><label>股东回报率</label><strong>0.0%</strong></div>
-        <div><label>近4年盈利</label><strong>4/4</strong></div>
-        <div><label>CFO/利润</label><strong>121.9%</strong></div>
-      </div>
-      <div class="tags"><span class="tag">现金类资产&gt;总负债</span><span class="tag">近年盈利稳定</span><span class="tag">经营现金流稳定</span></div>
-      <details>
-        <summary>更多</summary>
-        <p>最新报告期: 20251231; 最近一年利润: 2.82亿; 一次性/其他收益占比: 0.3%; 近4年派息年数: ; 最近派息/利润: </p>
-        <p class="small">披露易标题: </p>
-      </details>
-    </article>
-    
-    <article class="card">
-      <div class="card-head">
-        <div><span class="rank">#39</span> <b>09982.HK</b> <span>中原建业</span></div>
-        <div class="score">93.0</div>
-      </div>
-      <div class="grid">
-        <div><label>市值</label><strong>3.63亿</strong></div>
-        <div><label>成交额</label><strong>0.02亿</strong></div>
-        <div><label>PB/PE</label><strong>0.13 / 6.89</strong></div>
-        <div><label>现金/负债</label><strong>469.2%</strong></div>
-        <div><label>净现金/市值</label><strong>557.8%</strong></div>
-        <div><label>股东回报率</label><strong>0.0%</strong></div>
-        <div><label>近4年盈利</label><strong>4/4</strong></div>
-        <div><label>CFO/利润</label><strong>67.9%</strong></div>
-      </div>
-      <div class="tags"><span class="tag">现金类资产&gt;总负债</span><span class="tag">近年盈利稳定</span><span class="tag">经营现金流稳定</span></div>
-      <details>
-        <summary>更多</summary>
-        <p>最新报告期: 20251231; 最近一年利润: 0.48亿; 一次性/其他收益占比: 37.0%; 近4年派息年数: ; 最近派息/利润: </p>
-        <p class="small">披露易标题: </p>
-      </details>
-    </article>
-    
-    <article class="card">
-      <div class="card-head">
-        <div><span class="rank">#40</span> <b>00113.HK</b> <span>迪生创建</span></div>
-        <div class="score">92.1</div>
-      </div>
-      <div class="grid">
-        <div><label>市值</label><strong>24.01亿</strong></div>
-        <div><label>成交额</label><strong>0.01亿</strong></div>
-        <div><label>PB/PE</label><strong>0.65 / 9.65</strong></div>
-        <div><label>现金/负债</label><strong>304.7%</strong></div>
-        <div><label>净现金/市值</label><strong>106.4%</strong></div>
-        <div><label>股东回报率</label><strong>0.0%</strong></div>
-        <div><label>近4年盈利</label><strong>4/4</strong></div>
-        <div><label>CFO/利润</label><strong>4.7%</strong></div>
-      </div>
-      <div class="tags"><span class="tag">现金类资产&gt;总负债</span><span class="tag">近年盈利稳定</span><span class="tag">经营现金流稳定</span></div>
-      <details>
-        <summary>更多</summary>
-        <p>最新报告期: 20260331; 最近一年利润: 1.37亿; 一次性/其他收益占比: 9.1%; 近4年派息年数: ; 最近派息/利润: </p>
-        <p class="small">披露易标题: </p>
+      <details class="detail">
+        <summary><span class="closed-label">展开详情</span><span class="open-label">收起详情</span></summary>
+        <div class="detail-body">
+          <div class="detail-grid">
+            <div><label>最新报告期</label><strong>20251231</strong></div>
+            <div><label>最近一年利润</label><strong>4.14亿</strong></div>
+            <div><label>一次性/其他收益占比</label><strong>-12.3%</strong></div>
+            <div><label>最近派息/利润</label><strong>15.8%</strong></div>
+            <div><label>DPS估算收益率</label><strong></strong></div>
+            <div><label>流动性</label><strong>低</strong></div>
+          </div>
+          
+          <div class="notice-title">近期披露易标题</div>
+          <ul class="notices"><li>01/06/2026 17:16: Monthly Return of Equity Issuer on Movements in Securities for the month ended 31 May 2026</li><li>18/05/2026 17:29: Poll Results of Annual General Meeting held on 18 May 2026</li><li>04/05/2026 16:55: Monthly Return of Equity Issuer on Movements in Securities for the month ended 30 April 2026</li><li>16/04/2026 17:11: Notification Letter to Non-Registered Shareholders</li></ul>
+        </div>
       </details>
     </article>
     </div>
   </section>
   <section>
-    <h2>前 80 总表</h2>
-    <div class="table-wrap"><table>
-      <thead><tr><th>#</th><th>代码</th><th>名称</th><th>市值</th><th>成交额</th><th>PB</th><th>PE</th><th>现金/负债</th><th>净现金/市值</th><th>股东回报</th><th>分数</th></tr></thead>
-      <tbody><tr>
-      <td>1</td><td>01451.HK</td><td>万成集团股份</td><td>2.15亿</td><td>0.00亿</td>
-      <td>1.13</td><td>8.10</td><td>215.4%</td><td>40.6%</td><td>17.0%</td><td>139.5</td>
-    </tr><tr>
-      <td>2</td><td>00327.HK</td><td>百富环球</td><td>36.95亿</td><td>0.05亿</td>
-      <td>0.47</td><td>4.90</td><td>206.2%</td><td>52.1%</td><td>13.2%</td><td>129.6</td>
-    </tr><tr>
-      <td>3</td><td>01502.HK</td><td>金融街物业</td><td>7.47亿</td><td>0.00亿</td>
-      <td>0.50</td><td>6.29</td><td>177.6%</td><td>100.9%</td><td>9.7%</td><td>128.2</td>
-    </tr><tr>
-      <td>4</td><td>06826.HK</td><td>昊海生物科技</td><td>36.08亿</td><td>0.01亿</td>
-      <td>0.59</td><td>13.70</td><td>226.1%</td><td>39.0%</td><td>11.9%</td><td>126.3</td>
-    </tr><tr>
-      <td>5</td><td>00623.HK</td><td>中视金桥</td><td>8.98亿</td><td>0.00亿</td>
-      <td>0.43</td><td>10.13</td><td>678.9%</td><td>69.1%</td><td>16.8%</td><td>126.2</td>
-    </tr><tr>
-      <td>6</td><td>01180.HK</td><td>汇彩控股</td><td>7.79亿</td><td>0.00亿</td>
-      <td>1.74</td><td>5.50</td><td>309.6%</td><td>59.4%</td><td>23.0%</td><td>123.6</td>
-    </tr><tr>
-      <td>7</td><td>03315.HK</td><td>金邦达宝嘉</td><td>5.56亿</td><td>0.00亿</td>
-      <td>0.25</td><td>12.52</td><td>299.4%</td><td>150.9%</td><td>7.8%</td><td>121.8</td>
-    </tr><tr>
-      <td>8</td><td>01778.HK</td><td>彩生活</td><td>2.94亿</td><td>0.00亿</td>
-      <td>0.06</td><td>11.06</td><td>153.4%</td><td>266.5%</td><td>5.9%</td><td>121.3</td>
-    </tr><tr>
-      <td>9</td><td>02469.HK</td><td>粉笔</td><td>9.83亿</td><td>0.01亿</td>
-      <td>0.68</td><td>4.48</td><td>226.3%</td><td>69.4%</td><td>15.5%</td><td>120.5</td>
-    </tr><tr>
-      <td>10</td><td>00239.HK</td><td>白花油</td><td>7.42亿</td><td>0.00亿</td>
-      <td>1.03</td><td>8.12</td><td>326.2%</td><td>29.1%</td><td>7.0%</td><td>119.6</td>
-    </tr><tr>
-      <td>11</td><td>01425.HK</td><td>捷隆控股</td><td>7.88亿</td><td>0.00亿</td>
-      <td>0.84</td><td>4.72</td><td>475.5%</td><td>81.3%</td><td>8.0%</td><td>119.5</td>
-    </tr><tr>
-      <td>12</td><td>01669.HK</td><td>环球信贷集团</td><td>5.60亿</td><td>0.00亿</td>
-      <td>0.59</td><td>10.72</td><td>4941.9%</td><td>65.8%</td><td>7.7%</td><td>119.3</td>
-    </tr><tr>
-      <td>13</td><td>01666.HK</td><td>同仁堂科技</td><td>41.37亿</td><td>0.01亿</td>
-      <td>0.51</td><td>9.43</td><td>140.3%</td><td>33.5%</td><td>11.5%</td><td>118.7</td>
-    </tr><tr>
-      <td>14</td><td>02348.HK</td><td>东瑞制药</td><td>15.66亿</td><td>0.00亿</td>
-      <td>0.42</td><td>6.61</td><td>252.6%</td><td>60.8%</td><td>8.5%</td><td>118.0</td>
-    </tr><tr>
-      <td>15</td><td>00046.HK</td><td>科联系统</td><td>3.03亿</td><td>0.00亿</td>
-      <td>0.61</td><td>16.43</td><td>215.1%</td><td>55.4%</td><td>8.0%</td><td>117.9</td>
-    </tr><tr>
-      <td>16</td><td>03686.HK</td><td>祈福生活服务</td><td>7.21亿</td><td>0.00亿</td>
-      <td>1.10</td><td>2.29</td><td>223.5%</td><td>21.8%</td><td>14.6%</td><td>117.0</td>
-    </tr><tr>
-      <td>17</td><td>03662.HK</td><td>星悦康旅</td><td>2.32亿</td><td>0.00亿</td>
-      <td>0.17</td><td>4.07</td><td>194.7%</td><td>406.0%</td><td>8.4%</td><td>116.3</td>
-    </tr><tr>
-      <td>18</td><td>06100.HK</td><td>同道猎聘</td><td>10.96亿</td><td>0.00亿</td>
-      <td>0.34</td><td>9.65</td><td>123.1%</td><td>27.0%</td><td>13.8%</td><td>114.2</td>
-    </tr><tr>
-      <td>19</td><td>03658.HK</td><td>新希望服务</td><td>14.82亿</td><td>0.00亿</td>
-      <td>1.02</td><td>6.19</td><td>137.6%</td><td>17.7%</td><td>11.2%</td><td>109.5</td>
-    </tr><tr>
-      <td>20</td><td>06929.HK</td><td>业聚医疗</td><td>32.79亿</td><td>0.00亿</td>
-      <td>1.02</td><td>10.06</td><td>565.0%</td><td>38.6%</td><td>5.8%</td><td>109.2</td>
-    </tr><tr>
-      <td>21</td><td>01260.HK</td><td>皓天财经集团</td><td>5.64亿</td><td>0.00亿</td>
-      <td>0.36</td><td>8.13</td><td>902.1%</td><td>161.9%</td><td>0.0%</td><td>107.8</td>
-    </tr><tr>
-      <td>22</td><td>00934.HK</td><td>中石化冠德</td><td>90.50亿</td><td>0.03亿</td>
-      <td>0.55</td><td>8.80</td><td>1069.5%</td><td>33.5%</td><td>6.2%</td><td>107.8</td>
-    </tr><tr>
-      <td>23</td><td>02219.HK</td><td>朝聚眼科</td><td>17.49亿</td><td>0.01亿</td>
-      <td>0.66</td><td>8.61</td><td>242.3%</td><td>49.9%</td><td>4.6%</td><td>107.6</td>
-    </tr><tr>
-      <td>24</td><td>01731.HK</td><td>其利工业集团</td><td>9.41亿</td><td>0.01亿</td>
-      <td>0.64</td><td>4.93</td><td>160.3%</td><td>24.2%</td><td>7.5%</td><td>107.4</td>
-    </tr><tr>
-      <td>25</td><td>02283.HK</td><td>东江集团控股</td><td>16.67亿</td><td>0.00亿</td>
-      <td>0.92</td><td>7.64</td><td>120.5%</td><td>10.8%</td><td>10.4%</td><td>107.4</td>
-    </tr><tr>
-      <td>26</td><td>01568.HK</td><td>承达集团</td><td>12.65亿</td><td>0.00亿</td>
-      <td>0.35</td><td>4.73</td><td>115.2%</td><td>37.4%</td><td>30.8%</td><td>106.1</td>
-    </tr><tr>
-      <td>27</td><td>00887.HK</td><td>英皇钟表珠宝</td><td>17.13亿</td><td>0.00亿</td>
-      <td>0.30</td><td>3.74</td><td>155.8%</td><td>30.4%</td><td>3.8%</td><td>106.0</td>
-    </tr><tr>
-      <td>28</td><td>00420.HK</td><td>福田实业</td><td>8.09亿</td><td>0.00亿</td>
-      <td>0.25</td><td>11.34</td><td>148.3%</td><td>56.3%</td><td>7.5%</td><td>105.3</td>
-    </tr><tr>
-      <td>29</td><td>09909.HK</td><td>宝龙商业</td><td>14.79亿</td><td>0.00亿</td>
-      <td>0.39</td><td>5.72</td><td>190.1%</td><td>143.6%</td><td>0.6%</td><td>104.8</td>
-    </tr><tr>
-      <td>30</td><td>06668.HK</td><td>星盛商业</td><td>12.48亿</td><td>0.00亿</td>
-      <td>0.89</td><td>7.90</td><td>132.4%</td><td>26.3%</td><td>9.9%</td><td>104.6</td>
-    </tr><tr>
-      <td>31</td><td>01045.HK</td><td>亚太卫星</td><td>22.75亿</td><td>0.05亿</td>
-      <td>0.37</td><td>16.09</td><td>350.7%</td><td>77.6%</td><td>3.3%</td><td>103.1</td>
-    </tr><tr>
-      <td>32</td><td>02489.HK</td><td>集海黄金</td><td>16.08亿</td><td>0.01亿</td>
-      <td>1.02</td><td>11.92</td><td>157.8%</td><td>24.9%</td><td>5.0%</td><td>102.9</td>
-    </tr><tr>
-      <td>33</td><td>06626.HK</td><td>越秀服务</td><td>24.34亿</td><td>0.00亿</td>
-      <td>0.63</td><td>8.03</td><td>106.1%</td><td>8.4%</td><td>11.1%</td><td>101.6</td>
-    </tr><tr>
-      <td>34</td><td>00640.HK</td><td>星谦发展</td><td>7.73亿</td><td>0.00亿</td>
-      <td>1.12</td><td>6.75</td><td>177.7%</td><td>21.3%</td><td>7.0%</td><td>100.2</td>
-    </tr><tr>
-      <td>35</td><td>01970.HK</td><td>IMAX CHINA</td><td>28.55亿</td><td>0.00亿</td>
-      <td>1.16</td><td>9.74</td><td>209.8%</td><td>16.7%</td><td>0.4%</td><td>99.7</td>
-    </tr><tr>
-      <td>36</td><td>00717.HK</td><td>英皇资本</td><td>4.52亿</td><td>0.00亿</td>
-      <td>0.12</td><td>3.48</td><td>210.7%</td><td>465.4%</td><td>0.0%</td><td>97.5</td>
-    </tr><tr>
-      <td>37</td><td>01767.HK</td><td>TS WONDERS</td><td>3.20亿</td><td>0.00亿</td>
-      <td>0.60</td><td>17.86</td><td>654.9%</td><td>111.6%</td><td>0.6%</td><td>97.4</td>
-    </tr><tr>
-      <td>38</td><td>01712.HK</td><td>龙资源</td><td>9.62亿</td><td>0.04亿</td>
-      <td>1.01</td><td>3.08</td><td>176.0%</td><td>23.4%</td><td>0.0%</td><td>93.1</td>
-    </tr><tr>
-      <td>39</td><td>09982.HK</td><td>中原建业</td><td>3.63亿</td><td>0.02亿</td>
-      <td>0.13</td><td>6.89</td><td>469.2%</td><td>557.8%</td><td>0.0%</td><td>93.0</td>
-    </tr><tr>
-      <td>40</td><td>00113.HK</td><td>迪生创建</td><td>24.01亿</td><td>0.01亿</td>
-      <td>0.65</td><td>9.65</td><td>304.7%</td><td>106.4%</td><td>0.0%</td><td>92.1</td>
-    </tr><tr>
-      <td>41</td><td>06038.HK</td><td>信越控股</td><td>3.61亿</td><td>0.00亿</td>
-      <td>1.21</td><td>6.50</td><td>210.6%</td><td>51.0%</td><td>0.0%</td><td>91.6</td>
-    </tr><tr>
-      <td>42</td><td>00085.HK</td><td>中电华大科技</td><td>22.13亿</td><td>0.01亿</td>
-      <td>0.86</td><td>9.40</td><td>138.1%</td><td>19.1%</td><td>7.5%</td><td>91.4</td>
-    </tr><tr>
-      <td>43</td><td>00050.HK</td><td>香港小轮(集团)</td><td>17.07亿</td><td>0.00亿</td>
-      <td>0.23</td><td>5.09</td><td>618.3%</td><td>93.7%</td><td>4.7%</td><td>89.8</td>
-    </tr><tr>
-      <td>44</td><td>00811.HK</td><td>新华文轩</td><td>109.32亿</td><td>0.04亿</td>
-      <td>0.62</td><td>6.26</td><td>113.1%</td><td>9.3%</td><td>7.2%</td><td>88.9</td>
-    </tr><tr>
-      <td>45</td><td>00071.HK</td><td>美丽华酒店</td><td>69.10亿</td><td>0.00亿</td>
-      <td>0.33</td><td>10.20</td><td>551.1%</td><td>73.9%</td><td>0.0%</td><td>88.7</td>
-    </tr><tr>
-      <td>46</td><td>00398.HK</td><td>东方表行集团</td><td>15.89亿</td><td>0.01亿</td>
-      <td>0.88</td><td>8.82</td><td>201.7%</td><td>26.9%</td><td>0.0%</td><td>88.2</td>
-    </tr><tr>
-      <td>47</td><td>01051.HK</td><td>国际资源</td><td>37.15亿</td><td>0.00亿</td>
-      <td>0.29</td><td>4.84</td><td>1911.1%</td><td>128.3%</td><td>1.3%</td><td>85.3</td>
-    </tr><tr>
-      <td>48</td><td>08030.HK</td><td>丰银禾控股</td><td>3.21亿</td><td>0.01亿</td>
-      <td>1.20</td><td>6.11</td><td>173.4%</td><td>22.8%</td><td>0.0%</td><td>83.9</td>
-    </tr><tr>
-      <td>49</td><td>02306.HK</td><td>乐华娱乐</td><td>15.78亿</td><td>0.00亿</td>
-      <td>1.01</td><td>22.21</td><td>176.4%</td><td>27.8%</td><td>4.4%</td><td>83.1</td>
-    </tr><tr>
-      <td>50</td><td>06820.HK</td><td>友谊时光</td><td>7.96亿</td><td>0.00亿</td>
-      <td>0.58</td><td>7.72</td><td>431.7%</td><td>81.1%</td><td>0.0%</td><td>82.8</td>
-    </tr><tr>
-      <td>51</td><td>02559.HK</td><td>嘀嗒出行</td><td>14.05亿</td><td>0.02亿</td>
-      <td>0.87</td><td>9.78</td><td>265.7%</td><td>66.7%</td><td>0.0%</td><td>78.7</td>
-    </tr><tr>
-      <td>52</td><td>01104.HK</td><td>亚太资源</td><td>32.31亿</td><td>0.10亿</td>
-      <td>0.35</td><td>1.34</td><td>574.8%</td><td>118.1%</td><td>4.5%</td><td>78.7</td>
-    </tr><tr>
-      <td>53</td><td>02167.HK</td><td>天润云</td><td>5.90亿</td><td>0.00亿</td>
-      <td>0.97</td><td>8.76</td><td>235.9%</td><td>36.7%</td><td>2.8%</td><td>78.6</td>
-    </tr><tr>
-      <td>54</td><td>08195.HK</td><td>传承教育集团</td><td>5.32亿</td><td>0.00亿</td>
-      <td>1.08</td><td>13.71</td><td>312.5%</td><td>23.6%</td><td>0.0%</td><td>74.9</td>
-    </tr><tr>
-      <td>55</td><td>00882.HK</td><td>天津发展</td><td>22.53亿</td><td>0.00亿</td>
-      <td>0.17</td><td>5.26</td><td>126.7%</td><td>51.8%</td><td>8.7%</td><td>72.5</td>
-    </tr><tr>
-      <td>56</td><td>02683.HK</td><td>华新手袋国际控股</td><td>4.54亿</td><td>0.00亿</td>
-      <td>1.42</td><td>5.30</td><td>117.2%</td><td>5.6%</td><td>0.0%</td><td>69.7</td>
-    </tr><tr>
-      <td>57</td><td>00318.HK</td><td>黄河实业</td><td>2.42亿</td><td>0.00亿</td>
-      <td>0.44</td><td>21.90</td><td>137.2%</td><td>8.3%</td><td>0.0%</td><td>67.8</td>
-    </tr><tr>
-      <td>58</td><td>03700.HK</td><td>映宇宙</td><td>28.87亿</td><td>0.05亿</td>
-      <td>0.57</td><td>10.81</td><td>393.2%</td><td>74.7%</td><td>0.2%</td><td>67.8</td>
-    </tr><tr>
-      <td>59</td><td>02175.HK</td><td>中国通才教育</td><td>15.11亿</td><td>0.00亿</td>
-      <td>0.69</td><td>17.74</td><td>106.3%</td><td>1.8%</td><td>0.0%</td><td>67.6</td>
-    </tr><tr>
-      <td>60</td><td>00806.HK</td><td>惠理集团</td><td>37.81亿</td><td>0.02亿</td>
-      <td>0.89</td><td>5.66</td><td>373.6%</td><td>27.9%</td><td>0.4%</td><td>65.6</td>
-    </tr><tr>
-      <td>61</td><td>03303.HK</td><td>巨涛海洋石油服务</td><td>12.44亿</td><td>0.00亿</td>
-      <td>0.44</td><td>24.52</td><td>168.9%</td><td>43.7%</td><td>2.3%</td><td>61.1</td>
-    </tr><tr>
-      <td>62</td><td>01140.HK</td><td>华科智能投资</td><td>16.20亿</td><td>0.10亿</td>
-      <td>0.15</td><td>14.71</td><td>572.9%</td><td>195.4%</td><td>0.0%</td><td>55.9</td>
-    </tr><tr>
-      <td>63</td><td>02550.HK</td><td>宜搜科技</td><td>8.45亿</td><td>0.01亿</td>
-      <td>0.81</td><td>23.47</td><td>312.3%</td><td>47.6%</td><td>0.0%</td><td>52.1</td>
-    </tr><tr>
-      <td>64</td><td>01022.HK</td><td>飞鱼科技</td><td>7.00亿</td><td>0.00亿</td>
-      <td>1.06</td><td>6.00</td><td>103.5%</td><td>1.1%</td><td>0.0%</td><td>47.6</td>
-    </tr><tr>
-      <td>65</td><td>09857.HK</td><td>柠萌影视</td><td>7.24亿</td><td>0.00亿</td>
-      <td>0.28</td><td>20.94</td><td>179.1%</td><td>91.0%</td><td>0.0%</td><td>43.9</td>
-    </tr><tr>
-      <td>66</td><td>01458.HK</td><td>周黑鸭</td><td>25.60亿</td><td>0.01亿</td>
-      <td>0.68</td><td>14.75</td><td>85.6%</td><td>-5.9%</td><td>10.8%</td><td>106.9</td>
-    </tr><tr>
-      <td>67</td><td>02111.HK</td><td>超盈国际控股</td><td>24.85亿</td><td>0.01亿</td>
-      <td>0.66</td><td>4.51</td><td>74.8%</td><td>-25.4%</td><td>10.7%</td><td>100.5</td>
-    </tr><tr>
-      <td>68</td><td>02180.HK</td><td>万宝盛华</td><td>11.00亿</td><td>0.00亿</td>
-      <td>0.94</td><td>6.33</td><td>66.3%</td><td>-38.7%</td><td>32.8%</td><td>97.4</td>
-    </tr><tr>
-      <td>69</td><td>09898.HK</td><td>微博-SW</td><td>139.79亿</td><td>0.07亿</td>
-      <td>0.46</td><td>4.76</td><td>78.0%</td><td>-34.1%</td><td>9.8%</td><td>95.3</td>
-    </tr><tr>
-      <td>70</td><td>03382.HK</td><td>天津港发展</td><td>35.72亿</td><td>0.04亿</td>
-      <td>0.25</td><td>5.36</td><td>69.7%</td><td>-73.1%</td><td>22.5%</td><td>95.1</td>
-    </tr><tr>
-      <td>71</td><td>09919.HK</td><td>艾德韦宣集团</td><td>5.81亿</td><td>0.00亿</td>
-      <td>1.53</td><td>6.90</td><td>99.5%</td><td>-0.2%</td><td>12.2%</td><td>93.2</td>
-    </tr><tr>
-      <td>72</td><td>01127.HK</td><td>狮子山集团</td><td>9.55亿</td><td>0.00亿</td>
-      <td>0.58</td><td>5.09</td><td>75.4%</td><td>-18.2%</td><td>10.3%</td><td>92.5</td>
-    </tr><tr>
-      <td>73</td><td>01556.HK</td><td>建业建荣</td><td>3.98亿</td><td>0.00亿</td>
-      <td>0.45</td><td>2.99</td><td>64.3%</td><td>-93.5%</td><td>13.6%</td><td>88.2</td>
-    </tr><tr>
-      <td>74</td><td>08049.HK</td><td>吉林长龙药业</td><td>12.77亿</td><td>0.00亿</td>
-      <td>0.68</td><td>5.80</td><td>69.3%</td><td>-23.6%</td><td>9.3%</td><td>85.1</td>
-    </tr><tr>
-      <td>75</td><td>03660.HK</td><td>奇富科技-S</td><td>144.99亿</td><td>0.01亿</td>
-      <td>0.53</td><td>2.55</td><td>23.0%</td><td>-174.1%</td><td>42.9%</td><td>81.8</td>
-    </tr><tr>
-      <td>76</td><td>01995.HK</td><td>永升服务</td><td>28.77亿</td><td>0.03亿</td>
-      <td>0.50</td><td>5.94</td><td>69.1%</td><td>-43.0%</td><td>10.9%</td><td>81.3</td>
-    </tr><tr>
-      <td>77</td><td>00240.HK</td><td>利基控股</td><td>18.75亿</td><td>0.00亿</td>
-      <td>0.64</td><td>4.14</td><td>48.2%</td><td>-137.8%</td><td>10.5%</td><td>78.1</td>
-    </tr><tr>
-      <td>78</td><td>00833.HK</td><td>华讯</td><td>5.16亿</td><td>0.02亿</td>
-      <td>0.74</td><td>10.93</td><td>79.5%</td><td>-19.8%</td><td>5.0%</td><td>77.1</td>
-    </tr><tr>
-      <td>79</td><td>03337.HK</td><td>安东油田服务</td><td>25.21亿</td><td>0.04亿</td>
-      <td>0.60</td><td>6.10</td><td>33.7%</td><td>-205.8%</td><td>9.7%</td><td>76.5</td>
-    </tr><tr>
-      <td>80</td><td>03838.HK</td><td>中国淀粉</td><td>9.60亿</td><td>0.00亿</td>
-      <td>0.20</td><td>4.69</td><td>85.6%</td><td>-32.6%</td><td>8.4%</td><td>76.4</td>
-    </tr></tbody>
-    </table></div>
+    <h2>前 80 表格</h2>
+    <div class="table-wrap"><table border="1" class="dataframe rank-table">
+  <thead>
+    <tr style="text-align: right;">
+      <th>代码</th>
+      <th>名称</th>
+      <th>市值</th>
+      <th>成交额</th>
+      <th>PB</th>
+      <th>PE</th>
+      <th>现金/负债</th>
+      <th>净现金/市值</th>
+      <th>利润</th>
+      <th>盈利年数</th>
+      <th>CFO/利润</th>
+      <th>一次性占比</th>
+      <th>股东回报率</th>
+      <th>分数</th>
+      <th>流动性</th>
+      <th>标签</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>01451.HK</td>
+      <td>万成集团股份</td>
+      <td>2.15亿</td>
+      <td>0.00亿</td>
+      <td>1.13</td>
+      <td>8.10</td>
+      <td>215.4%</td>
+      <td>40.6%</td>
+      <td>0.24亿</td>
+      <td>4</td>
+      <td>393.1%</td>
+      <td>-2.3%</td>
+      <td>17.0%</td>
+      <td>139.5</td>
+      <td>极低</td>
+      <td>现金类资产&gt;总负债;近年盈利稳定;经营现金流稳定;股东回报率较高</td>
+    </tr>
+    <tr>
+      <td>00327.HK</td>
+      <td>百富环球</td>
+      <td>36.95亿</td>
+      <td>0.05亿</td>
+      <td>0.47</td>
+      <td>4.90</td>
+      <td>206.2%</td>
+      <td>52.1%</td>
+      <td>6.81亿</td>
+      <td>4</td>
+      <td>173.1%</td>
+      <td>12.1%</td>
+      <td>13.2%</td>
+      <td>129.6</td>
+      <td>中低</td>
+      <td>现金类资产&gt;总负债;近年盈利稳定;经营现金流稳定;股东回报率较高</td>
+    </tr>
+    <tr>
+      <td>01502.HK</td>
+      <td>金融街物业</td>
+      <td>7.47亿</td>
+      <td>0.00亿</td>
+      <td>0.50</td>
+      <td>6.29</td>
+      <td>177.6%</td>
+      <td>100.9%</td>
+      <td>1.07亿</td>
+      <td>4</td>
+      <td>145.6%</td>
+      <td>-15.5%</td>
+      <td>9.7%</td>
+      <td>128.2</td>
+      <td>低</td>
+      <td>现金类资产&gt;总负债;近年盈利稳定;经营现金流稳定;股东回报率较高</td>
+    </tr>
+    <tr>
+      <td>02518.HK</td>
+      <td>汽车之家-S</td>
+      <td>176.25亿</td>
+      <td>0.01亿</td>
+      <td>0.68</td>
+      <td>13.98</td>
+      <td>479.4%</td>
+      <td>86.4%</td>
+      <td>14.43亿</td>
+      <td>4</td>
+      <td>61.6%</td>
+      <td>14.0%</td>
+      <td>14.4%</td>
+      <td>127.5</td>
+      <td>低</td>
+      <td>现金类资产&gt;总负债;近年盈利稳定;经营现金流稳定;股东回报率较高</td>
+    </tr>
+    <tr>
+      <td>06826.HK</td>
+      <td>昊海生物科技</td>
+      <td>36.08亿</td>
+      <td>0.01亿</td>
+      <td>0.59</td>
+      <td>13.70</td>
+      <td>226.1%</td>
+      <td>39.0%</td>
+      <td>2.51亿</td>
+      <td>4</td>
+      <td>195.6%</td>
+      <td>81.3%</td>
+      <td>11.9%</td>
+      <td>126.3</td>
+      <td>中低</td>
+      <td>现金类资产&gt;总负债;近年盈利稳定;经营现金流稳定;一次性/其他收益占比较高;股东回报率较高</td>
+    </tr>
+    <tr>
+      <td>00623.HK</td>
+      <td>中视金桥</td>
+      <td>8.98亿</td>
+      <td>0.00亿</td>
+      <td>0.43</td>
+      <td>10.13</td>
+      <td>678.9%</td>
+      <td>69.1%</td>
+      <td>0.80亿</td>
+      <td>4</td>
+      <td>49.3%</td>
+      <td>5.7%</td>
+      <td>16.8%</td>
+      <td>126.2</td>
+      <td>极低</td>
+      <td>现金类资产&gt;总负债;近年盈利稳定;经营现金流稳定;股东回报率较高</td>
+    </tr>
+    <tr>
+      <td>01180.HK</td>
+      <td>汇彩控股</td>
+      <td>7.79亿</td>
+      <td>0.00亿</td>
+      <td>1.74</td>
+      <td>5.50</td>
+      <td>309.6%</td>
+      <td>59.4%</td>
+      <td>1.28亿</td>
+      <td>3</td>
+      <td>179.1%</td>
+      <td>18.6%</td>
+      <td>23.0%</td>
+      <td>123.6</td>
+      <td>极低</td>
+      <td>现金类资产&gt;总负债;近年盈利稳定;经营现金流稳定;股东回报率较高</td>
+    </tr>
+    <tr>
+      <td>03315.HK</td>
+      <td>金邦达宝嘉</td>
+      <td>5.56亿</td>
+      <td>0.00亿</td>
+      <td>0.25</td>
+      <td>12.52</td>
+      <td>299.4%</td>
+      <td>150.9%</td>
+      <td>0.40亿</td>
+      <td>4</td>
+      <td>399.7%</td>
+      <td>87.4%</td>
+      <td>7.8%</td>
+      <td>121.8</td>
+      <td>低</td>
+      <td>现金类资产&gt;总负债;近年盈利稳定;经营现金流稳定;一次性/其他收益占比较高;股东回报率较高</td>
+    </tr>
+    <tr>
+      <td>02877.HK</td>
+      <td>神威药业</td>
+      <td>61.86亿</td>
+      <td>0.10亿</td>
+      <td>0.69</td>
+      <td>5.88</td>
+      <td>543.4%</td>
+      <td>194.6%</td>
+      <td>9.50亿</td>
+      <td>4</td>
+      <td>123.4%</td>
+      <td>62.4%</td>
+      <td>5.7%</td>
+      <td>121.5</td>
+      <td>中低</td>
+      <td>现金类资产&gt;总负债;近年盈利稳定;经营现金流稳定;一次性/其他收益占比较高;股东回报率较高</td>
+    </tr>
+    <tr>
+      <td>01778.HK</td>
+      <td>彩生活</td>
+      <td>2.94亿</td>
+      <td>0.00亿</td>
+      <td>0.06</td>
+      <td>11.06</td>
+      <td>153.4%</td>
+      <td>266.5%</td>
+      <td>0.24亿</td>
+      <td>4</td>
+      <td>510.5%</td>
+      <td>18.8%</td>
+      <td>5.9%</td>
+      <td>121.3</td>
+      <td>极低</td>
+      <td>现金类资产&gt;总负债;近年盈利稳定;经营现金流稳定;股东回报率较高</td>
+    </tr>
+    <tr>
+      <td>02555.HK</td>
+      <td>茶百道</td>
+      <td>70.34亿</td>
+      <td>0.07亿</td>
+      <td>1.60</td>
+      <td>7.89</td>
+      <td>382.4%</td>
+      <td>32.5%</td>
+      <td>8.05亿</td>
+      <td>4</td>
+      <td>84.5%</td>
+      <td>18.6%</td>
+      <td>15.5%</td>
+      <td>120.6</td>
+      <td>中低</td>
+      <td>现金类资产&gt;总负债;近年盈利稳定;经营现金流稳定;股东回报率较高</td>
+    </tr>
+    <tr>
+      <td>02469.HK</td>
+      <td>粉笔</td>
+      <td>9.83亿</td>
+      <td>0.01亿</td>
+      <td>0.68</td>
+      <td>4.48</td>
+      <td>226.3%</td>
+      <td>69.4%</td>
+      <td>1.98亿</td>
+      <td>3</td>
+      <td>114.2%</td>
+      <td>14.4%</td>
+      <td>15.5%</td>
+      <td>120.5</td>
+      <td>低</td>
+      <td>现金类资产&gt;总负债;近年盈利稳定;经营现金流稳定;股东回报率较高</td>
+    </tr>
+    <tr>
+      <td>00239.HK</td>
+      <td>白花油</td>
+      <td>7.42亿</td>
+      <td>0.00亿</td>
+      <td>1.03</td>
+      <td>8.12</td>
+      <td>326.2%</td>
+      <td>29.1%</td>
+      <td>0.83亿</td>
+      <td>4</td>
+      <td>123.5%</td>
+      <td>-1.6%</td>
+      <td>7.0%</td>
+      <td>119.6</td>
+      <td>极低</td>
+      <td>现金类资产&gt;总负债;近年盈利稳定;经营现金流稳定;股东回报率较高</td>
+    </tr>
+    <tr>
+      <td>01425.HK</td>
+      <td>捷隆控股</td>
+      <td>7.88亿</td>
+      <td>0.00亿</td>
+      <td>0.84</td>
+      <td>4.72</td>
+      <td>475.5%</td>
+      <td>81.3%</td>
+      <td>1.51亿</td>
+      <td>4</td>
+      <td>108.3%</td>
+      <td>17.7%</td>
+      <td>8.0%</td>
+      <td>119.5</td>
+      <td>极低</td>
+      <td>现金类资产&gt;总负债;近年盈利稳定;经营现金流稳定;股东回报率较高</td>
+    </tr>
+    <tr>
+      <td>01669.HK</td>
+      <td>环球信贷集团</td>
+      <td>5.60亿</td>
+      <td>0.00亿</td>
+      <td>0.59</td>
+      <td>10.72</td>
+      <td>4941.9%</td>
+      <td>65.8%</td>
+      <td>0.47亿</td>
+      <td>4</td>
+      <td>533.0%</td>
+      <td>14.0%</td>
+      <td>7.7%</td>
+      <td>119.3</td>
+      <td>低</td>
+      <td>现金类资产&gt;总负债;近年盈利稳定;经营现金流稳定;股东回报率较高</td>
+    </tr>
+    <tr>
+      <td>01666.HK</td>
+      <td>同仁堂科技</td>
+      <td>41.37亿</td>
+      <td>0.01亿</td>
+      <td>0.51</td>
+      <td>9.43</td>
+      <td>140.3%</td>
+      <td>33.5%</td>
+      <td>3.96亿</td>
+      <td>4</td>
+      <td>394.3%</td>
+      <td>-0.9%</td>
+      <td>11.5%</td>
+      <td>118.7</td>
+      <td>中低</td>
+      <td>现金类资产&gt;总负债;近年盈利稳定;经营现金流稳定;股东回报率较高</td>
+    </tr>
+    <tr>
+      <td>00639.HK</td>
+      <td>首钢资源</td>
+      <td>121.68亿</td>
+      <td>0.18亿</td>
+      <td>0.74</td>
+      <td>19.24</td>
+      <td>210.1%</td>
+      <td>31.1%</td>
+      <td>5.71亿</td>
+      <td>4</td>
+      <td>145.0%</td>
+      <td>22.2%</td>
+      <td>15.5%</td>
+      <td>118.3</td>
+      <td>中</td>
+      <td>现金类资产&gt;总负债;近年盈利稳定;经营现金流稳定;股东回报率较高</td>
+    </tr>
+    <tr>
+      <td>02348.HK</td>
+      <td>东瑞制药</td>
+      <td>15.66亿</td>
+      <td>0.00亿</td>
+      <td>0.42</td>
+      <td>6.61</td>
+      <td>252.6%</td>
+      <td>60.8%</td>
+      <td>2.14亿</td>
+      <td>4</td>
+      <td>166.1%</td>
+      <td>27.8%</td>
+      <td>8.5%</td>
+      <td>118.0</td>
+      <td>极低</td>
+      <td>现金类资产&gt;总负债;近年盈利稳定;经营现金流稳定;股东回报率较高</td>
+    </tr>
+    <tr>
+      <td>00046.HK</td>
+      <td>科联系统</td>
+      <td>3.03亿</td>
+      <td>0.00亿</td>
+      <td>0.61</td>
+      <td>16.43</td>
+      <td>215.1%</td>
+      <td>55.4%</td>
+      <td>0.17亿</td>
+      <td>4</td>
+      <td>197.5%</td>
+      <td>11.4%</td>
+      <td>8.0%</td>
+      <td>117.9</td>
+      <td>极低</td>
+      <td>现金类资产&gt;总负债;近年盈利稳定;经营现金流稳定;股东回报率较高</td>
+    </tr>
+    <tr>
+      <td>01571.HK</td>
+      <td>信邦控股</td>
+      <td>37.70亿</td>
+      <td>0.05亿</td>
+      <td>0.92</td>
+      <td>6.43</td>
+      <td>137.8%</td>
+      <td>7.8%</td>
+      <td>5.29亿</td>
+      <td>4</td>
+      <td>199.9%</td>
+      <td>16.7%</td>
+      <td>12.3%</td>
+      <td>117.5</td>
+      <td>中低</td>
+      <td>现金类资产&gt;总负债;近年盈利稳定;经营现金流稳定;股东回报率较高</td>
+    </tr>
+    <tr>
+      <td>03686.HK</td>
+      <td>祈福生活服务</td>
+      <td>7.21亿</td>
+      <td>0.00亿</td>
+      <td>1.10</td>
+      <td>2.29</td>
+      <td>223.5%</td>
+      <td>21.8%</td>
+      <td>2.85亿</td>
+      <td>4</td>
+      <td>28.7%</td>
+      <td>73.1%</td>
+      <td>14.6%</td>
+      <td>117.0</td>
+      <td>极低</td>
+      <td>现金类资产&gt;总负债;近年盈利稳定;经营现金流稳定;一次性/其他收益占比较高;股东回报率较高</td>
+    </tr>
+    <tr>
+      <td>06186.HK</td>
+      <td>中国飞鹤</td>
+      <td>261.59亿</td>
+      <td>0.43亿</td>
+      <td>0.97</td>
+      <td>12.18</td>
+      <td>204.3%</td>
+      <td>31.6%</td>
+      <td>19.39亿</td>
+      <td>4</td>
+      <td>114.1%</td>
+      <td>33.8%</td>
+      <td>12.5%</td>
+      <td>116.8</td>
+      <td>中</td>
+      <td>现金类资产&gt;总负债;近年盈利稳定;经营现金流稳定;股东回报率较高</td>
+    </tr>
+    <tr>
+      <td>03662.HK</td>
+      <td>星悦康旅</td>
+      <td>2.32亿</td>
+      <td>0.00亿</td>
+      <td>0.17</td>
+      <td>4.07</td>
+      <td>194.7%</td>
+      <td>406.0%</td>
+      <td>0.52亿</td>
+      <td>4</td>
+      <td>43.0%</td>
+      <td>-12.8%</td>
+      <td>8.4%</td>
+      <td>116.3</td>
+      <td>极低</td>
+      <td>现金类资产&gt;总负债;近年盈利稳定;经营现金流稳定;股东回报率较高</td>
+    </tr>
+    <tr>
+      <td>03983.HK</td>
+      <td>中海石油化学</td>
+      <td>96.35亿</td>
+      <td>0.13亿</td>
+      <td>0.46</td>
+      <td>8.93</td>
+      <td>287.5%</td>
+      <td>94.8%</td>
+      <td>9.74亿</td>
+      <td>4</td>
+      <td>141.5%</td>
+      <td>30.5%</td>
+      <td>6.9%</td>
+      <td>116.2</td>
+      <td>中</td>
+      <td>现金类资产&gt;总负债;近年盈利稳定;经营现金流稳定;股东回报率较高</td>
+    </tr>
+    <tr>
+      <td>06601.HK</td>
+      <td>朝云集团</td>
+      <td>28.67亿</td>
+      <td>0.01亿</td>
+      <td>0.86</td>
+      <td>11.58</td>
+      <td>340.8%</td>
+      <td>72.5%</td>
+      <td>2.24亿</td>
+      <td>4</td>
+      <td>119.8%</td>
+      <td>49.8%</td>
+      <td>5.6%</td>
+      <td>116.0</td>
+      <td>中低</td>
+      <td>现金类资产&gt;总负债;近年盈利稳定;经营现金流稳定;股东回报率较高</td>
+    </tr>
+    <tr>
+      <td>06100.HK</td>
+      <td>同道猎聘</td>
+      <td>10.96亿</td>
+      <td>0.00亿</td>
+      <td>0.34</td>
+      <td>9.65</td>
+      <td>123.1%</td>
+      <td>27.0%</td>
+      <td>1.03亿</td>
+      <td>4</td>
+      <td>223.1%</td>
+      <td>89.0%</td>
+      <td>13.8%</td>
+      <td>114.2</td>
+      <td>低</td>
+      <td>现金类资产&gt;总负债;近年盈利稳定;经营现金流稳定;一次性/其他收益占比较高;股东回报率较高</td>
+    </tr>
+    <tr>
+      <td>00517.HK</td>
+      <td>中远海运国际</td>
+      <td>85.76亿</td>
+      <td>0.18亿</td>
+      <td>1.08</td>
+      <td>11.12</td>
+      <td>387.0%</td>
+      <td>37.4%</td>
+      <td>6.96亿</td>
+      <td>4</td>
+      <td>33.3%</td>
+      <td>18.6%</td>
+      <td>8.5%</td>
+      <td>114.1</td>
+      <td>中</td>
+      <td>现金类资产&gt;总负债;近年盈利稳定;经营现金流稳定;股东回报率较高</td>
+    </tr>
+    <tr>
+      <td>02460.HK</td>
+      <td>华润饮料</td>
+      <td>176.51亿</td>
+      <td>0.07亿</td>
+      <td>1.49</td>
+      <td>16.18</td>
+      <td>156.9%</td>
+      <td>13.1%</td>
+      <td>9.85亿</td>
+      <td>4</td>
+      <td>153.4%</td>
+      <td>39.2%</td>
+      <td>21.6%</td>
+      <td>113.9</td>
+      <td>中低</td>
+      <td>现金类资产&gt;总负债;近年盈利稳定;经营现金流稳定;股东回报率较高</td>
+    </tr>
+    <tr>
+      <td>02610.HK</td>
+      <td>南山铝业国际</td>
+      <td>182.04亿</td>
+      <td>0.17亿</td>
+      <td>1.19</td>
+      <td>5.73</td>
+      <td>114.0%</td>
+      <td>1.9%</td>
+      <td>28.71亿</td>
+      <td>4</td>
+      <td>88.1%</td>
+      <td>8.0%</td>
+      <td>12.2%</td>
+      <td>110.9</td>
+      <td>中</td>
+      <td>现金类资产&gt;总负债;近年盈利稳定;经营现金流稳定;股东回报率较高</td>
+    </tr>
+    <tr>
+      <td>03658.HK</td>
+      <td>新希望服务</td>
+      <td>14.82亿</td>
+      <td>0.00亿</td>
+      <td>1.02</td>
+      <td>6.19</td>
+      <td>137.6%</td>
+      <td>17.7%</td>
+      <td>2.16亿</td>
+      <td>4</td>
+      <td>98.0%</td>
+      <td>0.0%</td>
+      <td>11.2%</td>
+      <td>109.5</td>
+      <td>极低</td>
+      <td>现金类资产&gt;总负债;近年盈利稳定;经营现金流稳定;股东回报率较高</td>
+    </tr>
+    <tr>
+      <td>06929.HK</td>
+      <td>业聚医疗</td>
+      <td>32.79亿</td>
+      <td>0.00亿</td>
+      <td>1.02</td>
+      <td>10.06</td>
+      <td>565.0%</td>
+      <td>38.6%</td>
+      <td>2.94亿</td>
+      <td>4</td>
+      <td>46.6%</td>
+      <td>2.6%</td>
+      <td>5.8%</td>
+      <td>109.2</td>
+      <td>极低</td>
+      <td>现金类资产&gt;总负债;近年盈利稳定;经营现金流稳定;股东回报率较高</td>
+    </tr>
+    <tr>
+      <td>01260.HK</td>
+      <td>皓天财经集团</td>
+      <td>5.64亿</td>
+      <td>0.00亿</td>
+      <td>0.36</td>
+      <td>8.13</td>
+      <td>902.1%</td>
+      <td>161.9%</td>
+      <td>0.52亿</td>
+      <td>4</td>
+      <td>115.0%</td>
+      <td>66.3%</td>
+      <td>0.0%</td>
+      <td>107.8</td>
+      <td>极低</td>
+      <td>现金类资产&gt;总负债;近年盈利稳定;经营现金流稳定;一次性/其他收益占比较高</td>
+    </tr>
+    <tr>
+      <td>00934.HK</td>
+      <td>中石化冠德</td>
+      <td>90.50亿</td>
+      <td>0.03亿</td>
+      <td>0.55</td>
+      <td>8.80</td>
+      <td>1069.5%</td>
+      <td>33.5%</td>
+      <td>9.29亿</td>
+      <td>4</td>
+      <td>24.5%</td>
+      <td>7.3%</td>
+      <td>6.2%</td>
+      <td>107.8</td>
+      <td>中低</td>
+      <td>现金类资产&gt;总负债;近年盈利稳定;经营现金流稳定;股东回报率较高</td>
+    </tr>
+    <tr>
+      <td>02219.HK</td>
+      <td>朝聚眼科</td>
+      <td>17.49亿</td>
+      <td>0.01亿</td>
+      <td>0.66</td>
+      <td>8.61</td>
+      <td>242.3%</td>
+      <td>49.9%</td>
+      <td>1.83亿</td>
+      <td>4</td>
+      <td>185.0%</td>
+      <td>40.2%</td>
+      <td>4.6%</td>
+      <td>107.6</td>
+      <td>低</td>
+      <td>现金类资产&gt;总负债;近年盈利稳定;经营现金流稳定;股东回报率较高</td>
+    </tr>
+    <tr>
+      <td>01731.HK</td>
+      <td>其利工业集团</td>
+      <td>9.41亿</td>
+      <td>0.01亿</td>
+      <td>0.64</td>
+      <td>4.93</td>
+      <td>160.3%</td>
+      <td>24.2%</td>
+      <td>1.73亿</td>
+      <td>4</td>
+      <td>100.5%</td>
+      <td>21.1%</td>
+      <td>7.5%</td>
+      <td>107.4</td>
+      <td>低</td>
+      <td>现金类资产&gt;总负债;近年盈利稳定;经营现金流稳定;股东回报率较高</td>
+    </tr>
+    <tr>
+      <td>02283.HK</td>
+      <td>东江集团控股</td>
+      <td>16.67亿</td>
+      <td>0.00亿</td>
+      <td>0.92</td>
+      <td>7.64</td>
+      <td>120.5%</td>
+      <td>10.8%</td>
+      <td>1.97亿</td>
+      <td>4</td>
+      <td>179.5%</td>
+      <td>12.7%</td>
+      <td>10.4%</td>
+      <td>107.4</td>
+      <td>低</td>
+      <td>现金类资产&gt;总负债;近年盈利稳定;经营现金流稳定;股东回报率较高</td>
+    </tr>
+    <tr>
+      <td>02651.HK</td>
+      <td>大众口腔</td>
+      <td>5.93亿</td>
+      <td>0.00亿</td>
+      <td>1.67</td>
+      <td>19.00</td>
+      <td>203.2%</td>
+      <td>24.5%</td>
+      <td>0.28亿</td>
+      <td>4</td>
+      <td>333.6%</td>
+      <td>20.0%</td>
+      <td>5.5%</td>
+      <td>107.2</td>
+      <td>低</td>
+      <td>现金类资产&gt;总负债;近年盈利稳定;经营现金流稳定;股东回报率较高</td>
+    </tr>
+    <tr>
+      <td>01836.HK</td>
+      <td>九兴控股</td>
+      <td>103.81亿</td>
+      <td>0.11亿</td>
+      <td>1.21</td>
+      <td>9.67</td>
+      <td>113.3%</td>
+      <td>3.0%</td>
+      <td>9.70亿</td>
+      <td>4</td>
+      <td>141.1%</td>
+      <td>4.0%</td>
+      <td>11.5%</td>
+      <td>107.2</td>
+      <td>中</td>
+      <td>现金类资产&gt;总负债;近年盈利稳定;经营现金流稳定;股东回报率较高</td>
+    </tr>
+    <tr>
+      <td>01568.HK</td>
+      <td>承达集团</td>
+      <td>12.65亿</td>
+      <td>0.00亿</td>
+      <td>0.35</td>
+      <td>4.73</td>
+      <td>115.2%</td>
+      <td>37.4%</td>
+      <td>2.41亿</td>
+      <td>4</td>
+      <td>69.0%</td>
+      <td>14.2%</td>
+      <td>30.8%</td>
+      <td>106.1</td>
+      <td>低</td>
+      <td>现金类资产&gt;总负债;近年盈利稳定;经营现金流稳定;股东回报率较高</td>
+    </tr>
+    <tr>
+      <td>00887.HK</td>
+      <td>英皇钟表珠宝</td>
+      <td>17.13亿</td>
+      <td>0.00亿</td>
+      <td>0.30</td>
+      <td>3.74</td>
+      <td>155.8%</td>
+      <td>30.4%</td>
+      <td>4.14亿</td>
+      <td>4</td>
+      <td>239.2%</td>
+      <td>-12.3%</td>
+      <td>3.8%</td>
+      <td>106.0</td>
+      <td>低</td>
+      <td>现金类资产&gt;总负债;近年盈利稳定;经营现金流稳定</td>
+    </tr>
+    <tr>
+      <td>00420.HK</td>
+      <td>福田实业</td>
+      <td>8.09亿</td>
+      <td>0.00亿</td>
+      <td>0.25</td>
+      <td>11.34</td>
+      <td>148.3%</td>
+      <td>56.3%</td>
+      <td>0.64亿</td>
+      <td>3</td>
+      <td>522.7%</td>
+      <td>33.4%</td>
+      <td>7.5%</td>
+      <td>105.3</td>
+      <td>极低</td>
+      <td>现金类资产&gt;总负债;近年盈利稳定;经营现金流稳定;股东回报率较高</td>
+    </tr>
+    <tr>
+      <td>02291.HK</td>
+      <td>心泰医疗</td>
+      <td>29.72亿</td>
+      <td>0.01亿</td>
+      <td>1.32</td>
+      <td>11.20</td>
+      <td>1865.7%</td>
+      <td>36.8%</td>
+      <td>2.40亿</td>
+      <td>3</td>
+      <td>92.2%</td>
+      <td>7.1%</td>
+      <td>7.2%</td>
+      <td>105.1</td>
+      <td>低</td>
+      <td>现金类资产&gt;总负债;近年盈利稳定;经营现金流稳定;股东回报率较高</td>
+    </tr>
+    <tr>
+      <td>03613.HK</td>
+      <td>同仁堂国药</td>
+      <td>54.08亿</td>
+      <td>0.03亿</td>
+      <td>1.29</td>
+      <td>13.61</td>
+      <td>780.9%</td>
+      <td>33.2%</td>
+      <td>3.59亿</td>
+      <td>4</td>
+      <td>208.8%</td>
+      <td>-0.3%</td>
+      <td>5.2%</td>
+      <td>105.1</td>
+      <td>中低</td>
+      <td>现金类资产&gt;总负债;近年盈利稳定;经营现金流稳定;股东回报率较高</td>
+    </tr>
+    <tr>
+      <td>09909.HK</td>
+      <td>宝龙商业</td>
+      <td>14.79亿</td>
+      <td>0.00亿</td>
+      <td>0.39</td>
+      <td>5.72</td>
+      <td>190.1%</td>
+      <td>143.6%</td>
+      <td>2.34亿</td>
+      <td>4</td>
+      <td>181.9%</td>
+      <td>40.7%</td>
+      <td>0.6%</td>
+      <td>104.8</td>
+      <td>低</td>
+      <td>现金类资产&gt;总负债;近年盈利稳定;经营现金流稳定</td>
+    </tr>
+    <tr>
+      <td>06668.HK</td>
+      <td>星盛商业</td>
+      <td>12.48亿</td>
+      <td>0.00亿</td>
+      <td>0.89</td>
+      <td>7.90</td>
+      <td>132.4%</td>
+      <td>26.3%</td>
+      <td>1.43亿</td>
+      <td>4</td>
+      <td>121.8%</td>
+      <td>19.2%</td>
+      <td>9.9%</td>
+      <td>104.6</td>
+      <td>低</td>
+      <td>现金类资产&gt;总负债;近年盈利稳定;经营现金流稳定;股东回报率较高</td>
+    </tr>
+    <tr>
+      <td>00799.HK</td>
+      <td>IGG</td>
+      <td>37.56亿</td>
+      <td>0.04亿</td>
+      <td>1.09</td>
+      <td>6.47</td>
+      <td>208.5%</td>
+      <td>30.7%</td>
+      <td>5.24亿</td>
+      <td>3</td>
+      <td>117.6%</td>
+      <td>15.4%</td>
+      <td>8.6%</td>
+      <td>104.2</td>
+      <td>中低</td>
+      <td>现金类资产&gt;总负债;近年盈利稳定;经营现金流稳定;股东回报率较高</td>
+    </tr>
+    <tr>
+      <td>02192.HK</td>
+      <td>医脉通</td>
+      <td>48.48亿</td>
+      <td>0.09亿</td>
+      <td>0.90</td>
+      <td>13.10</td>
+      <td>1618.3%</td>
+      <td>72.0%</td>
+      <td>3.34亿</td>
+      <td>4</td>
+      <td>40.2%</td>
+      <td>57.9%</td>
+      <td>3.9%</td>
+      <td>103.6</td>
+      <td>中低</td>
+      <td>现金类资产&gt;总负债;近年盈利稳定;经营现金流稳定;一次性/其他收益占比较高</td>
+    </tr>
+    <tr>
+      <td>01045.HK</td>
+      <td>亚太卫星</td>
+      <td>22.75亿</td>
+      <td>0.05亿</td>
+      <td>0.37</td>
+      <td>16.09</td>
+      <td>350.7%</td>
+      <td>77.6%</td>
+      <td>1.28亿</td>
+      <td>4</td>
+      <td>241.8%</td>
+      <td>67.8%</td>
+      <td>3.3%</td>
+      <td>103.1</td>
+      <td>中低</td>
+      <td>现金类资产&gt;总负债;近年盈利稳定;经营现金流稳定;一次性/其他收益占比较高</td>
+    </tr>
+    <tr>
+      <td>02489.HK</td>
+      <td>集海黄金</td>
+      <td>16.08亿</td>
+      <td>0.01亿</td>
+      <td>1.02</td>
+      <td>11.92</td>
+      <td>157.8%</td>
+      <td>24.9%</td>
+      <td>1.11亿</td>
+      <td>4</td>
+      <td>195.1%</td>
+      <td>16.6%</td>
+      <td>5.0%</td>
+      <td>102.9</td>
+      <td>低</td>
+      <td>现金类资产&gt;总负债;近年盈利稳定;经营现金流稳定;股东回报率较高</td>
+    </tr>
+    <tr>
+      <td>06626.HK</td>
+      <td>越秀服务</td>
+      <td>24.34亿</td>
+      <td>0.00亿</td>
+      <td>0.63</td>
+      <td>8.03</td>
+      <td>106.1%</td>
+      <td>8.4%</td>
+      <td>2.74亿</td>
+      <td>4</td>
+      <td>185.9%</td>
+      <td>38.0%</td>
+      <td>11.1%</td>
+      <td>101.6</td>
+      <td>极低</td>
+      <td>现金类资产&gt;总负债;近年盈利稳定;经营现金流稳定;股东回报率较高</td>
+    </tr>
+    <tr>
+      <td>02156.HK</td>
+      <td>建发物业</td>
+      <td>36.90亿</td>
+      <td>0.02亿</td>
+      <td>1.66</td>
+      <td>9.29</td>
+      <td>136.0%</td>
+      <td>24.5%</td>
+      <td>3.59亿</td>
+      <td>4</td>
+      <td>166.9%</td>
+      <td>2.3%</td>
+      <td>5.7%</td>
+      <td>101.2</td>
+      <td>中低</td>
+      <td>现金类资产&gt;总负债;近年盈利稳定;经营现金流稳定;股东回报率较高</td>
+    </tr>
+    <tr>
+      <td>01126.HK</td>
+      <td>德林国际</td>
+      <td>43.66亿</td>
+      <td>0.01亿</td>
+      <td>1.04</td>
+      <td>6.30</td>
+      <td>134.0%</td>
+      <td>9.4%</td>
+      <td>6.26亿</td>
+      <td>4</td>
+      <td>124.1%</td>
+      <td>16.5%</td>
+      <td>9.1%</td>
+      <td>101.0</td>
+      <td>中低</td>
+      <td>现金类资产&gt;总负债;近年盈利稳定;经营现金流稳定;股东回报率较高</td>
+    </tr>
+    <tr>
+      <td>01837.HK</td>
+      <td>五谷磨房</td>
+      <td>29.54亿</td>
+      <td>0.00亿</td>
+      <td>1.57</td>
+      <td>10.04</td>
+      <td>313.3%</td>
+      <td>27.6%</td>
+      <td>2.66亿</td>
+      <td>4</td>
+      <td>88.8%</td>
+      <td>8.3%</td>
+      <td>2.7%</td>
+      <td>101.0</td>
+      <td>低</td>
+      <td>现金类资产&gt;总负债;近年盈利稳定;经营现金流稳定</td>
+    </tr>
+    <tr>
+      <td>02510.HK</td>
+      <td>德翔海运</td>
+      <td>129.21亿</td>
+      <td>0.06亿</td>
+      <td>0.78</td>
+      <td>5.05</td>
+      <td>143.6%</td>
+      <td>8.0%</td>
+      <td>23.12亿</td>
+      <td>4</td>
+      <td>152.7%</td>
+      <td>36.6%</td>
+      <td>10.8%</td>
+      <td>100.8</td>
+      <td>中低</td>
+      <td>现金类资产&gt;总负债;近年盈利稳定;经营现金流稳定;股东回报率较高</td>
+    </tr>
+    <tr>
+      <td>00667.HK</td>
+      <td>中国东方教育</td>
+      <td>85.85亿</td>
+      <td>0.19亿</td>
+      <td>1.26</td>
+      <td>10.26</td>
+      <td>129.1%</td>
+      <td>13.8%</td>
+      <td>7.56亿</td>
+      <td>4</td>
+      <td>205.8%</td>
+      <td>15.3%</td>
+      <td>5.2%</td>
+      <td>100.5</td>
+      <td>中</td>
+      <td>现金类资产&gt;总负债;近年盈利稳定;经营现金流稳定;股东回报率较高</td>
+    </tr>
+    <tr>
+      <td>00640.HK</td>
+      <td>星谦发展</td>
+      <td>7.73亿</td>
+      <td>0.00亿</td>
+      <td>1.12</td>
+      <td>6.75</td>
+      <td>177.7%</td>
+      <td>21.3%</td>
+      <td>1.12亿</td>
+      <td>4</td>
+      <td>113.1%</td>
+      <td>13.0%</td>
+      <td>7.0%</td>
+      <td>100.2</td>
+      <td>低</td>
+      <td>现金类资产&gt;总负债;近年盈利稳定;经营现金流稳定;股东回报率较高</td>
+    </tr>
+    <tr>
+      <td>01970.HK</td>
+      <td>IMAX CHINA</td>
+      <td>28.55亿</td>
+      <td>0.00亿</td>
+      <td>1.16</td>
+      <td>9.74</td>
+      <td>209.8%</td>
+      <td>16.7%</td>
+      <td>2.65亿</td>
+      <td>4</td>
+      <td>153.5%</td>
+      <td>2.9%</td>
+      <td>0.4%</td>
+      <td>99.7</td>
+      <td>极低</td>
+      <td>现金类资产&gt;总负债;近年盈利稳定;经营现金流稳定</td>
+    </tr>
+    <tr>
+      <td>00717.HK</td>
+      <td>英皇资本</td>
+      <td>4.52亿</td>
+      <td>0.00亿</td>
+      <td>0.12</td>
+      <td>3.48</td>
+      <td>210.7%</td>
+      <td>465.4%</td>
+      <td>0.19亿</td>
+      <td>2</td>
+      <td>293.3%</td>
+      <td>9.9%</td>
+      <td>0.0%</td>
+      <td>97.5</td>
+      <td>低</td>
+      <td>现金类资产&gt;总负债</td>
+    </tr>
+    <tr>
+      <td>08017.HK</td>
+      <td>捷利交易宝</td>
+      <td>6.79亿</td>
+      <td>0.00亿</td>
+      <td>1.71</td>
+      <td>11.39</td>
+      <td>640.4%</td>
+      <td>38.8%</td>
+      <td>0.33亿</td>
+      <td>4</td>
+      <td>30.1%</td>
+      <td>25.2%</td>
+      <td>4.3%</td>
+      <td>97.4</td>
+      <td>低</td>
+      <td>现金类资产&gt;总负债;近年盈利稳定;经营现金流稳定;股东回报率较高</td>
+    </tr>
+    <tr>
+      <td>06896.HK</td>
+      <td>金嗓子</td>
+      <td>22.70亿</td>
+      <td>0.01亿</td>
+      <td>1.49</td>
+      <td>8.16</td>
+      <td>108.3%</td>
+      <td>3.3%</td>
+      <td>2.51亿</td>
+      <td>4</td>
+      <td>49.1%</td>
+      <td>15.0%</td>
+      <td>14.9%</td>
+      <td>97.4</td>
+      <td>低</td>
+      <td>现金类资产&gt;总负债;近年盈利稳定;经营现金流稳定;股东回报率较高</td>
+    </tr>
+    <tr>
+      <td>01767.HK</td>
+      <td>TS WONDERS</td>
+      <td>3.20亿</td>
+      <td>0.00亿</td>
+      <td>0.60</td>
+      <td>17.86</td>
+      <td>654.9%</td>
+      <td>111.6%</td>
+      <td>0.16亿</td>
+      <td>4</td>
+      <td>85.4%</td>
+      <td>12.1%</td>
+      <td>0.6%</td>
+      <td>97.4</td>
+      <td>极低</td>
+      <td>现金类资产&gt;总负债;近年盈利稳定;经营现金流稳定</td>
+    </tr>
+    <tr>
+      <td>06603.HK</td>
+      <td>IFBH</td>
+      <td>18.64亿</td>
+      <td>0.09亿</td>
+      <td>1.41</td>
+      <td>10.52</td>
+      <td>559.4%</td>
+      <td>50.7%</td>
+      <td>1.60亿</td>
+      <td>2</td>
+      <td>54.2%</td>
+      <td>3.7%</td>
+      <td>15.8%</td>
+      <td>97.4</td>
+      <td>中低</td>
+      <td>现金类资产&gt;总负债;股东回报率较高</td>
+    </tr>
+    <tr>
+      <td>06049.HK</td>
+      <td>保利物业</td>
+      <td>151.61亿</td>
+      <td>0.30亿</td>
+      <td>1.30</td>
+      <td>8.84</td>
+      <td>143.9%</td>
+      <td>21.8%</td>
+      <td>15.49亿</td>
+      <td>4</td>
+      <td>117.9%</td>
+      <td>6.1%</td>
+      <td>4.9%</td>
+      <td>95.0</td>
+      <td>中</td>
+      <td>现金类资产&gt;总负债;近年盈利稳定;经营现金流稳定;股东回报率较高</td>
+    </tr>
+    <tr>
+      <td>01114.HK</td>
+      <td>BRILLIANCE CHI</td>
+      <td>104.94亿</td>
+      <td>0.77亿</td>
+      <td>0.45</td>
+      <td>4.77</td>
+      <td>317.7%</td>
+      <td>34.0%</td>
+      <td>19.86亿</td>
+      <td>4</td>
+      <td>-29.2%</td>
+      <td>10.5%</td>
+      <td>80.3%</td>
+      <td>94.2</td>
+      <td>高</td>
+      <td>现金类资产&gt;总负债;近年盈利稳定;股东回报率较高</td>
+    </tr>
+    <tr>
+      <td>02549.HK</td>
+      <td>卡罗特</td>
+      <td>22.36亿</td>
+      <td>0.00亿</td>
+      <td>1.44</td>
+      <td>7.83</td>
+      <td>211.0%</td>
+      <td>24.4%</td>
+      <td>2.58亿</td>
+      <td>4</td>
+      <td>-21.1%</td>
+      <td>-2.6%</td>
+      <td>4.0%</td>
+      <td>93.7</td>
+      <td>低</td>
+      <td>现金类资产&gt;总负债;近年盈利稳定;经营现金流稳定;股东回报率较高</td>
+    </tr>
+    <tr>
+      <td>01712.HK</td>
+      <td>龙资源</td>
+      <td>9.62亿</td>
+      <td>0.04亿</td>
+      <td>1.01</td>
+      <td>3.08</td>
+      <td>176.0%</td>
+      <td>23.4%</td>
+      <td>2.82亿</td>
+      <td>4</td>
+      <td>121.9%</td>
+      <td>0.3%</td>
+      <td>0.0%</td>
+      <td>93.1</td>
+      <td>中低</td>
+      <td>现金类资产&gt;总负债;近年盈利稳定;经营现金流稳定</td>
+    </tr>
+    <tr>
+      <td>09982.HK</td>
+      <td>中原建业</td>
+      <td>3.63亿</td>
+      <td>0.02亿</td>
+      <td>0.13</td>
+      <td>6.89</td>
+      <td>469.2%</td>
+      <td>557.8%</td>
+      <td>0.48亿</td>
+      <td>4</td>
+      <td>67.9%</td>
+      <td>37.0%</td>
+      <td>0.0%</td>
+      <td>93.0</td>
+      <td>中低</td>
+      <td>现金类资产&gt;总负债;近年盈利稳定;经营现金流稳定</td>
+    </tr>
+    <tr>
+      <td>00113.HK</td>
+      <td>迪生创建</td>
+      <td>24.01亿</td>
+      <td>0.01亿</td>
+      <td>0.65</td>
+      <td>9.65</td>
+      <td>304.7%</td>
+      <td>106.4%</td>
+      <td>1.37亿</td>
+      <td>4</td>
+      <td>4.7%</td>
+      <td>9.1%</td>
+      <td>0.0%</td>
+      <td>92.1</td>
+      <td>中低</td>
+      <td>现金类资产&gt;总负债;近年盈利稳定;经营现金流稳定</td>
+    </tr>
+    <tr>
+      <td>06038.HK</td>
+      <td>信越控股</td>
+      <td>3.61亿</td>
+      <td>0.00亿</td>
+      <td>1.21</td>
+      <td>6.50</td>
+      <td>210.6%</td>
+      <td>51.0%</td>
+      <td>0.50亿</td>
+      <td>4</td>
+      <td>91.1%</td>
+      <td>13.9%</td>
+      <td>0.0%</td>
+      <td>91.6</td>
+      <td>低</td>
+      <td>现金类资产&gt;总负债;近年盈利稳定;经营现金流稳定</td>
+    </tr>
+    <tr>
+      <td>00085.HK</td>
+      <td>中电华大科技</td>
+      <td>22.13亿</td>
+      <td>0.01亿</td>
+      <td>0.86</td>
+      <td>9.40</td>
+      <td>138.1%</td>
+      <td>19.1%</td>
+      <td>2.13亿</td>
+      <td>4</td>
+      <td>129.6%</td>
+      <td>37.7%</td>
+      <td>7.5%</td>
+      <td>91.4</td>
+      <td>中低</td>
+      <td>现金类资产&gt;总负债;近年盈利稳定;经营现金流稳定;股东回报率较高</td>
+    </tr>
+    <tr>
+      <td>03339.HK</td>
+      <td>中国龙工</td>
+      <td>112.99亿</td>
+      <td>0.08亿</td>
+      <td>0.89</td>
+      <td>7.85</td>
+      <td>120.6%</td>
+      <td>9.9%</td>
+      <td>13.01亿</td>
+      <td>4</td>
+      <td>95.7%</td>
+      <td>15.8%</td>
+      <td>4.5%</td>
+      <td>90.5</td>
+      <td>中低</td>
+      <td>现金类资产&gt;总负债;近年盈利稳定;经营现金流稳定;股东回报率较高</td>
+    </tr>
+    <tr>
+      <td>00050.HK</td>
+      <td>香港小轮(集团)</td>
+      <td>17.07亿</td>
+      <td>0.00亿</td>
+      <td>0.23</td>
+      <td>5.09</td>
+      <td>618.3%</td>
+      <td>93.7%</td>
+      <td>3.03亿</td>
+      <td>4</td>
+      <td>20.9%</td>
+      <td>40.0%</td>
+      <td>4.7%</td>
+      <td>89.8</td>
+      <td>极低</td>
+      <td>现金类资产&gt;总负债;近年盈利稳定;经营现金流稳定;股东回报率较高</td>
+    </tr>
+    <tr>
+      <td>01475.HK</td>
+      <td>日清食品</td>
+      <td>67.11亿</td>
+      <td>0.00亿</td>
+      <td>1.69</td>
+      <td>19.52</td>
+      <td>155.5%</td>
+      <td>7.8%</td>
+      <td>2.99亿</td>
+      <td>4</td>
+      <td>161.6%</td>
+      <td>3.6%</td>
+      <td>2.2%</td>
+      <td>89.0</td>
+      <td>低</td>
+      <td>现金类资产&gt;总负债;近年盈利稳定;经营现金流稳定</td>
+    </tr>
+    <tr>
+      <td>00811.HK</td>
+      <td>新华文轩</td>
+      <td>109.32亿</td>
+      <td>0.04亿</td>
+      <td>0.62</td>
+      <td>6.26</td>
+      <td>113.1%</td>
+      <td>9.3%</td>
+      <td>15.68亿</td>
+      <td>4</td>
+      <td>96.2%</td>
+      <td>26.1%</td>
+      <td>7.2%</td>
+      <td>88.9</td>
+      <td>中低</td>
+      <td>现金类资产&gt;总负债;近年盈利稳定;经营现金流稳定;股东回报率较高</td>
+    </tr>
+    <tr>
+      <td>00071.HK</td>
+      <td>美丽华酒店</td>
+      <td>69.10亿</td>
+      <td>0.00亿</td>
+      <td>0.33</td>
+      <td>10.20</td>
+      <td>551.1%</td>
+      <td>73.9%</td>
+      <td>6.12亿</td>
+      <td>4</td>
+      <td>37.5%</td>
+      <td>38.8%</td>
+      <td>0.0%</td>
+      <td>88.7</td>
+      <td>低</td>
+      <td>现金类资产&gt;总负债;近年盈利稳定;经营现金流稳定</td>
+    </tr>
+    <tr>
+      <td>01513.HK</td>
+      <td>丽珠医药</td>
+      <td>210.61亿</td>
+      <td>0.08亿</td>
+      <td>1.28</td>
+      <td>9.56</td>
+      <td>110.3%</td>
+      <td>4.1%</td>
+      <td>20.23亿</td>
+      <td>4</td>
+      <td>155.4%</td>
+      <td>9.8%</td>
+      <td>5.4%</td>
+      <td>88.4</td>
+      <td>中低</td>
+      <td>现金类资产&gt;总负债;近年盈利稳定;经营现金流稳定;股东回报率较高</td>
+    </tr>
+    <tr>
+      <td>00398.HK</td>
+      <td>东方表行集团</td>
+      <td>15.89亿</td>
+      <td>0.01亿</td>
+      <td>0.88</td>
+      <td>8.82</td>
+      <td>201.7%</td>
+      <td>26.9%</td>
+      <td>0.92亿</td>
+      <td>4</td>
+      <td>181.7%</td>
+      <td>35.2%</td>
+      <td>0.0%</td>
+      <td>88.2</td>
+      <td>低</td>
+      <td>现金类资产&gt;总负债;近年盈利稳定;经营现金流稳定</td>
+    </tr>
+    <tr>
+      <td>00696.HK</td>
+      <td>中国民航信息网络</td>
+      <td>244.34亿</td>
+      <td>0.24亿</td>
+      <td>0.92</td>
+      <td>9.42</td>
+      <td>117.4%</td>
+      <td>6.1%</td>
+      <td>23.42亿</td>
+      <td>4</td>
+      <td>124.9%</td>
+      <td>9.8%</td>
+      <td>3.0%</td>
+      <td>88.1</td>
+      <td>中</td>
+      <td>现金类资产&gt;总负债;近年盈利稳定;经营现金流稳定</td>
+    </tr>
+    <tr>
+      <td>00837.HK</td>
+      <td>谭木匠</td>
+      <td>14.95亿</td>
+      <td>0.01亿</td>
+      <td>1.39</td>
+      <td>7.89</td>
+      <td>114.2%</td>
+      <td>1.4%</td>
+      <td>1.71亿</td>
+      <td>4</td>
+      <td>103.8%</td>
+      <td>26.3%</td>
+      <td>6.0%</td>
+      <td>87.3</td>
+      <td>低</td>
+      <td>现金类资产&gt;总负债;近年盈利稳定;经营现金流稳定;股东回报率较高</td>
+    </tr>
+    <tr>
+      <td>09901.HK</td>
+      <td>新东方-S</td>
+      <td>548.68亿</td>
+      <td>0.26亿</td>
+      <td>1.72</td>
+      <td>16.57</td>
+      <td>125.5%</td>
+      <td>12.3%</td>
+      <td>20.26亿</td>
+      <td>4</td>
+      <td>180.2%</td>
+      <td>0.0%</td>
+      <td>0.0%</td>
+      <td>87.0</td>
+      <td>中</td>
+      <td>现金类资产&gt;总负债;近年盈利稳定;经营现金流稳定</td>
+    </tr>
+  </tbody>
+</table></div>
   </section>
 </main>
 </body>
