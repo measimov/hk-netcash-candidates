@@ -1,0 +1,598 @@
+{
+  "mode": "deterministic",
+  "payload": {
+    "generated_at": "2026-06-25T20:26:45.182603+08:00",
+    "quote_time_min": "2026/06/25 10:08:38",
+    "quote_time_max": "2026/06/25 15:12:03",
+    "primary_count": 264,
+    "governance_filtered_count": 401,
+    "top_primary": [
+      {
+        "ts_code": "01981.HK",
+        "name": "华夏控股",
+        "price_hkd": 0.62,
+        "total_mv_hkd": 1026060940.0,
+        "cash_to_liab": 2.1284572153890777,
+        "net_cash_to_mv": 0.7659437849763583,
+        "profit_latest": 301002000.0,
+        "cfo_to_profit_latest": 1.9319771961648096,
+        "oneoff_ratio_latest": 0.0276941681450621,
+        "dividend_paid_yield_est": 0.0883056712011666,
+        "score": 132.87028947154946,
+        "liquidity_bucket": "低",
+        "flags": "现金类资产>总负债;近年盈利稳定;经营现金流稳定;股东回报率较高"
+      },
+      {
+        "ts_code": "01358.HK",
+        "name": "普华和顺",
+        "price_hkd": 1.11,
+        "total_mv_hkd": 1601569159.0695655,
+        "cash_to_liab": 4.738509806799626,
+        "net_cash_to_mv": 0.8905765897918658,
+        "profit_latest": 94374000.0,
+        "cfo_to_profit_latest": 2.5505329857799817,
+        "oneoff_ratio_latest": 0.2842944031195032,
+        "dividend_paid_yield_est": 0.0937287029722827,
+        "score": 130.19413773175094,
+        "liquidity_bucket": "低",
+        "flags": "现金类资产>总负债;近年盈利稳定;经营现金流稳定;股东回报率较高"
+      },
+      {
+        "ts_code": "00327.HK",
+        "name": "百富环球",
+        "price_hkd": 3.32,
+        "total_mv_hkd": 3525448240.0,
+        "cash_to_liab": 2.061888882355462,
+        "net_cash_to_mv": 0.5459548674638888,
+        "profit_latest": 680654850.14,
+        "cfo_to_profit_latest": 1.7310662206221712,
+        "oneoff_ratio_latest": 0.1209362688050616,
+        "dividend_paid_yield_est": 0.1382862804362148,
+        "score": 130.02472838977926,
+        "liquidity_bucket": "中低",
+        "flags": "现金类资产>总负债;近年盈利稳定;经营现金流稳定;股东回报率较高"
+      },
+      {
+        "ts_code": "02518.HK",
+        "name": "汽车之家-S",
+        "price_hkd": 36.86,
+        "total_mv_hkd": 18776026936.0,
+        "cash_to_liab": 4.79378702957582,
+        "net_cash_to_mv": 0.8109159649109272,
+        "profit_latest": 1442830000.0,
+        "cfo_to_profit_latest": 0.6164704088492754,
+        "oneoff_ratio_latest": 0.1396657956931863,
+        "dividend_paid_yield_est": 0.1349182129230409,
+        "score": 126.62290385742332,
+        "liquidity_bucket": "低",
+        "flags": "现金类资产>总负债;近年盈利稳定;经营现金流稳定;股东回报率较高"
+      },
+      {
+        "ts_code": "00623.HK",
+        "name": "中视金桥",
+        "price_hkd": 1.91,
+        "total_mv_hkd": 888675956.6010362,
+        "cash_to_liab": 6.788816341759164,
+        "net_cash_to_mv": 0.6983636671950851,
+        "profit_latest": 80043000.0,
+        "cfo_to_profit_latest": 0.4925352622965156,
+        "oneoff_ratio_latest": 0.057144284946841,
+        "dividend_paid_yield_est": 0.1695072302576396,
+        "score": 126.35398785009922,
+        "liquidity_bucket": "低",
+        "flags": "现金类资产>总负债;近年盈利稳定;经营现金流稳定;股东回报率较高"
+      },
+      {
+        "ts_code": "06826.HK",
+        "name": "昊海生物科技",
+        "price_hkd": 15.75,
+        "total_mv_hkd": 3622199096.7017207,
+        "cash_to_liab": 2.260822367241565,
+        "net_cash_to_mv": 0.3883063747878306,
+        "profit_latest": 251009000.0,
+        "cfo_to_profit_latest": 1.9559975937117793,
+        "oneoff_ratio_latest": 0.8133493221358596,
+        "dividend_paid_yield_est": 0.1189608821868367,
+        "score": 126.11395312907136,
+        "liquidity_bucket": "中低",
+        "flags": "现金类资产>总负债;近年盈利稳定;经营现金流稳定;一次性/其他收益占比较高;股东回报率较高"
+      },
+      {
+        "ts_code": "02660.HK",
+        "name": "禅游科技",
+        "price_hkd": 2.16,
+        "total_mv_hkd": 2238152443.7837834,
+        "cash_to_liab": 8.819341294909513,
+        "net_cash_to_mv": 0.9036663278309686,
+        "profit_latest": 347787000.0,
+        "cfo_to_profit_latest": 0.6969783229390403,
+        "oneoff_ratio_latest": 0.2694580303461601,
+        "dividend_paid_yield_est": 0.1527259686664229,
+        "score": 124.78914130067344,
+        "liquidity_bucket": "低",
+        "flags": "现金类资产>总负债;近年盈利稳定;经营现金流稳定;股东回报率较高"
+      },
+      {
+        "ts_code": "01180.HK",
+        "name": "汇彩控股",
+        "price_hkd": 0.75,
+        "total_mv_hkd": 789138986.1486487,
+        "cash_to_liab": 3.095592659754315,
+        "net_cash_to_mv": 0.5859560577493738,
+        "profit_latest": 127840855.58,
+        "cfo_to_profit_latest": 1.7908703608192795,
+        "oneoff_ratio_latest": 0.1861112484898155,
+        "dividend_paid_yield_est": 0.2274099686999823,
+        "score": 123.46892482866645,
+        "liquidity_bucket": "低",
+        "flags": "现金类资产>总负债;近年盈利稳定;经营现金流稳定;股东回报率较高"
+      },
+      {
+        "ts_code": "03315.HK",
+        "name": "金邦达宝嘉",
+        "price_hkd": 0.68,
+        "total_mv_hkd": 547945360.0000001,
+        "cash_to_liab": 2.994153590109367,
+        "net_cash_to_mv": 1.5307018933420655,
+        "profit_latest": 40116000.0,
+        "cfo_to_profit_latest": 3.996784325456177,
+        "oneoff_ratio_latest": 0.8738657892112872,
+        "dividend_paid_yield_est": 0.0789896277249249,
+        "score": 122.17065379374412,
+        "liquidity_bucket": "极低",
+        "flags": "现金类资产>总负债;近年盈利稳定;经营现金流稳定;一次性/其他收益占比较高;股东回报率较高"
+      },
+      {
+        "ts_code": "02469.HK",
+        "name": "粉笔",
+        "price_hkd": 0.405,
+        "total_mv_hkd": 894538901.8314607,
+        "cash_to_liab": 2.2634591426651536,
+        "net_cash_to_mv": 0.7629986785399695,
+        "profit_latest": 198126000.0,
+        "cfo_to_profit_latest": 1.1423134772821335,
+        "oneoff_ratio_latest": 0.1437317666535437,
+        "dividend_paid_yield_est": 0.1702497227210514,
+        "score": 121.62170547505406,
+        "liquidity_bucket": "中低",
+        "flags": "现金类资产>总负债;近年盈利稳定;经营现金流稳定;股东回报率较高"
+      },
+      {
+        "ts_code": "02877.HK",
+        "name": "神威药业",
+        "price_hkd": 7.55,
+        "total_mv_hkd": 6243850000.0,
+        "cash_to_liab": 5.433882034573444,
+        "net_cash_to_mv": 1.9282034321772623,
+        "profit_latest": 949948000.0,
+        "cfo_to_profit_latest": 1.23378648094422,
+        "oneoff_ratio_latest": 0.6241225835519418,
+        "dividend_paid_yield_est": 0.0568620322397238,
+        "score": 121.3470892137748,
+        "liquidity_bucket": "中低",
+        "flags": "现金类资产>总负债;近年盈利稳定;经营现金流稳定;一次性/其他收益占比较高;股东回报率较高"
+      },
+      {
+        "ts_code": "02555.HK",
+        "name": "茶百道",
+        "price_hkd": 4.62,
+        "total_mv_hkd": 6826670235.000001,
+        "cash_to_liab": 3.823643900868688,
+        "net_cash_to_mv": 0.3353473833059697,
+        "profit_latest": 804897000.0,
+        "cfo_to_profit_latest": 0.8453342477360457,
+        "oneoff_ratio_latest": 0.1862586144562596,
+        "dividend_paid_yield_est": 0.1601731096360772,
+        "score": 120.78954135710534,
+        "liquidity_bucket": "中低",
+        "flags": "现金类资产>总负债;近年盈利稳定;经营现金流稳定;股东回报率较高"
+      },
+      {
+        "ts_code": "01936.HK",
+        "name": "利特米",
+        "price_hkd": 0.82,
+        "total_mv_hkd": 382744839.99999994,
+        "cash_to_liab": 9.376646106382085,
+        "net_cash_to_mv": 0.4547790218151603,
+        "profit_latest": 16060201.94,
+        "cfo_to_profit_latest": 1.516553435068451,
+        "oneoff_ratio_latest": 0.4278011432028108,
+        "dividend_paid_yield_est": 0.1335833905690276,
+        "score": 120.58586928626838,
+        "liquidity_bucket": "低",
+        "flags": "现金类资产>总负债;近年盈利稳定;经营现金流稳定;股东回报率较高"
+      },
+      {
+        "ts_code": "01666.HK",
+        "name": "同仁堂科技",
+        "price_hkd": 3.16,
+        "total_mv_hkd": 4047277440.000001,
+        "cash_to_liab": 1.4026470502887325,
+        "net_cash_to_mv": 0.3428383698845216,
+        "profit_latest": 396277000.0,
+        "cfo_to_profit_latest": 3.94277992414397,
+        "oneoff_ratio_latest": -0.0088523936539339,
+        "dividend_paid_yield_est": 0.1175046700035468,
+        "score": 119.57049600779074,
+        "liquidity_bucket": "中低",
+        "flags": "现金类资产>总负债;近年盈利稳定;经营现金流稳定;股东回报率较高"
+      },
+      {
+        "ts_code": "02348.HK",
+        "name": "东瑞制药",
+        "price_hkd": 1.0,
+        "total_mv_hkd": 1505690999.9999998,
+        "cash_to_liab": 2.5256517853424776,
+        "net_cash_to_mv": 0.6326391005857113,
+        "profit_latest": 213971000.0,
+        "cfo_to_profit_latest": 1.6610007898266588,
+        "oneoff_ratio_latest": 0.2782059251019998,
+        "dividend_paid_yield_est": 0.088271763595585,
+        "score": 119.39932023499506,
+        "liquidity_bucket": "低",
+        "flags": "现金类资产>总负债;近年盈利稳定;经营现金流稳定;股东回报率较高"
+      }
+    ],
+    "secondary_top20": [
+      {
+        "secondary_grade": "A",
+        "source_rank": 1,
+        "ts_code": "01981.HK",
+        "name": "华夏控股",
+        "profit_trend": "同比增长",
+        "cfo_profit_avg4": 1.885201055151637,
+        "oneoff_latest": 0.0276941681450621,
+        "shareholder_return_yield_est": 0.0883056712011666,
+        "secondary_concern": "暂未发现硬伤"
+      },
+      {
+        "secondary_grade": "A",
+        "source_rank": 4,
+        "ts_code": "02518.HK",
+        "name": "汽车之家-S",
+        "profit_trend": "大致稳定",
+        "cfo_profit_avg4": 1.0206530462673638,
+        "oneoff_latest": 0.1396657956931863,
+        "shareholder_return_yield_est": 0.1349182129230409,
+        "secondary_concern": "暂未发现硬伤"
+      },
+      {
+        "secondary_grade": "A",
+        "source_rank": 17,
+        "ts_code": "06601.HK",
+        "name": "朝云集团",
+        "profit_trend": "大致稳定",
+        "cfo_profit_avg4": 1.0491760055078323,
+        "oneoff_latest": 0.4979413013836422,
+        "shareholder_return_yield_est": 0.0604522537500009,
+        "secondary_concern": "暂未发现硬伤"
+      },
+      {
+        "secondary_grade": "B",
+        "source_rank": 2,
+        "ts_code": "01358.HK",
+        "name": "普华和顺",
+        "profit_trend": "较高点回落明显",
+        "cfo_profit_avg4": 2.1447435150793157,
+        "oneoff_latest": 0.2842944031195032,
+        "shareholder_return_yield_est": 0.0937287029722827,
+        "secondary_concern": "最近派息/利润>120%；利润趋势下滑"
+      },
+      {
+        "secondary_grade": "B",
+        "source_rank": 3,
+        "ts_code": "00327.HK",
+        "name": "百富环球",
+        "profit_trend": "较高点回落明显",
+        "cfo_profit_avg4": 1.074447775292104,
+        "oneoff_latest": 0.1209362688050616,
+        "shareholder_return_yield_est": 0.1382862804362148,
+        "secondary_concern": "利润趋势下滑"
+      },
+      {
+        "secondary_grade": "B",
+        "source_rank": 7,
+        "ts_code": "02660.HK",
+        "name": "禅游科技",
+        "profit_trend": "较高点回落明显",
+        "cfo_profit_avg4": 0.9760469880771924,
+        "oneoff_latest": 0.2694580303461601,
+        "shareholder_return_yield_est": 0.1527259686664229,
+        "secondary_concern": "利润趋势下滑"
+      },
+      {
+        "secondary_grade": "B",
+        "source_rank": 10,
+        "ts_code": "02469.HK",
+        "name": "粉笔",
+        "profit_trend": "同比下滑明显",
+        "cfo_profit_avg4": 1.378611167500291,
+        "oneoff_latest": 0.1437317666535437,
+        "shareholder_return_yield_est": 0.1702497227210514,
+        "secondary_concern": "利润趋势下滑；主要靠回购，非稳定现金股息"
+      },
+      {
+        "secondary_grade": "B",
+        "source_rank": 12,
+        "ts_code": "02555.HK",
+        "name": "茶百道",
+        "profit_trend": "同比增长",
+        "cfo_profit_avg4": 1.008744978092463,
+        "oneoff_latest": 0.1862586144562596,
+        "shareholder_return_yield_est": 0.1601731096360772,
+        "secondary_concern": "最近派息/利润>120%"
+      },
+      {
+        "secondary_grade": "B",
+        "source_rank": 13,
+        "ts_code": "01936.HK",
+        "name": "利特米",
+        "profit_trend": "同比增长",
+        "cfo_profit_avg4": 1.2526066028550504,
+        "oneoff_latest": 0.4278011432028108,
+        "shareholder_return_yield_est": 0.1335833905690276,
+        "secondary_concern": "最近派息/利润>120%；主要靠回购，非稳定现金股息"
+      },
+      {
+        "secondary_grade": "B",
+        "source_rank": 14,
+        "ts_code": "01666.HK",
+        "name": "同仁堂科技",
+        "profit_trend": "同比下滑明显",
+        "cfo_profit_avg4": 1.5383413502051797,
+        "oneoff_latest": -0.0088523936539339,
+        "shareholder_return_yield_est": 0.1175046700035468,
+        "secondary_concern": "最近派息/利润>120%；利润趋势下滑"
+      },
+      {
+        "secondary_grade": "B",
+        "source_rank": 15,
+        "ts_code": "02348.HK",
+        "name": "东瑞制药",
+        "profit_trend": "较高点回落明显",
+        "cfo_profit_avg4": 1.0754134796814114,
+        "oneoff_latest": 0.2782059251019998,
+        "shareholder_return_yield_est": 0.088271763595585,
+        "secondary_concern": "利润趋势下滑"
+      },
+      {
+        "secondary_grade": "B",
+        "source_rank": 18,
+        "ts_code": "00046.HK",
+        "name": "科联系统",
+        "profit_trend": "较高点回落明显",
+        "cfo_profit_avg4": 1.573189791123765,
+        "oneoff_latest": 0.1141834743005855,
+        "shareholder_return_yield_est": 0.08032862064508,
+        "secondary_concern": "最近派息/利润>120%；利润趋势下滑"
+      },
+      {
+        "secondary_grade": "B",
+        "source_rank": 19,
+        "ts_code": "01346.HK",
+        "name": "利华控股集团",
+        "profit_trend": "大致稳定",
+        "cfo_profit_avg4": 0.8508846790565046,
+        "oneoff_latest": 0.1191104575753513,
+        "shareholder_return_yield_est": 0.0897865598169805,
+        "secondary_concern": "应收/资产偏高"
+      },
+      {
+        "secondary_grade": "B",
+        "source_rank": 20,
+        "ts_code": "08512.HK",
+        "name": "凯富善集团控股",
+        "profit_trend": "较高点回落明显",
+        "cfo_profit_avg4": 1.7262598980706794,
+        "oneoff_latest": 0.0631547824372936,
+        "shareholder_return_yield_est": 0.0,
+        "secondary_concern": "利润趋势下滑"
+      },
+      {
+        "secondary_grade": "B-",
+        "source_rank": 5,
+        "ts_code": "00623.HK",
+        "name": "中视金桥",
+        "profit_trend": "同比下滑明显",
+        "cfo_profit_avg4": 0.2737978316211828,
+        "oneoff_latest": 0.057144284946841,
+        "shareholder_return_yield_est": 0.1695072302576396,
+        "secondary_concern": "最近派息/利润>120%；4年CFO/利润均值偏低；利润趋势下滑；收入趋势下滑"
+      },
+      {
+        "secondary_grade": "B-",
+        "source_rank": 8,
+        "ts_code": "01180.HK",
+        "name": "汇彩控股",
+        "profit_trend": "较高点回落明显",
+        "cfo_profit_avg4": 1.2608933237192608,
+        "oneoff_latest": 0.1861112484898155,
+        "shareholder_return_yield_est": 0.2274099686999823,
+        "secondary_concern": "最近派息/利润>120%；利润趋势下滑；收入趋势下滑；金融/放贷属性，净现金口径需折价"
+      },
+      {
+        "secondary_grade": "B-",
+        "source_rank": 16,
+        "ts_code": "00639.HK",
+        "name": "首钢资源",
+        "profit_trend": "较高点回落明显",
+        "cfo_profit_avg4": 1.714440027932719,
+        "oneoff_latest": 0.2223908654401034,
+        "shareholder_return_yield_est": 0.1621145613345948,
+        "secondary_concern": "最近派息/利润>120%；利润趋势下滑；收入趋势下滑"
+      },
+      {
+        "secondary_grade": "C",
+        "source_rank": 6,
+        "ts_code": "06826.HK",
+        "name": "昊海生物科技",
+        "profit_trend": "较高点回落明显",
+        "cfo_profit_avg4": 1.5762207277576776,
+        "oneoff_latest": 0.8133493221358596,
+        "shareholder_return_yield_est": 0.1189608821868367,
+        "secondary_concern": "一次性/其他收益占利润>50%；利润趋势下滑"
+      },
+      {
+        "secondary_grade": "C",
+        "source_rank": 9,
+        "ts_code": "03315.HK",
+        "name": "金邦达宝嘉",
+        "profit_trend": "较高点回落明显",
+        "cfo_profit_avg4": 2.702393590462414,
+        "oneoff_latest": 0.8738657892112872,
+        "shareholder_return_yield_est": 0.0789896277249249,
+        "secondary_concern": "近期披露易 profit warning；一次性/其他收益占利润>50%；利润趋势下滑；收入趋势下滑"
+      },
+      {
+        "secondary_grade": "C",
+        "source_rank": 11,
+        "ts_code": "02877.HK",
+        "name": "神威药业",
+        "profit_trend": "大致稳定",
+        "cfo_profit_avg4": 1.2193934324463889,
+        "oneoff_latest": 0.6241225835519418,
+        "shareholder_return_yield_est": 0.0568620322397238,
+        "secondary_concern": "一次性/其他收益占利润>50%；收入趋势下滑"
+      }
+    ],
+    "governance_top": [
+      {
+        "governance_grade": "Clean",
+        "ts_code": "00536.HK",
+        "name": "贸易通",
+        "governance_score": 4
+      },
+      {
+        "governance_grade": "Clean",
+        "ts_code": "06686.HK",
+        "name": "诺亚控股",
+        "governance_score": 0
+      },
+      {
+        "governance_grade": "Clean",
+        "ts_code": "01571.HK",
+        "name": "信邦控股",
+        "governance_score": 2
+      },
+      {
+        "governance_grade": "Clean",
+        "ts_code": "01681.HK",
+        "name": "康臣药业",
+        "governance_score": 0
+      },
+      {
+        "governance_grade": "Clean",
+        "ts_code": "02610.HK",
+        "name": "南山铝业国际",
+        "governance_score": 12
+      },
+      {
+        "governance_grade": "Clean",
+        "ts_code": "02076.HK",
+        "name": "BOSS直聘-W",
+        "governance_score": 6
+      },
+      {
+        "governance_grade": "Clean",
+        "ts_code": "00887.HK",
+        "name": "英皇钟表珠宝",
+        "governance_score": 14
+      },
+      {
+        "governance_grade": "Clean",
+        "ts_code": "01346.HK",
+        "name": "利华控股集团",
+        "governance_score": 0
+      },
+      {
+        "governance_grade": "Clean",
+        "ts_code": "03316.HK",
+        "name": "滨江服务",
+        "governance_score": 2
+      },
+      {
+        "governance_grade": "Clean",
+        "ts_code": "00999.HK",
+        "name": "小菜园",
+        "governance_score": 2
+      },
+      {
+        "governance_grade": "Clean",
+        "ts_code": "00667.HK",
+        "name": "中国东方教育",
+        "governance_score": 0
+      },
+      {
+        "governance_grade": "Clean",
+        "ts_code": "01579.HK",
+        "name": "颐海国际",
+        "governance_score": 17
+      },
+      {
+        "governance_grade": "Clean",
+        "ts_code": "03339.HK",
+        "name": "中国龙工",
+        "governance_score": 8
+      },
+      {
+        "governance_grade": "Clean",
+        "ts_code": "01837.HK",
+        "name": "五谷磨房",
+        "governance_score": 0
+      },
+      {
+        "governance_grade": "Clean",
+        "ts_code": "06038.HK",
+        "name": "信越控股",
+        "governance_score": 0
+      },
+      {
+        "governance_grade": "Clean",
+        "ts_code": "00987.HK",
+        "name": "中国再生能源投资",
+        "governance_score": 0
+      },
+      {
+        "governance_grade": "Clean",
+        "ts_code": "01475.HK",
+        "name": "日清食品",
+        "governance_score": 10
+      },
+      {
+        "governance_grade": "Watch",
+        "ts_code": "09985.HK",
+        "name": "卫龙美味",
+        "governance_score": 34
+      },
+      {
+        "governance_grade": "Watch",
+        "ts_code": "02489.HK",
+        "name": "集海黄金",
+        "governance_score": 24
+      },
+      {
+        "governance_grade": "Clean",
+        "ts_code": "01513.HK",
+        "name": "丽珠医药",
+        "governance_score": 18
+      }
+    ],
+    "property_targets": [
+      {
+        "ts_code": "01995.HK",
+        "name": "永升服务",
+        "verdict": "可以跟踪，但不符合严格净现金主线",
+        "cash_to_liab": 0.6913095688251799,
+        "net_cash_to_mv": -0.4429031123009344
+      },
+      {
+        "ts_code": "02156.HK",
+        "name": "建发物业",
+        "verdict": "可以进候选，但只放在 B+/复核层，不放核心前排",
+        "cash_to_liab": 1.3597075288891085,
+        "net_cash_to_mv": 0.2457526929538459
+      }
+    ]
+  },
+  "summary": "# LLM/规则汇总\n\n- 主榜候选: 264；治理过滤后: 401。\n- 行情时间: 2026/06/25 10:08:38 至 2026/06/25 15:12:03。\n- 二次检验 A 档: 01981.HK 华夏控股, 02518.HK 汽车之家-S, 06601.HK 朝云集团。\n- 规则提示: A 档不等于买入结论，仍需逐家公司核年报、派息政策、关联交易和流动性。\n\n## 主榜前五\n\n1. 01981.HK 华夏控股 score=132.9 cash/liab=2.13 net_cash/mv=0.77\n2. 01358.HK 普华和顺 score=130.2 cash/liab=4.74 net_cash/mv=0.89\n3. 00327.HK 百富环球 score=130.0 cash/liab=2.06 net_cash/mv=0.55\n4. 02518.HK 汽车之家-S score=126.6 cash/liab=4.79 net_cash/mv=0.81\n5. 00623.HK 中视金桥 score=126.4 cash/liab=6.79 net_cash/mv=0.70\n"
+}

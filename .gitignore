@@ -1,0 +1,21 @@
+.DS_Store
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.venv/
+venv/
+
+# Local credentials. Keep real Tushare/DPSK tokens outside git.
+.env
+.env.*
+!.env.example
+*.key
+*.pem
+
+# Heavy or volatile local run artifacts.
+financial_cache/
+scripts/hk_netcash_outputs/
+scripts/hk_public_site/
+tencent_hk_quotes_*.csv
+hk_ranked_candidates_before_*.csv
+hk_loose_ranked_candidates_before_*.csv

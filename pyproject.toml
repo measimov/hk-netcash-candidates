@@ -1,0 +1,23 @@
+[build-system]
+requires = ["setuptools>=69", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "hk-netcash-pipeline"
+version = "0.1.0"
+description = "HK net-cash and shareholder-return candidate pipeline"
+requires-python = ">=3.11"
+dependencies = [
+  "beautifulsoup4>=4.12",
+  "numpy>=1.26",
+  "pandas>=2.2",
+  "requests>=2.31",
+  "tabulate>=0.9",
+  "tushare>=1.4",
+]
+
+[project.scripts]
+hk-netcash-pipeline = "hk_netcash_pipeline.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]

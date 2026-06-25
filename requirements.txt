@@ -1,0 +1,6 @@
+beautifulsoup4>=4.12
+numpy>=1.26
+pandas>=2.2
+requests>=2.31
+tabulate>=0.9
+tushare>=1.4
