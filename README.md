@@ -8,6 +8,7 @@
 
 ```bash
 python -m pip install -r requirements.txt
+python -m pip install -e .
 export TUSHARE_TOKEN="..."
 python -m hk_netcash_pipeline.cli --profile refresh
 ```

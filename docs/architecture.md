@@ -5,6 +5,8 @@
 现有研究流程已经拆成数据、筛选、复核、治理和静态发布几层。重构后的仓库把这些步骤纳入统一 CLI：
 
 ```bash
+python -m pip install -r requirements.txt
+python -m pip install -e .
 python -m hk_netcash_pipeline.cli --profile refresh
 python -m hk_netcash_pipeline.cli --profile refresh --use-llm
 ```
@@ -68,6 +70,8 @@ flowchart TD
 日常刷新行情和复核：
 
 ```bash
+python -m pip install -r requirements.txt
+python -m pip install -e .
 python -m hk_netcash_pipeline.cli --profile refresh
 ```
 
