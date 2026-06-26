@@ -30,8 +30,9 @@ flowchart TD
     C --> D5[governance: HKEX/SFC/披露易治理覆盖]
     C --> D6[secondary: 前20盈利稳定性二次检验]
     C --> D7[property: 永升/建发物业专项]
-    C --> D8[render: 静态页面渲染]
-    C --> D9[digest: 规则或DPSK汇总]
+    C --> D8[a-dividend-etf: A股红利ETF实时股息率]
+    C --> D9[render: 静态页面渲染]
+    C --> D10[digest: 规则或DPSK汇总]
     D1 --> E[(CSV/HTML/MD artifacts)]
     D2 --> E
     D3 --> E
@@ -39,8 +40,9 @@ flowchart TD
     D5 --> E
     D6 --> E
     D7 --> E
-    D8 --> F[GitHub Pages 静态站]
-    D9 --> F
+    D8 --> E
+    D9 --> F[GitHub Pages 静态站]
+    D10 --> F
 ```
 
 ## 设计模式
@@ -62,6 +64,7 @@ flowchart TD
 | `governance` | 质量池、HKEX/SFC/披露易 | 治理风险覆盖 | 违规、配股摊薄、停牌延迟、profit warning 等 |
 | `secondary` | 当前主榜前20、财报缓存、公告标题 | 前20二次检验 | 盈利稳定性、一次性收益、派息透支、现金流覆盖 |
 | `property` | 主榜、质量池、治理过滤 | 物业股专项 | 永升服务、建发物业专项判断 |
+| `a-dividend-etf` | Tushare ETF基础/分红/NAV、实时行情 | A股红利ETF实时股息率排名 | 近12个月分红/实时价，多维排名 |
 | `render` | 当前 CSV/MD | `index.html` | 移动端静态页面 |
 | `digest` | 汇总产物 | `llm_digest.*` | 规则摘要或 DPSK 摘要 |
 

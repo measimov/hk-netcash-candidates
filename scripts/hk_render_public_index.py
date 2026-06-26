@@ -321,6 +321,7 @@ section h2 {{ font-size:17px; margin:22px 0 8px; }}
   <div class="links">
     <a class="button" href="secondary_validation_top20.html">前20二次检验</a>
     <a class="button" href="property_service_target_review.html">物业股专项复核</a>
+    <a class="button" href="a_dividend_etf_rank.html">A股红利ETF</a>
     <a class="button" href="expanded_quality_candidates.html">宽口径合并榜</a>
     <a class="button" href="governance_risk_overlay.html">治理风险过滤</a>
     <a class="button" href="llm_digest.html">流水线汇总</a>

@@ -28,6 +28,7 @@ def build_payload(output_dir: Path) -> dict:
     secondary = _read_csv(output_dir / "secondary_validation_top20.csv")
     governance = _read_csv(output_dir / "governance_filtered_candidates.csv")
     property_review = _read_csv(output_dir / "property_service_target_review.csv")
+    dividend_etf = _read_csv(output_dir / "a_dividend_etf_rank.csv")
     quote_times = ranked.get("quote_time", pd.Series(dtype=str)).dropna().astype(str)
     return {
         "generated_at": datetime.now(ZoneInfo("Asia/Shanghai")).isoformat(),
@@ -79,12 +80,31 @@ def build_payload(output_dir: Path) -> dict:
             ["ts_code", "name", "verdict", "candidate_tier", "cash_to_liab", "net_cash_to_mv", "shareholder_return_yield_est", "comment"],
             10,
         ),
+        "a_dividend_etf_top": _top_records(
+            dividend_etf,
+            [
+                "rank",
+                "ts_code",
+                "name",
+                "strategy_tag",
+                "price",
+                "dividend_yield_ttm",
+                "div_cash_ttm",
+                "amount_cny",
+                "total_fee_rate",
+                "premium_rate",
+                "div_years_3y",
+                "score",
+            ],
+            15,
+        ),
     }
 
 
 def deterministic_summary(payload: dict) -> str:
     top = payload.get("top_primary", [])[:5]
     secondary = payload.get("secondary_top20", [])
+    etfs = payload.get("a_dividend_etf_top", [])[:5]
     a_names = [f"{r.get('ts_code')} {r.get('name')}" for r in secondary if r.get("secondary_grade") == "A"]
     lines = [
         "# LLM/规则汇总",
@@ -103,6 +123,14 @@ def deterministic_summary(payload: dict) -> str:
             f"score={row.get('score'):.1f} cash/liab={row.get('cash_to_liab'):.2f} "
             f"net_cash/mv={row.get('net_cash_to_mv'):.2f}"
         )
+    if etfs:
+        lines.extend(["", "## A股红利ETF前五", ""])
+        for idx, row in enumerate(etfs, start=1):
+            lines.append(
+                f"{idx}. {row.get('ts_code')} {row.get('name')} "
+                f"yield={float(row.get('dividend_yield_ttm') or 0):.2%} "
+                f"amount={float(row.get('amount_cny') or 0) / 1e8:.2f}亿 score={float(row.get('score') or 0):.1f}"
+            )
     lines.append("")
     return "\n".join(lines)
 

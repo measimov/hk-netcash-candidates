@@ -12,3 +12,11 @@
 3. 00327.HK 百富环球 score=130.0 cash/liab=2.06 net_cash/mv=0.55
 4. 02518.HK 汽车之家-S score=126.6 cash/liab=4.79 net_cash/mv=0.81
 5. 00623.HK 中视金桥 score=126.4 cash/liab=6.79 net_cash/mv=0.70
+
+## A股红利ETF前五
+
+1. 159307.SZ 博时中证红利低波动100ETF yield=5.28% amount=1.11亿 score=85.2
+2. 563020.SH 易方达中证红利低波动ETF yield=4.44% amount=1.81亿 score=85.2
+3. 515180.SH 易方达中证红利ETF yield=4.69% amount=3.53亿 score=84.5
+4. 515080.SH 招商中证红利ETF yield=4.87% amount=3.78亿 score=83.4
+5. 515450.SH 南方标普中国A股大盘红利低波50ETF yield=5.65% amount=1.41亿 score=81.6
