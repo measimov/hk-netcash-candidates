@@ -67,7 +67,7 @@ flowchart TD
 | `secondary` | 当前主榜前20、财报缓存、公告标题 | 前20二次检验 | 盈利稳定性、一次性收益、派息透支、现金流覆盖 |
 | `special-dividend` | 合并 universe、财报缓存/可选补抓 | 特殊高分红观察池 | 低 PB、高现金分红、净现金或现金覆盖负债，但被负 PE、亏损、非 12 月财年等静态口径漏掉的标的 |
 | `property` | 主榜、质量池、治理过滤 | 物业股专项 | 永升服务、建发物业专项判断 |
-| `a-dividend-etf` | Tushare ETF基础/分红/NAV、实时行情 | 沪深上市红利ETF实时股息率排名 | 近12个月分红/实时价，多维排名，含恒生/港股通/H股红利ETF |
+| `a-dividend-etf` | Tushare ETF基础/分红/NAV/日线、实时行情 | 沪深上市红利ETF实时股息率排名 | 近12个月分红/实时价，多维排名，含恒生/港股通/H股红利ETF，并附历史最高股息率与1/2/5/10年分位 |
 | `render` | 当前 CSV/MD | `index.html` | 移动端静态页面 |
 | `digest` | 汇总产物 | `llm_digest.*` | 规则摘要或 DPSK 摘要 |
 

@@ -14,6 +14,7 @@ venv/
 
 # Heavy or volatile local run artifacts.
 tmp/
+a_etf_daily_cache/
 financial_cache/
 scripts/hk_netcash_outputs/
 scripts/hk_public_site/

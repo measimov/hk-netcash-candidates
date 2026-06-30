@@ -39,6 +39,7 @@ STATIC_ARTIFACTS = [
     "a_dividend_etf_rank.csv",
     "a_dividend_etf_rank.md",
     "a_dividend_etf_rank.html",
+    "a_dividend_etf_yield_history_stats.csv",
     "a_dividend_etf_universe.csv",
     "a_dividend_etf_realtime_quotes.csv",
     "top20_hkex_announcement_titles.csv",
