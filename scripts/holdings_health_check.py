@@ -118,7 +118,7 @@ INSTRUMENTS: dict[int, Instrument] = {
     4: Instrument(4, "000423.SZ", "东阿阿胶", "A股", "A股", "CNY", "sina", "000423.SZ", "A股", "中药消费"),
     5: Instrument(5, "000651.SZ", "格力电器", "A股", "A股", "CNY", "sina", "000651.SZ", "A股", "家电红利"),
     6: Instrument(6, "200596.SZ", "古井贡B", "B股", "B股", "HKD", "sina", "000596.SZ", "A股", "B/A折价"),
-    7: Instrument(7, "00992.HK", "联想集团", "港股", "港股", "HKD", "tencent", "00992.HK", "港股", "科技硬件"),
+    7: Instrument(7, "01579.HK", "颐海国际", "港股", "港股", "HKD", "tencent", "01579.HK", "港股", "食品消费"),
     8: Instrument(8, "603816.SH", "顾家家居", "A股", "A股", "CNY", "sina", "603816.SH", "A股", "地产链消费"),
     9: Instrument(9, "600298.SH", "安琪酵母", "A股", "A股", "CNY", "sina", "600298.SH", "A股", "食品出海"),
     10: Instrument(10, "600741.SH", "华域汽车A", "A股", "A股", "CNY", "sina", "600741.SH", "A股", "汽车零部件"),
