@@ -1,0 +1,860 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>持仓体检与买入逻辑复核</title>
+  <style>
+    :root{--bg:#f5f6f8;--fg:#17202a;--muted:#647080;--card:#fff;--line:#dde3ea;--blue:#155e75;--good:#16734a;--warn:#9a6500;--bad:#a32018}
+    *{box-sizing:border-box}
+    body{margin:0;background:var(--bg);color:var(--fg);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC",Arial,sans-serif}
+    header{position:sticky;top:0;z-index:3;background:rgba(245,246,248,.96);border-bottom:1px solid var(--line);backdrop-filter:blur(10px)}
+    .bar,main{max-width:1240px;margin:0 auto;padding:14px}
+    h1{font-size:20px;line-height:1.25;margin:0 0 6px}
+    .meta{font-size:13px;color:var(--muted);line-height:1.5}
+    .links{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 14px}
+    .links a{background:var(--blue);color:white;text-decoration:none;border-radius:6px;padding:8px 10px;font-size:14px}
+    .summary{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-bottom:12px}
+    .metric,.panel,.card{background:var(--card);border:1px solid var(--line);border-radius:8px}
+    .metric{padding:10px}
+    .metric label,.grid label{display:block;font-size:12px;color:var(--muted);margin-bottom:4px}
+    .metric strong{font-size:18px}
+    .note{background:#fff8e6;border:1px solid #ead498;color:#3c2a00;border-radius:8px;padding:10px;font-size:13px;line-height:1.55;margin-bottom:12px}
+    .panel{padding:10px;margin-bottom:12px;overflow:auto}
+    table{width:100%;border-collapse:collapse;font-size:13px}
+    th,td{border-bottom:1px solid var(--line);padding:8px;text-align:left;white-space:nowrap}
+    .cards{display:grid;grid-template-columns:1fr;gap:10px}
+    .card{padding:12px}
+    .head{display:flex;justify-content:space-between;gap:8px;align-items:flex-start;margin-bottom:10px}
+    .head b{display:block;font-size:16px}
+    .head span{display:block;color:var(--muted);font-size:12px;margin-top:3px}
+    .pill{border-radius:999px;padding:4px 8px;font-size:12px;font-weight:700;white-space:nowrap}
+    .grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-bottom:10px}
+    .grid div{border:1px solid var(--line);border-radius:6px;padding:8px;min-height:72px}
+    .grid strong{display:block;font-size:15px;line-height:1.2}
+    .grid small{display:block;color:var(--muted);font-size:11px;line-height:1.35;margin-top:4px}
+    .logic{font-size:13px;line-height:1.55;border-top:1px solid var(--line);padding-top:9px}
+    .decision{margin-top:8px;font-size:13px;font-weight:700}
+    details{margin-top:8px;color:var(--muted);font-size:12px;line-height:1.45}
+    details summary{cursor:pointer;color:var(--fg)}
+    .good{color:var(--good);background:#eaf7f0}
+    .warn{color:var(--warn);background:#fff4da}
+    .bad{color:var(--bad);background:#fdecea}
+    .logic .good,.logic .warn,.logic .bad{background:transparent;font-weight:700}
+    @media(min-width:760px){.summary{grid-template-columns:repeat(4,minmax(0,1fr))}.cards{grid-template-columns:repeat(2,minmax(0,1fr))}.grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
+  </style>
+</head>
+<body>
+  <header>
+    <div class="bar">
+      <h1>持仓体检与买入逻辑复核</h1>
+      <div class="meta">生成时间：2026-07-01 00:44:28 CST。行情以 Sina/Tencent/Yahoo 当前返回值和 Tushare 20260630 日线为准；跨币种仓位用 Frankfurter 2026-06-30 汇率估算。</div>
+    </div>
+  </header>
+  <main>
+    <nav class="links">
+      <a href="index.html">返回主榜</a>
+      <a href="holdings_2026_06_30.html">原始持仓表</a>
+      <a href="holdings_health_check_2026_07_01.csv">CSV</a>
+      <a href="holdings_health_check_2026_07_01.md">Markdown</a>
+    </nav>
+    <section class="summary">
+      <div class="metric"><label>估算总市值</label><strong>109.6万 CNY</strong></div>
+      <div class="metric"><label>高风险</label><strong>0 个</strong></div>
+      <div class="metric"><label>中风险</label><strong>2 个</strong></div>
+      <div class="metric"><label>需复核逻辑</label><strong>2 个</strong></div>
+    </section>
+    <div class="note">成本价按当前价和手写浮盈亏倒推，不能替代真实成交记录。对港股/新加坡股，Tushare 财报字段存在滞后和口径差异；事件驱动逻辑需要继续用公告、年报和行业数据二次验证。</div>
+    <section class="panel">
+      <table>
+        <thead><tr><th>主题</th><th>市值(CNY)</th><th>权重</th></tr></thead>
+        <tbody><tr><td>红利ETF</td><td>15.3万</td><td>13.9%</td></tr>
+<tr><td>通信公用</td><td>12.8万</td><td>11.7%</td></tr>
+<tr><td>创新药</td><td>7.6万</td><td>6.9%</td></tr>
+<tr><td>家电红利</td><td>7.5万</td><td>6.9%</td></tr>
+<tr><td>物业地产链</td><td>6.4万</td><td>5.8%</td></tr>
+<tr><td>家电出海</td><td>6.3万</td><td>5.8%</td></tr>
+<tr><td>食品出海</td><td>5.8万</td><td>5.3%</td></tr>
+<tr><td>医药CXO</td><td>5.0万</td><td>4.5%</td></tr>
+<tr><td>互联网AI</td><td>4.3万</td><td>3.9%</td></tr>
+<tr><td>资源周期</td><td>3.7万</td><td>3.3%</td></tr>
+<tr><td>B/A折价</td><td>3.6万</td><td>3.3%</td></tr>
+<tr><td>铝周期</td><td>3.5万</td><td>3.2%</td></tr></tbody>
+      </table>
+    </section>
+    <section class="cards">
+      
+    <article class="card">
+      <div class="head">
+        <div><b>联想集团</b><span>00992.HK</span></div>
+        <div class="pill warn">风险 中</div>
+      </div>
+      <div class="grid">
+        <div><label>仓位</label><strong>1.8%</strong><small>小仓，仓位大体匹配</small></div>
+        <div><label>现价/成本</label><strong>23.02HKD / 24.28HKD</strong><small>2026/06/30 16:08:11</small></div>
+        <div><label>股息率</label><strong>1.7%</strong><small>TTM/最新可得口径</small></div>
+        <div><label>PE/PB</label><strong>19.06 / 8.18</strong><small></small></div>
+        <div><label>盈利趋势</label><strong>增长</strong><small>利润CAGR 6.2%</small></div>
+        <div><label>现金流</label><strong>210.5%</strong><small>CFO/利润</small></div>
+      </div>
+      <div class="logic"><span class="bad">需复核</span>：股东回报证据偏弱或暂无TTM股息</div>
+      <div class="decision">优先复核/降权候选</div>
+      <details>
+        <summary>公告与数据口径</summary>
+        <ul><li>29/06/2026 16:49: 更改註冊辦事處地址</li><li>27/02/2026 16:31: (1) 修訂與富士通的持續關連交易的現有年度上限及 (2) 續訂與富士通的持續關連交易</li><li>26/06/2026 17:17: 變更申請表格</li></ul>
+        <p>Tushare 港股财报；</p>
+      </details>
+    </article>
+            
+    <article class="card">
+      <div class="head">
+        <div><b>栢能集团</b><span>PCT.SI</span></div>
+        <div class="pill warn">风险 中</div>
+      </div>
+      <div class="grid">
+        <div><label>仓位</label><strong>0.3%</strong><small>观察仓，仓位大体匹配</small></div>
+        <div><label>现价/成本</label><strong>2.89SGD / 1.38SGD</strong><small>2026-06-30 17:08:22 +08</small></div>
+        <div><label>股息率</label><strong>0.0%</strong><small>TTM/最新可得口径</small></div>
+        <div><label>PE/PB</label><strong> / </strong><small></small></div>
+        <div><label>盈利趋势</label><strong>Tushare不覆盖</strong><small>利润CAGR </small></div>
+        <div><label>现金流</label><strong></strong><small>CFO/利润</small></div>
+      </div>
+      <div class="logic"><span class="bad">需复核</span>：股东回报证据偏弱或暂无TTM股息；事件/产品期权逻辑，财务数据验证不足</div>
+      <div class="decision">优先复核/降权候选</div>
+      <details>
+        <summary>公告与数据口径</summary>
+        <ul><li>暂无抓取到近期公告标题</li></ul>
+        <p>Yahoo行情/分红事件；需SGX财报补验；非港股，Tushare覆盖有限</p>
+      </details>
+    </article>
+            
+    <article class="card">
+      <div class="head">
+        <div><b>康方生物</b><span>09926.HK</span></div>
+        <div class="pill good">风险 低</div>
+      </div>
+      <div class="grid">
+        <div><label>仓位</label><strong>6.9%</strong><small>中等，仓位大体匹配</small></div>
+        <div><label>现价/成本</label><strong>88.05HKD / 97.93HKD</strong><small>2026/06/30 16:08:09</small></div>
+        <div><label>股息率</label><strong></strong><small>TTM/最新可得口径</small></div>
+        <div><label>PE/PB</label><strong>-65.82 / 6.49</strong><small></small></div>
+        <div><label>盈利趋势</label><strong>亏损/转亏</strong><small>利润CAGR </small></div>
+        <div><label>现金流</label><strong>85.1%</strong><small>CFO/利润</small></div>
+      </div>
+      <div class="logic"><span class="warn">未破但需跟踪</span>：事件/产品期权逻辑，财务数据验证不足；利润趋势为亏损/转亏</div>
+      <div class="decision">可继续持有</div>
+      <details>
+        <summary>公告与数据口径</summary>
+        <ul><li>29/06/2026 21:21: 於2026年6月29日（星期一）舉行的股東週年大會投票表決結果</li><li>29/04/2026 22:53: 致非登記持有人之通知信函及回條 - 以電子方式發布公司通訊安排的提示信函</li><li>29/04/2026 22:51: 致登記股東之通知信函及回條 - 以電子方式發布公司通訊安排的提示信函</li></ul>
+        <p>Tushare 港股财报；</p>
+      </details>
+    </article>
+            
+    <article class="card">
+      <div class="head">
+        <div><b>美的集团</b><span>000333.SZ</span></div>
+        <div class="pill good">风险 低</div>
+      </div>
+      <div class="grid">
+        <div><label>仓位</label><strong>4.1%</strong><small>中等，仓位大体匹配</small></div>
+        <div><label>现价/成本</label><strong>75.53CNY / 74.35CNY</strong><small>2026-06-30 15:00:00</small></div>
+        <div><label>股息率</label><strong>5.7%</strong><small>TTM/最新可得口径</small></div>
+        <div><label>PE/PB</label><strong>13.01 / 2.48</strong><small></small></div>
+        <div><label>盈利趋势</label><strong>稳定</strong><small>利润CAGR 14.1%</small></div>
+        <div><label>现金流</label><strong>121.4%</strong><small>CFO/利润</small></div>
+      </div>
+      <div class="logic"><span class="warn">未破但需跟踪</span>：估值不贵但安全边际一般；股东回报/分红仍有数据支撑；盈利趋势未明显破坏出海/代工逻辑</div>
+      <div class="decision">可继续持有</div>
+      <details>
+        <summary>公告与数据口径</summary>
+        <ul><li>20260701: 关于调整股权激励计划行权价格和回购价格的公告</li><li>20260701: 北京市嘉源律师事务所关于美的集团股份有限公司相关股票激励计划涉及的价格调整的法律意见书</li><li>20260625: 2026年6月25日投资者关系活动记录表</li></ul>
+        <p>Tushare A股财务/分红/公告；</p>
+      </details>
+    </article>
+            
+    <article class="card">
+      <div class="head">
+        <div><b>快手-W</b><span>01024.HK</span></div>
+        <div class="pill good">风险 低</div>
+      </div>
+      <div class="grid">
+        <div><label>仓位</label><strong>3.9%</strong><small>小仓，仓位大体匹配</small></div>
+        <div><label>现价/成本</label><strong>41.60HKD / 37.82HKD</strong><small>2026/06/30 16:08:09</small></div>
+        <div><label>股息率</label><strong>2.6%</strong><small>TTM/最新可得口径</small></div>
+        <div><label>PE/PB</label><strong>8.73 / 6.20</strong><small></small></div>
+        <div><label>盈利趋势</label><strong>增长</strong><small>利润CAGR </small></div>
+        <div><label>现金流</label><strong>143.5%</strong><small>CFO/利润</small></div>
+      </div>
+      <div class="logic"><span class="warn">未破但需跟踪</span>：事件/产品期权逻辑，财务数据验证不足；低估值仍有估值指标支撑</div>
+      <div class="decision">可继续持有</div>
+      <details>
+        <summary>公告与数据口径</summary>
+        <ul><li>31/03/2026 19:37: 翌日披露報表</li><li>30/03/2026 19:23: 翌日披露報表</li><li>30/01/2026 19:05: 翌日披露報表</li></ul>
+        <p>Tushare 港股财报；</p>
+      </details>
+    </article>
+            
+    <article class="card">
+      <div class="head">
+        <div><b>海信家电A</b><span>000921.SZ</span></div>
+        <div class="pill good">风险 低</div>
+      </div>
+      <div class="grid">
+        <div><label>仓位</label><strong>3.7%</strong><small>小仓，仓位大体匹配</small></div>
+        <div><label>现价/成本</label><strong>27.32CNY / 23.67CNY</strong><small>2026-06-30 15:00:00</small></div>
+        <div><label>股息率</label><strong>4.5%</strong><small>TTM/最新可得口径</small></div>
+        <div><label>PE/PB</label><strong>12.23 / 2.05</strong><small></small></div>
+        <div><label>盈利趋势</label><strong>稳定</strong><small>利润CAGR 30.5%</small></div>
+        <div><label>现金流</label><strong>181.9%</strong><small>CFO/利润</small></div>
+      </div>
+      <div class="logic"><span class="warn">未破但需跟踪</span>：估值不贵但安全边际一般；股东回报/分红仍有数据支撑；盈利趋势未明显破坏出海/代工逻辑</div>
+      <div class="decision">可继续持有</div>
+      <details>
+        <summary>公告与数据口径</summary>
+        <ul><li>20260627: 关于召开2025年度暨2026年第一季度业绩说明会的公告</li><li>20260627: H股公告-认购理财产品</li><li>20260626: 2025年度股东周年大会决议公告</li></ul>
+        <p>Tushare A股财务/分红/公告；</p>
+      </details>
+    </article>
+            
+    <article class="card">
+      <div class="head">
+        <div><b>云铝股份A</b><span>000807.SZ</span></div>
+        <div class="pill good">风险 低</div>
+      </div>
+      <div class="grid">
+        <div><label>仓位</label><strong>3.2%</strong><small>小仓，仓位大体匹配</small></div>
+        <div><label>现价/成本</label><strong>22.14CNY / 27.02CNY</strong><small>2026-06-30 15:00:00</small></div>
+        <div><label>股息率</label><strong>3.2%</strong><small>TTM/最新可得口径</small></div>
+        <div><label>PE/PB</label><strong>8.85 / 2.15</strong><small></small></div>
+        <div><label>盈利趋势</label><strong>增长</strong><small>利润CAGR 9.8%</small></div>
+        <div><label>现金流</label><strong>139.3%</strong><small>CFO/利润</small></div>
+      </div>
+      <div class="logic"><span class="warn">未破但需跟踪</span>：资源/商品价格假设，需独立跟踪周期拐点</div>
+      <div class="decision">可继续持有</div>
+      <details>
+        <summary>公告与数据口径</summary>
+        <ul><li>20260701: 云南铝业股份有限公司2026年第一次临时股东会决议公告</li><li>20260701: 云南海合律师事务所关于云南铝业股份有限公司2026年第一次临时股东会的见证意见书</li><li>20260613: 云南铝业股份有限公司第九届董事会第二十五次会议决议公告</li></ul>
+        <p>Tushare A股财务/分红/公告；</p>
+      </details>
+    </article>
+            
+    <article class="card">
+      <div class="head">
+        <div><b>古井贡B</b><span>200596.SZ</span></div>
+        <div class="pill good">风险 低</div>
+      </div>
+      <div class="grid">
+        <div><label>仓位</label><strong>2.5%</strong><small>小仓，仓位大体匹配</small></div>
+        <div><label>现价/成本</label><strong>51.75HKD / 67.10HKD</strong><small>2026-06-30 15:00:00</small></div>
+        <div><label>股息率</label><strong>2.2%</strong><small>TTM/最新可得口径</small></div>
+        <div><label>PE/PB</label><strong>14.93 / 1.61</strong><small>PE/PB取A股公司口径；B股吸引力另看B/A折价</small></div>
+        <div><label>盈利趋势</label><strong>明显下滑</strong><small>利润CAGR 4.1%</small></div>
+        <div><label>现金流</label><strong>54.9%</strong><small>CFO/利润</small></div>
+      </div>
+      <div class="logic"><span class="warn">未破但需跟踪</span>：股息率中等，需看持续性；估值不贵但安全边际一般；利润趋势为明显下滑；最新净利同比下滑超过20%；经营现金流/利润偏低；B/A折价仍较明显</div>
+      <div class="decision">可继续持有</div>
+      <details>
+        <summary>公告与数据口径</summary>
+        <ul><li>20260627: 第十一届董事会第一次会议决议公告</li><li>20260627: 2025年度股东会决议公告</li><li>20260627: 关于选举职工代表董事的公告</li></ul>
+        <p>Tushare A股财务/分红/公告；</p>
+      </details>
+    </article>
+            
+    <article class="card">
+      <div class="head">
+        <div><b>保利物业</b><span>06049.HK</span></div>
+        <div class="pill good">风险 低</div>
+      </div>
+      <div class="grid">
+        <div><label>仓位</label><strong>2.4%</strong><small>小仓，仓位大体匹配</small></div>
+        <div><label>现价/成本</label><strong>25.76HKD / 34.13HKD</strong><small>2026/06/30 16:08:12</small></div>
+        <div><label>股息率</label><strong>5.2%</strong><small>TTM/最新可得口径</small></div>
+        <div><label>PE/PB</label><strong>8.31 / 2.81</strong><small></small></div>
+        <div><label>盈利趋势</label><strong>稳定</strong><small>利润CAGR 11.7%</small></div>
+        <div><label>现金流</label><strong>117.9%</strong><small>CFO/利润</small></div>
+      </div>
+      <div class="logic"><span class="warn">未破但需跟踪</span>：地产链仍是主要折价和风险来源</div>
+      <div class="decision">可继续持有</div>
+      <details>
+        <summary>公告与数据口径</summary>
+        <ul><li>31/03/2026 12:12: 董事會換屆選舉</li><li>31/03/2026 12:01: 截至2025年12月31日止年度的末期股息</li><li>31/03/2026 12:00: 截至2025年12月31日止年度全年業績公告</li></ul>
+        <p>Tushare 港股财报；</p>
+      </details>
+    </article>
+            
+    <article class="card">
+      <div class="head">
+        <div><b>紫金矿业A</b><span>601899.SH</span></div>
+        <div class="pill good">风险 低</div>
+      </div>
+      <div class="grid">
+        <div><label>仓位</label><strong>2.1%</strong><small>小仓，仓位大体匹配</small></div>
+        <div><label>现价/成本</label><strong>25.14CNY / 30.08CNY</strong><small>2026-06-30 15:00:01</small></div>
+        <div><label>股息率</label><strong>2.4%</strong><small>TTM/最新可得口径</small></div>
+        <div><label>PE/PB</label><strong>10.84 / 3.39</strong><small></small></div>
+        <div><label>盈利趋势</label><strong>增长</strong><small>利润CAGR 37.2%</small></div>
+        <div><label>现金流</label><strong>145.7%</strong><small>CFO/利润</small></div>
+      </div>
+      <div class="logic"><span class="warn">未破但需跟踪</span>：近半年公告标题存在风险关键词</div>
+      <div class="decision">可继续持有</div>
+      <details>
+        <summary>公告与数据口径</summary>
+        <ul><li>20260622: 紫金矿业集团股份有限公司2025年年度权益分派实施公告</li><li>20260622: 福建至理律师事务所关于紫金矿业集团股份有限公司差异化分红事项的法律意见书</li><li>20260609: 紫金矿业集团股份有限公司第九届董事会临时会议决议公告</li></ul>
+        <p>Tushare A股财务/分红/公告；</p>
+      </details>
+    </article>
+            
+    <article class="card">
+      <div class="head">
+        <div><b>京东集团-SW</b><span>09618.HK</span></div>
+        <div class="pill good">风险 低</div>
+      </div>
+      <div class="grid">
+        <div><label>仓位</label><strong>2.0%</strong><small>小仓，仓位大体匹配</small></div>
+        <div><label>现价/成本</label><strong>99.25HKD / 116.76HKD</strong><small>2026/06/30 16:08:09</small></div>
+        <div><label>股息率</label><strong>11.7%</strong><small>TTM/最新可得口径</small></div>
+        <div><label>PE/PB</label><strong>12.47 / 2.12</strong><small></small></div>
+        <div><label>盈利趋势</label><strong>明显下滑</strong><small>利润CAGR 23.7%</small></div>
+        <div><label>现金流</label><strong>96.7%</strong><small>CFO/利润</small></div>
+      </div>
+      <div class="logic"><span class="warn">未破但需跟踪</span>：利润趋势为明显下滑；股东回报/分红仍有数据支撑</div>
+      <div class="decision">可继续持有</div>
+      <details>
+        <summary>公告与数据口径</summary>
+        <ul><li>31/03/2026 07:45: 擬發行以人民幣計值的優先票據</li><li>28/04/2026 18:00: 董事會會議日期</li><li>20/02/2026 18:00: 董事會會議日期</li></ul>
+        <p>Tushare 港股财报；</p>
+      </details>
+    </article>
+            
+    <article class="card">
+      <div class="head">
+        <div><b>顾家家居</b><span>603816.SH</span></div>
+        <div class="pill good">风险 低</div>
+      </div>
+      <div class="grid">
+        <div><label>仓位</label><strong>1.8%</strong><small>小仓，仓位大体匹配</small></div>
+        <div><label>现价/成本</label><strong>22.36CNY / 28.96CNY</strong><small>2026-06-30 15:00:03</small></div>
+        <div><label>股息率</label><strong>12.3%</strong><small>TTM/最新可得口径</small></div>
+        <div><label>PE/PB</label><strong>10.39 / 1.66</strong><small></small></div>
+        <div><label>盈利趋势</label><strong>增长</strong><small>利润CAGR -0.4%</small></div>
+        <div><label>现金流</label><strong>155.0%</strong><small>CFO/利润</small></div>
+      </div>
+      <div class="logic"><span class="warn">未破但需跟踪</span>：地产链仍是主要折价和风险来源；股东回报/分红仍有数据支撑</div>
+      <div class="decision">可继续持有</div>
+      <details>
+        <summary>公告与数据口径</summary>
+        <ul><li>20260630: 关于高级管理人员离任暨聘任高级管理人员的公告</li><li>20260626: 顾家家居差异化分红事项法律意见书</li><li>20260626: 顾家家居2025年年度权益分派实施公告</li></ul>
+        <p>Tushare A股财务/分红/公告；</p>
+      </details>
+    </article>
+            
+    <article class="card">
+      <div class="head">
+        <div><b>赛轮轮胎A</b><span>601058.SH</span></div>
+        <div class="pill good">风险 低</div>
+      </div>
+      <div class="grid">
+        <div><label>仓位</label><strong>1.8%</strong><small>小仓，仓位大体匹配</small></div>
+        <div><label>现价/成本</label><strong>11.53CNY / 15.76CNY</strong><small>2026-06-30 15:00:02</small></div>
+        <div><label>股息率</label><strong>2.9%</strong><small>TTM/最新可得口径</small></div>
+        <div><label>PE/PB</label><strong>10.71 / 1.69</strong><small></small></div>
+        <div><label>盈利趋势</label><strong>稳定</strong><small>利润CAGR 38.3%</small></div>
+        <div><label>现金流</label><strong>118.6%</strong><small>CFO/利润</small></div>
+      </div>
+      <div class="logic"><span class="warn">未破但需跟踪</span>：近半年公告标题存在风险关键词</div>
+      <div class="decision">可继续持有</div>
+      <details>
+        <summary>公告与数据口径</summary>
+        <ul><li>20260701: 赛轮轮胎关于股东部分股份质押延期购回的公告</li><li>20260626: 赛轮轮胎2026年第一次临时股东会会议材料</li><li>20260618: 赛轮轮胎第七届董事会第六次会议决议公告</li></ul>
+        <p>Tushare A股财务/分红/公告；</p>
+      </details>
+    </article>
+            
+    <article class="card">
+      <div class="head">
+        <div><b>雅戈尔</b><span>600177.SH</span></div>
+        <div class="pill good">风险 低</div>
+      </div>
+      <div class="grid">
+        <div><label>仓位</label><strong>1.4%</strong><small>小仓，仓位大体匹配</small></div>
+        <div><label>现价/成本</label><strong>7.53CNY / 7.64CNY</strong><small>2026-06-30 15:00:01</small></div>
+        <div><label>股息率</label><strong>5.8%</strong><small>TTM/最新可得口径</small></div>
+        <div><label>PE/PB</label><strong>13.57 / 0.82</strong><small></small></div>
+        <div><label>盈利趋势</label><strong>高点回落</strong><small>利润CAGR -21.5%</small></div>
+        <div><label>现金流</label><strong>50.4%</strong><small>CFO/利润</small></div>
+      </div>
+      <div class="logic"><span class="warn">未破但需跟踪</span>：利润趋势为高点回落；经营现金流/利润偏低；股东回报/分红仍有数据支撑</div>
+      <div class="decision">可继续持有</div>
+      <details>
+        <summary>公告与数据口径</summary>
+        <ul><li>20260610: 雅戈尔时尚股份有限公司关于控股股东及其一致行动人权益变动触及1%刻度的提示性公告</li><li>20260605: 雅戈尔时尚股份有限公司关于控股子公司互保的公告</li><li>20260605: 雅戈尔时尚股份有限公司与私募基金合作投资公告</li></ul>
+        <p>Tushare A股财务/分红/公告；</p>
+      </details>
+    </article>
+            
+    <article class="card">
+      <div class="head">
+        <div><b>时代集团控股</b><span>01023.HK</span></div>
+        <div class="pill good">风险 低</div>
+      </div>
+      <div class="grid">
+        <div><label>仓位</label><strong>1.3%</strong><small>小仓，仓位大体匹配</small></div>
+        <div><label>现价/成本</label><strong>0.46HKD / 0.51HKD</strong><small>2026/06/30 16:08:13</small></div>
+        <div><label>股息率</label><strong>12.4%</strong><small>TTM/最新可得口径</small></div>
+        <div><label>PE/PB</label><strong>-2.49 / 0.00</strong><small></small></div>
+        <div><label>盈利趋势</label><strong>亏损/转亏</strong><small>利润CAGR </small></div>
+        <div><label>现金流</label><strong>-47.6%</strong><small>CFO/利润</small></div>
+      </div>
+      <div class="logic"><span class="warn">未破但需跟踪</span>：利润趋势为亏损/转亏；经营现金流/利润偏低；低估值仍有估值指标支撑</div>
+      <div class="decision">可继续持有</div>
+      <details>
+        <summary>公告与数据口径</summary>
+        <ul><li>27/02/2026 12:18: 截至二零二五年十二月三十一日止六個月之中期股息</li><li>27/02/2026 12:07: 截至二零二五年十二月三十一日止六個月的中期業績公佈</li><li>20/03/2026 06:37: 致非登記股東之通知信函 - 公司通訊之發佈通知</li></ul>
+        <p>Tushare 港股财报；</p>
+      </details>
+    </article>
+            
+    <article class="card">
+      <div class="head">
+        <div><b>洛阳钼业A</b><span>603993.SH</span></div>
+        <div class="pill good">风险 低</div>
+      </div>
+      <div class="grid">
+        <div><label>仓位</label><strong>1.3%</strong><small>小仓，仓位大体匹配</small></div>
+        <div><label>现价/成本</label><strong>17.55CNY / 19.01CNY</strong><small>2026-06-30 15:00:02</small></div>
+        <div><label>股息率</label><strong>1.6%</strong><small>TTM/最新可得口径</small></div>
+        <div><label>PE/PB</label><strong>15.55 / 4.23</strong><small></small></div>
+        <div><label>盈利趋势</label><strong>增长</strong><small>利润CAGR 49.7%</small></div>
+        <div><label>现金流</label><strong>102.5%</strong><small>CFO/利润</small></div>
+      </div>
+      <div class="logic"><span class="warn">未破但需跟踪</span>：资源/商品价格假设，需独立跟踪周期拐点</div>
+      <div class="decision">可继续持有</div>
+      <details>
+        <summary>公告与数据口径</summary>
+        <ul><li>20260617: 洛阳钼业关于2021年第一期员工持股计划2023年度对应权益分配期业绩考核情况暨存续期延长的公告</li><li>20260617: 洛阳钼业关于对下属子公司提供担保的进展公告</li><li>20260617: 洛阳钼业第七届董事会第十二次临时会议决议公告</li></ul>
+        <p>Tushare A股财务/分红/公告；</p>
+      </details>
+    </article>
+            
+    <article class="card">
+      <div class="head">
+        <div><b>中海物业</b><span>02669.HK</span></div>
+        <div class="pill good">风险 低</div>
+      </div>
+      <div class="grid">
+        <div><label>仓位</label><strong>1.3%</strong><small>小仓，仓位大体匹配</small></div>
+        <div><label>现价/成本</label><strong>3.23HKD / 4.97HKD</strong><small>2026/06/30 16:08:12</small></div>
+        <div><label>股息率</label><strong>5.6%</strong><small>TTM/最新可得口径</small></div>
+        <div><label>PE/PB</label><strong>7.01 / 3.08</strong><small></small></div>
+        <div><label>盈利趋势</label><strong>稳定</strong><small>利润CAGR 7.7%</small></div>
+        <div><label>现金流</label><strong>84.4%</strong><small>CFO/利润</small></div>
+      </div>
+      <div class="logic"><span class="warn">未破但需跟踪</span>：地产链仍是主要折价和风险来源；股东回报/分红仍有数据支撑</div>
+      <div class="decision">可继续持有</div>
+      <details>
+        <summary>公告与数据口径</summary>
+        <ul><li>29/04/2026 17:43: 重續持續關連交易 - 關於租賃物業及物業管理公用服務費</li><li>29/04/2026 17:15: 與中國海外發展、中國海外宏洋、中國建築國際、中建集團及中國建築興業關於提供物業管理服務及增值服務的持續關連交易</li><li>29/04/2026 12:11: 2025年可持續發展報告</li></ul>
+        <p>Tushare 港股财报；原表代码写作02069，按官方代码02669计算</p>
+      </details>
+    </article>
+            
+    <article class="card">
+      <div class="head">
+        <div><b>宝信B</b><span>900926.SH</span></div>
+        <div class="pill good">风险 低</div>
+      </div>
+      <div class="grid">
+        <div><label>仓位</label><strong>0.8%</strong><small>观察仓，仓位大体匹配</small></div>
+        <div><label>现价/成本</label><strong>0.81USD / 1.09USD</strong><small>2026-06-30 15:00:01</small></div>
+        <div><label>股息率</label><strong>4.2%</strong><small>TTM/最新可得口径</small></div>
+        <div><label>PE/PB</label><strong>38.28 / 4.16</strong><small>PE/PB取A股公司口径；B股吸引力另看B/A折价</small></div>
+        <div><label>盈利趋势</label><strong>明显下滑</strong><small>利润CAGR -15.8%</small></div>
+        <div><label>现金流</label><strong>164.5%</strong><small>CFO/利润</small></div>
+      </div>
+      <div class="logic"><span class="warn">未破但需跟踪</span>：利润趋势为明显下滑；B/A折价仍较明显</div>
+      <div class="decision">可继续持有</div>
+      <details>
+        <summary>公告与数据口径</summary>
+        <ul><li>20260627: 上海市华诚律师事务所关于上海宝信软件股份有限公司2026年第一次临时股东会所涉相关问题的法律意见书</li><li>20260627: 2026年第一次临时股东会决议公告</li><li>20260619: 2026年第一次临时股东会会议资料</li></ul>
+        <p>Tushare A股财务/分红/公告；</p>
+      </details>
+    </article>
+            
+    <article class="card">
+      <div class="head">
+        <div><b>建发物业</b><span>02156.HK</span></div>
+        <div class="pill good">风险 低</div>
+      </div>
+      <div class="grid">
+        <div><label>仓位</label><strong>0.8%</strong><small>观察仓，仓位大体匹配</small></div>
+        <div><label>现价/成本</label><strong>2.64HKD / 2.86HKD</strong><small>2026/06/30 16:08:12</small></div>
+        <div><label>股息率</label><strong>5.6%</strong><small>TTM/最新可得口径</small></div>
+        <div><label>PE/PB</label><strong>9.36 / 2.63</strong><small></small></div>
+        <div><label>盈利趋势</label><strong>稳定</strong><small>利润CAGR 13.2%</small></div>
+        <div><label>现金流</label><strong>166.9%</strong><small>CFO/利润</small></div>
+      </div>
+      <div class="logic"><span class="warn">未破但需跟踪</span>：地产链仍是主要折价和风险来源；股东回报/分红仍有数据支撑</div>
+      <div class="decision">可继续持有</div>
+      <details>
+        <summary>公告与数据口径</summary>
+        <ul><li>30/04/2026 17:26: 股東周年大會適用的代表委任表格</li><li>30/04/2026 17:25: 股東周年大會通告</li><li>30/04/2026 17:23: (1)發行和回購股份的一般授權、(2)重選退任董事、(3)宣派末期股息及特別股息及(4)股東周年大會通告</li></ul>
+        <p>Tushare 港股财报；</p>
+      </details>
+    </article>
+            
+    <article class="card">
+      <div class="head">
+        <div><b>绿城中国</b><span>03900.HK</span></div>
+        <div class="pill good">风险 低</div>
+      </div>
+      <div class="grid">
+        <div><label>仓位</label><strong>0.5%</strong><small>观察仓，仓位大体匹配</small></div>
+        <div><label>现价/成本</label><strong>6.76HKD / 9.51HKD</strong><small>2026/06/30 16:08:09</small></div>
+        <div><label>股息率</label><strong>16.3%</strong><small>TTM/最新可得口径</small></div>
+        <div><label>PE/PB</label><strong>218.43 / 4.11</strong><small></small></div>
+        <div><label>盈利趋势</label><strong>明显下滑</strong><small>利润CAGR -70.5%</small></div>
+        <div><label>现金流</label><strong>40612.9%</strong><small>CFO/利润</small></div>
+      </div>
+      <div class="logic"><span class="warn">未破但需跟踪</span>：地产链仍是主要折价和风险来源；利润趋势为明显下滑</div>
+      <div class="decision">可继续持有</div>
+      <details>
+        <summary>公告与数据口径</summary>
+        <ul><li>31/03/2026 06:13: 須予披露及持續關連交易金融服務框架協議</li><li>31/03/2026 06:09: 截至2025年12月31日止年度全年業績公佈</li><li>30/03/2026 22:38: 董事名單及其角色與職能</li></ul>
+        <p>Tushare 港股财报；</p>
+      </details>
+    </article>
+            
+    <article class="card">
+      <div class="head">
+        <div><b>易方达中证红利ETF</b><span>515180.SH</span></div>
+        <div class="pill good">风险 低</div>
+      </div>
+      <div class="grid">
+        <div><label>仓位</label><strong>8.9%</strong><small>偏重，需确认组合集中度</small></div>
+        <div><label>现价/成本</label><strong>1.28CNY / 1.19CNY</strong><small>2026-06-30 15:00:03</small></div>
+        <div><label>股息率</label><strong>4.8%</strong><small>TTM/最新可得口径</small></div>
+        <div><label>PE/PB</label><strong> / </strong><small></small></div>
+        <div><label>盈利趋势</label><strong>ETF不适用</strong><small>利润CAGR </small></div>
+        <div><label>现金流</label><strong></strong><small>CFO/利润</small></div>
+      </div>
+      <div class="logic"><span class="good">暂未打破</span>：股东回报/分红仍有数据支撑</div>
+      <div class="decision">可继续持有</div>
+      <details>
+        <summary>公告与数据口径</summary>
+        <ul><li>暂无抓取到近期公告标题</li></ul>
+        <p>Tushare fund_div/fund_daily + Sina行情；</p>
+      </details>
+    </article>
+            
+    <article class="card">
+      <div class="head">
+        <div><b>中国移动A</b><span>600941.SH</span></div>
+        <div class="pill good">风险 低</div>
+      </div>
+      <div class="grid">
+        <div><label>仓位</label><strong>6.3%</strong><small>中等，仓位大体匹配</small></div>
+        <div><label>现价/成本</label><strong>86.13CNY / 95.15CNY</strong><small>2026-06-30 15:00:01</small></div>
+        <div><label>股息率</label><strong>5.5%</strong><small>TTM/最新可得口径</small></div>
+        <div><label>PE/PB</label><strong>13.75 / 1.31</strong><small></small></div>
+        <div><label>盈利趋势</label><strong>稳定</strong><small>利润CAGR 3.0%</small></div>
+        <div><label>现金流</label><strong>169.9%</strong><small>CFO/利润</small></div>
+      </div>
+      <div class="logic"><span class="good">暂未打破</span>：股东回报/分红仍有数据支撑</div>
+      <div class="decision">可继续持有</div>
+      <details>
+        <summary>公告与数据口径</summary>
+        <ul><li>20260625: 港股公告：董事名单与其角色和职能</li><li>20260625: 中国移动：关于执行董事辞任的公告</li><li>20260617: 港股公告：董事名单与其角色和职能</li></ul>
+        <p>Tushare A股财务/分红/公告；</p>
+      </details>
+    </article>
+            
+    <article class="card">
+      <div class="head">
+        <div><b>中国电信</b><span>00728.HK</span></div>
+        <div class="pill good">风险 低</div>
+      </div>
+      <div class="grid">
+        <div><label>仓位</label><strong>5.4%</strong><small>中等，仓位大体匹配</small></div>
+        <div><label>现价/成本</label><strong>4.27HKD / 5.24HKD</strong><small>2026/06/30 16:08:09</small></div>
+        <div><label>股息率</label><strong>6.4%</strong><small>TTM/最新可得口径</small></div>
+        <div><label>PE/PB</label><strong>10.63 / 3.87</strong><small></small></div>
+        <div><label>盈利趋势</label><strong>稳定</strong><small>利润CAGR 6.3%</small></div>
+        <div><label>现金流</label><strong>376.9%</strong><small>CFO/利润</small></div>
+      </div>
+      <div class="logic"><span class="good">暂未打破</span>：股东回报/分红仍有数据支撑</div>
+      <div class="decision">可继续持有</div>
+      <details>
+        <summary>公告与数据口径</summary>
+        <ul><li>27/04/2026 19:16: 截至2025年12月31日止年度之末期股息（更新）</li><li>27/04/2026 19:11: 2026年5月19日舉行之年度股東會之代表委任表格</li><li>27/04/2026 19:08: 年度股東會通告</li></ul>
+        <p>Tushare 港股财报；</p>
+      </details>
+    </article>
+            
+    <article class="card">
+      <div class="head">
+        <div><b>安琪酵母</b><span>600298.SH</span></div>
+        <div class="pill good">风险 低</div>
+      </div>
+      <div class="grid">
+        <div><label>仓位</label><strong>5.3%</strong><small>中等，仓位大体匹配</small></div>
+        <div><label>现价/成本</label><strong>36.20CNY / 28.39CNY</strong><small>2026-06-30 15:00:03</small></div>
+        <div><label>股息率</label><strong>1.5%</strong><small>TTM/最新可得口径</small></div>
+        <div><label>PE/PB</label><strong>19.63 / 2.52</strong><small></small></div>
+        <div><label>盈利趋势</label><strong>增长</strong><small>利润CAGR 5.3%</small></div>
+        <div><label>现金流</label><strong>160.4%</strong><small>CFO/利润</small></div>
+      </div>
+      <div class="logic"><span class="good">暂未打破</span>：暂无明显反证</div>
+      <div class="decision">可继续持有</div>
+      <details>
+        <summary>公告与数据口径</summary>
+        <ul><li>20260701: 安琪酵母股份有限公司关于参加湖北辖区上市公司2026年投资者网上集体接待日活动的公告</li><li>20260701: 安琪酵母股份有限公司2026年第一次临时股东会决议公告</li><li>20260701: 北京市通商律师事务所关于安琪酵母股份有限公司2026年第一次临时股东会的法律意见书</li></ul>
+        <p>Tushare A股财务/分红/公告；</p>
+      </details>
+    </article>
+            
+    <article class="card">
+      <div class="head">
+        <div><b>博时中证红利低波动100ETF</b><span>159307.SZ</span></div>
+        <div class="pill good">风险 低</div>
+      </div>
+      <div class="grid">
+        <div><label>仓位</label><strong>5.0%</strong><small>中等，仓位大体匹配</small></div>
+        <div><label>现价/成本</label><strong>0.95CNY / 0.96CNY</strong><small>2026-06-30 15:00:00</small></div>
+        <div><label>股息率</label><strong>5.3%</strong><small>TTM/最新可得口径</small></div>
+        <div><label>PE/PB</label><strong> / </strong><small></small></div>
+        <div><label>盈利趋势</label><strong>ETF不适用</strong><small>利润CAGR </small></div>
+        <div><label>现金流</label><strong></strong><small>CFO/利润</small></div>
+      </div>
+      <div class="logic"><span class="good">暂未打破</span>：股东回报/分红仍有数据支撑</div>
+      <div class="decision">可继续持有</div>
+      <details>
+        <summary>公告与数据口径</summary>
+        <ul><li>暂无抓取到近期公告标题</li></ul>
+        <p>Tushare fund_div/fund_daily + Sina行情；</p>
+      </details>
+    </article>
+            
+    <article class="card">
+      <div class="head">
+        <div><b>药明康德A</b><span>603259.SH</span></div>
+        <div class="pill good">风险 低</div>
+      </div>
+      <div class="grid">
+        <div><label>仓位</label><strong>4.5%</strong><small>中等，仓位大体匹配</small></div>
+        <div><label>现价/成本</label><strong>124.51CNY / 94.95CNY</strong><small>2026-06-30 15:00:03</small></div>
+        <div><label>股息率</label><strong>1.5%</strong><small>TTM/最新可得口径</small></div>
+        <div><label>PE/PB</label><strong>18.46 / 4.41</strong><small></small></div>
+        <div><label>盈利趋势</label><strong>增长</strong><small>利润CAGR 29.5%</small></div>
+        <div><label>现金流</label><strong>89.8%</strong><small>CFO/利润</small></div>
+      </div>
+      <div class="logic"><span class="good">暂未打破</span>：暂无明显反证</div>
+      <div class="decision">可继续持有</div>
+      <details>
+        <summary>公告与数据口径</summary>
+        <ul><li>20260627: 关于2026年股份回购实施结果暨股份变动的公告</li><li>20260626: H股公告</li><li>20260625: H股公告</li></ul>
+        <p>Tushare A股财务/分红/公告；</p>
+      </details>
+    </article>
+            
+    <article class="card">
+      <div class="head">
+        <div><b>中国海洋石油</b><span>00883.HK</span></div>
+        <div class="pill good">风险 低</div>
+      </div>
+      <div class="grid">
+        <div><label>仓位</label><strong>3.2%</strong><small>小仓，仓位大体匹配</small></div>
+        <div><label>现价/成本</label><strong>20.32HKD / 19.73HKD</strong><small>2026/06/30 16:08:12</small></div>
+        <div><label>股息率</label><strong>6.3%</strong><small>TTM/最新可得口径</small></div>
+        <div><label>PE/PB</label><strong>7.15 / 4.55</strong><small></small></div>
+        <div><label>盈利趋势</label><strong>稳定</strong><small>利润CAGR -4.8%</small></div>
+        <div><label>现金流</label><strong>171.2%</strong><small>CFO/利润</small></div>
+      </div>
+      <div class="logic"><span class="good">暂未打破</span>：股东回报/分红仍有数据支撑</div>
+      <div class="decision">可继续持有</div>
+      <details>
+        <summary>公告与数据口径</summary>
+        <ul><li>30/06/2026 16:53: 致非登記持有人之通知信函及回條&amp;ndash;以電子方式發布公司通訊之安排</li><li>30/06/2026 16:50: 致登記持有人之通知信函及回條&amp;ndash;以電子方式發布公司通訊之安排</li><li>28/04/2026 18:31: 海外監管公告 獨立董事提名人及候選人聲明（李淑賢）</li></ul>
+        <p>Tushare 港股财报；</p>
+      </details>
+    </article>
+            
+    <article class="card">
+      <div class="head">
+        <div><b>申洲国际</b><span>02313.HK</span></div>
+        <div class="pill good">风险 低</div>
+      </div>
+      <div class="grid">
+        <div><label>仓位</label><strong>3.1%</strong><small>小仓，仓位大体匹配</small></div>
+        <div><label>现价/成本</label><strong>39.36HKD / 42.95HKD</strong><small>2026/06/30 16:08:12</small></div>
+        <div><label>股息率</label><strong>6.2%</strong><small>TTM/最新可得口径</small></div>
+        <div><label>PE/PB</label><strong>9.17 / 2.54</strong><small></small></div>
+        <div><label>盈利趋势</label><strong>稳定</strong><small>利润CAGR 8.5%</small></div>
+        <div><label>现金流</label><strong>95.3%</strong><small>CFO/利润</small></div>
+      </div>
+      <div class="logic"><span class="good">暂未打破</span>：盈利趋势未明显破坏出海/代工逻辑</div>
+      <div class="decision">可继续持有</div>
+      <details>
+        <summary>公告与数据口径</summary>
+        <ul><li>31/03/2026 18:01: 翌日披露報表</li><li>30/03/2026 12:02: 二零二五年十二月三十一日止十二個月期間之宣派股息</li><li>30/03/2026 12:00: 截至二零二五年十二月三十一日止年度之初步年度業績公告</li></ul>
+        <p>Tushare 港股财报；</p>
+      </details>
+    </article>
+            
+    <article class="card">
+      <div class="head">
+        <div><b>福耀玻璃</b><span>600660.SH</span></div>
+        <div class="pill good">风险 低</div>
+      </div>
+      <div class="grid">
+        <div><label>仓位</label><strong>2.8%</strong><small>小仓，仓位大体匹配</small></div>
+        <div><label>现价/成本</label><strong>50.44CNY / 61.56CNY</strong><small>2026-06-30 15:00:03</small></div>
+        <div><label>股息率</label><strong>4.2%</strong><small>TTM/最新可得口径</small></div>
+        <div><label>PE/PB</label><strong>14.64 / 3.36</strong><small></small></div>
+        <div><label>盈利趋势</label><strong>增长</strong><small>利润CAGR 25.1%</small></div>
+        <div><label>现金流</label><strong>129.5%</strong><small>CFO/利润</small></div>
+      </div>
+      <div class="logic"><span class="good">暂未打破</span>：股东回报/分红仍有数据支撑；盈利趋势未明显破坏出海/代工逻辑</div>
+      <div class="decision">可继续持有</div>
+      <details>
+        <summary>公告与数据口径</summary>
+        <ul><li>20260610: 福耀玻璃2026年度第二期中期票据发行情况公告</li><li>20260602: H股市场公告</li><li>20260501: H股市场公告</li></ul>
+        <p>Tushare A股财务/分红/公告；</p>
+      </details>
+    </article>
+            
+    <article class="card">
+      <div class="head">
+        <div><b>格力电器</b><span>000651.SZ</span></div>
+        <div class="pill good">风险 低</div>
+      </div>
+      <div class="grid">
+        <div><label>仓位</label><strong>2.7%</strong><small>小仓，仓位大体匹配</small></div>
+        <div><label>现价/成本</label><strong>37.50CNY / 42.25CNY</strong><small>2026-06-30 15:00:00</small></div>
+        <div><label>股息率</label><strong>8.0%</strong><small>TTM/最新可得口径</small></div>
+        <div><label>PE/PB</label><strong>7.20 / 1.38</strong><small></small></div>
+        <div><label>盈利趋势</label><strong>稳定</strong><small>利润CAGR 5.8%</small></div>
+        <div><label>现金流</label><strong>159.9%</strong><small>CFO/利润</small></div>
+      </div>
+      <div class="logic"><span class="good">暂未打破</span>：股东回报/分红仍有数据支撑；低估值仍有估值指标支撑</div>
+      <div class="decision">可继续持有</div>
+      <details>
+        <summary>公告与数据口径</summary>
+        <ul><li>20260701: 北京观韬（珠海）律师事务所关于珠海格力电器股份有限公司2025年年度股东会的法律意见书</li><li>20260701: 2025年年度股东会决议公告</li><li>20260627: 关于调整2025年年度股东会现场会议地点的公告</li></ul>
+        <p>Tushare A股财务/分红/公告；</p>
+      </details>
+    </article>
+            
+    <article class="card">
+      <div class="head">
+        <div><b>海尔智家A</b><span>600690.SH</span></div>
+        <div class="pill good">风险 低</div>
+      </div>
+      <div class="grid">
+        <div><label>仓位</label><strong>2.0%</strong><small>小仓，仓位大体匹配</small></div>
+        <div><label>现价/成本</label><strong>20.41CNY / 25.13CNY</strong><small>2026-06-30 15:00:03</small></div>
+        <div><label>股息率</label><strong>6.0%</strong><small>TTM/最新可得口径</small></div>
+        <div><label>PE/PB</label><strong>10.23 / 1.53</strong><small></small></div>
+        <div><label>盈利趋势</label><strong>稳定</strong><small>利润CAGR 9.9%</small></div>
+        <div><label>现金流</label><strong>133.0%</strong><small>CFO/利润</small></div>
+      </div>
+      <div class="logic"><span class="good">暂未打破</span>：股东回报/分红仍有数据支撑；低估值仍有估值指标支撑；盈利趋势未明显破坏出海/代工逻辑</div>
+      <div class="decision">可继续持有</div>
+      <details>
+        <summary>公告与数据口径</summary>
+        <ul><li>20260701: 海尔智家股份有限公司关于以集中竞价交易方式回购A股股份的进展公告</li><li>20260701: 海尔智家股份有限公司2026年度A股核心员工持股计划第一次持有人会议决议公告</li><li>20260701: 海尔智家股份有限公司关于2026年度A股核心员工持股计划进展的公告</li></ul>
+        <p>Tushare A股财务/分红/公告；</p>
+      </details>
+    </article>
+            
+    <article class="card">
+      <div class="head">
+        <div><b>华域汽车A</b><span>600741.SH</span></div>
+        <div class="pill good">风险 低</div>
+      </div>
+      <div class="grid">
+        <div><label>仓位</label><strong>1.8%</strong><small>小仓，仓位大体匹配</small></div>
+        <div><label>现价/成本</label><strong>15.52CNY / 20.57CNY</strong><small>2026-06-30 15:00:01</small></div>
+        <div><label>股息率</label><strong>5.2%</strong><small>TTM/最新可得口径</small></div>
+        <div><label>PE/PB</label><strong>6.82 / 0.72</strong><small></small></div>
+        <div><label>盈利趋势</label><strong>稳定</strong><small>利润CAGR 0.0%</small></div>
+        <div><label>现金流</label><strong>132.1%</strong><small>CFO/利润</small></div>
+      </div>
+      <div class="logic"><span class="good">暂未打破</span>：股东回报/分红仍有数据支撑；低估值仍有估值指标支撑</div>
+      <div class="decision">可继续持有</div>
+      <details>
+        <summary>公告与数据口径</summary>
+        <ul><li>20260630: 华域汽车2025年年度股东会决议公告</li><li>20260630: 华域汽车关于全资子公司参与上海尚颀尚成二号私募投资基金合伙企业（有限合伙）扩募暨关联交易的公告</li><li>20260630: 北京市嘉源律师事务所关于华域汽车2025年年度股东会的法律意见书</li></ul>
+        <p>Tushare A股财务/分红/公告；</p>
+      </details>
+    </article>
+            
+    <article class="card">
+      <div class="head">
+        <div><b>IGG</b><span>00799.HK</span></div>
+        <div class="pill good">风险 低</div>
+      </div>
+      <div class="grid">
+        <div><label>仓位</label><strong>1.8%</strong><small>小仓，仓位大体匹配</small></div>
+        <div><label>现价/成本</label><strong>3.25HKD / 3.10HKD</strong><small>2026/06/30 16:08:09</small></div>
+        <div><label>股息率</label><strong>8.7%</strong><small>TTM/最新可得口径</small></div>
+        <div><label>PE/PB</label><strong>6.41 / 4.63</strong><small></small></div>
+        <div><label>盈利趋势</label><strong>稳定</strong><small>利润CAGR </small></div>
+        <div><label>现金流</label><strong>117.6%</strong><small>CFO/利润</small></div>
+      </div>
+      <div class="logic"><span class="good">暂未打破</span>：股东回报/分红仍有数据支撑</div>
+      <div class="decision">可继续持有</div>
+      <details>
+        <summary>公告与数据口径</summary>
+        <ul><li>30/04/2026 20:07: 對股份獎勵計劃的修訂及根據股份獎勵計劃授出獎勵股份</li><li>27/05/2026 22:46: 根據股份獎勵計劃授出獎勵股份及根據股份激勵計劃授出受限制股份</li><li>27/05/2026 22:45: 二零二六年五月二十七日舉行的股東週年大會的投票結果</li></ul>
+        <p>Tushare 港股财报；</p>
+      </details>
+    </article>
+            
+    <article class="card">
+      <div class="head">
+        <div><b>东阿阿胶</b><span>000423.SZ</span></div>
+        <div class="pill good">风险 低</div>
+      </div>
+      <div class="grid">
+        <div><label>仓位</label><strong>1.7%</strong><small>小仓，仓位大体匹配</small></div>
+        <div><label>现价/成本</label><strong>45.36CNY / 45.55CNY</strong><small>2026-06-30 15:00:00</small></div>
+        <div><label>股息率</label><strong>6.0%</strong><small>TTM/最新可得口径</small></div>
+        <div><label>PE/PB</label><strong>16.51 / 2.71</strong><small></small></div>
+        <div><label>盈利趋势</label><strong>稳定</strong><small>利润CAGR 30.6%</small></div>
+        <div><label>现金流</label><strong>131.7%</strong><small>CFO/利润</small></div>
+      </div>
+      <div class="logic"><span class="good">暂未打破</span>：股东回报/分红仍有数据支撑</div>
+      <div class="decision">可继续持有</div>
+      <details>
+        <summary>公告与数据口径</summary>
+        <ul><li>20260625: 关于股份回购实施结果暨股份变动的公告</li><li>20260606: 2026年第一次临时股东会决议公告</li><li>20260606: 北京金诚同达律师事务所关于东阿阿胶股份有限公司2026年第一次临时股东会的法律意见书</li></ul>
+        <p>Tushare A股财务/分红/公告；</p>
+      </details>
+    </article>
+            
+    <article class="card">
+      <div class="head">
+        <div><b>永升服务</b><span>01995.HK</span></div>
+        <div class="pill good">风险 低</div>
+      </div>
+      <div class="grid">
+        <div><label>仓位</label><strong>1.3%</strong><small>小仓，仓位大体匹配</small></div>
+        <div><label>现价/成本</label><strong>1.65HKD / 1.97HKD</strong><small>2026/06/30 16:08:12</small></div>
+        <div><label>股息率</label><strong>11.0%</strong><small>TTM/最新可得口径</small></div>
+        <div><label>PE/PB</label><strong>5.87 / 1.81</strong><small></small></div>
+        <div><label>盈利趋势</label><strong>稳定</strong><small>利润CAGR -3.1%</small></div>
+        <div><label>现金流</label><strong>116.3%</strong><small>CFO/利润</small></div>
+      </div>
+      <div class="logic"><span class="good">暂未打破</span>：暂无明显反证</div>
+      <div class="decision">小仓可继续跟踪</div>
+      <details>
+        <summary>公告与数据口径</summary>
+        <ul><li>31/03/2026 18:30: 翌日披露報表</li><li>30/06/2026 16:42: 翌日披露報表</li><li>30/04/2026 18:05: 翌日披露報表</li></ul>
+        <p>Tushare 港股财报；</p>
+      </details>
+    </article>
+            
+    </section>
+  </main>
+</body>
+</html>

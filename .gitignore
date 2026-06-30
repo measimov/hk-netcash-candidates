@@ -16,6 +16,7 @@ venv/
 tmp/
 a_etf_daily_cache/
 financial_cache/
+holdings_health_cache/
 scripts/hk_netcash_outputs/
 scripts/hk_public_site/
 tencent_hk_quotes_*.csv
