@@ -29,6 +29,7 @@ def build_payload(output_dir: Path) -> dict:
     governance = _read_csv(output_dir / "governance_filtered_candidates.csv")
     property_review = _read_csv(output_dir / "property_service_target_review.csv")
     dividend_etf = _read_csv(output_dir / "a_dividend_etf_rank.csv")
+    special_dividend = _read_csv(output_dir / "special_dividend_watchlist.csv")
     quote_times = ranked.get("quote_time", pd.Series(dtype=str)).dropna().astype(str)
     return {
         "generated_at": datetime.now(ZoneInfo("Asia/Shanghai")).isoformat(),
@@ -98,6 +99,26 @@ def build_payload(output_dir: Path) -> dict:
             ],
             15,
         ),
+        "special_dividend_top": _top_records(
+            special_dividend,
+            [
+                "rank",
+                "ts_code",
+                "name",
+                "special_label",
+                "static_exclusion_hint",
+                "pb",
+                "prefilter_pe",
+                "cash_to_liab",
+                "net_cash_to_mv",
+                "profit_latest",
+                "cfo_latest",
+                "dividend_paid_yield_est",
+                "watch_score",
+                "flags",
+            ],
+            12,
+        ),
     }
 
 
@@ -105,6 +126,7 @@ def deterministic_summary(payload: dict) -> str:
     top = payload.get("top_primary", [])[:5]
     secondary = payload.get("secondary_top20", [])
     etfs = payload.get("a_dividend_etf_top", [])[:5]
+    special = payload.get("special_dividend_top", [])[:5]
     a_names = [f"{r.get('ts_code')} {r.get('name')}" for r in secondary if r.get("secondary_grade") == "A"]
     lines = [
         "# LLM/规则汇总",
@@ -130,6 +152,15 @@ def deterministic_summary(payload: dict) -> str:
                 f"{idx}. {row.get('ts_code')} {row.get('name')} "
                 f"yield={float(row.get('dividend_yield_ttm') or 0):.2%} "
                 f"amount={float(row.get('amount_cny') or 0) / 1e8:.2f}亿 score={float(row.get('score') or 0):.1f}"
+            )
+    if special:
+        lines.extend(["", "## 特殊高分红观察池前五", ""])
+        for idx, row in enumerate(special, start=1):
+            lines.append(
+                f"{idx}. {row.get('ts_code')} {row.get('name')} "
+                f"label={row.get('special_label')} "
+                f"yield={float(row.get('dividend_paid_yield_est') or 0):.2%} "
+                f"score={float(row.get('watch_score') or 0):.1f}"
             )
     lines.append("")
     return "\n".join(lines)

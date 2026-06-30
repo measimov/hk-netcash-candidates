@@ -20,3 +20,11 @@
 3. 515180.SH 易方达中证红利ETF yield=4.75% amount=0.47亿 score=87.8
 4. 563020.SH 易方达中证红利低波动ETF yield=4.49% amount=0.48亿 score=87.2
 5. 515450.SH 南方标普中国A股大盘红利低波50ETF yield=5.69% amount=0.31亿 score=81.2
+
+## 特殊高分红观察池前五
+
+1. 00018.HK 东方传媒集团 label=可复核 yield=24.85% score=70.7
+2. 00922.HK 安贤园中国 label=可复核 yield=15.57% score=64.1
+3. 00681.HK 中民控股 label=反转观察 yield=8.95% score=58.7
+4. 01008.HK 力图控股 label=可复核 yield=10.32% score=54.9
+5. 03818.HK 中国动向 label=谨慎观察 yield=6.33% score=53.3

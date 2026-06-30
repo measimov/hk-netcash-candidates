@@ -29,10 +29,11 @@ flowchart TD
     C --> D4[quality: 质量池评分]
     C --> D5[governance: HKEX/SFC/披露易治理覆盖]
     C --> D6[secondary: 前20盈利稳定性二次检验]
-    C --> D7[property: 永升/建发物业专项]
-    C --> D8[a-dividend-etf: 沪深红利ETF实时股息率]
-    C --> D9[render: 静态页面渲染]
-    C --> D10[digest: 规则或DPSK汇总]
+    C --> D7[special-dividend: 特殊高分红观察池]
+    C --> D8[property: 永升/建发物业专项]
+    C --> D9[a-dividend-etf: 沪深红利ETF实时股息率]
+    C --> D10[render: 静态页面渲染]
+    C --> D11[digest: 规则或DPSK汇总]
     D1 --> E[(CSV/HTML/MD artifacts)]
     D2 --> E
     D3 --> E
@@ -41,8 +42,9 @@ flowchart TD
     D6 --> E
     D7 --> E
     D8 --> E
-    D9 --> F[GitHub Pages 静态站]
-    D10 --> F
+    D9 --> E
+    D10 --> F[GitHub Pages 静态站]
+    D11 --> F
 ```
 
 ## 设计模式
@@ -63,6 +65,7 @@ flowchart TD
 | `quality` | 宽口径或主榜 | 质量候选池 | 盈利、现金流、派息、行业标签再分层 |
 | `governance` | 质量池、HKEX/SFC/披露易 | 治理风险覆盖 | 违规、配股摊薄、停牌延迟、profit warning 等 |
 | `secondary` | 当前主榜前20、财报缓存、公告标题 | 前20二次检验 | 盈利稳定性、一次性收益、派息透支、现金流覆盖 |
+| `special-dividend` | 合并 universe、财报缓存/可选补抓 | 特殊高分红观察池 | 低 PB、高现金分红、净现金或现金覆盖负债，但被负 PE、亏损、非 12 月财年等静态口径漏掉的标的 |
 | `property` | 主榜、质量池、治理过滤 | 物业股专项 | 永升服务、建发物业专项判断 |
 | `a-dividend-etf` | Tushare ETF基础/分红/NAV、实时行情 | 沪深上市红利ETF实时股息率排名 | 近12个月分红/实时价，多维排名，含恒生/港股通/H股红利ETF |
 | `render` | 当前 CSV/MD | `index.html` | 移动端静态页面 |
