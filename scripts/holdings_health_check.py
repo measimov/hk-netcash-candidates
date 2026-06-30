@@ -66,6 +66,35 @@ RISK_KEYWORDS = (
     "内幕",
 )
 
+RISK_TITLE_EXCLUDES = (
+    "内幕信息及知情人管理制度",
+    "内幕信息知情人登记管理制度",
+    "年年度权益分派实施公告",
+    "差异化分红事项的法律意见书",
+)
+
+HIGH_VOL_THEMES = (
+    "创新药",
+    "医药CXO",
+    "资源周期",
+    "铝周期",
+    "物业地产链",
+    "地产链",
+    "地产链消费",
+    "特殊高息",
+    "AI硬件",
+    "互联网AI",
+)
+
+
+def title_has_risk(title: str) -> bool:
+    text = compact(title)
+    if not text:
+        return False
+    if any(p in text for p in RISK_TITLE_EXCLUDES):
+        return False
+    return any(k in text for k in RISK_KEYWORDS)
+
 
 @dataclass(frozen=True)
 class Instrument:
@@ -572,7 +601,7 @@ def cn_financial_metrics(bundle: dict[str, pd.DataFrame], daily_basic: pd.Series
             title = compact(r.get("title"))
             if title:
                 ann_titles.append(f"{r.get('ann_date')}: {title}")
-            if any(k in title for k in RISK_KEYWORDS):
+            if title_has_risk(title):
                 risk_titles.append(f"{r.get('ann_date')}: {title}")
 
     return {
@@ -674,7 +703,10 @@ def fetch_hkex_titles(ts_code: str, stock_map: dict[str, dict], refresh: bool = 
     safe = c
     path = CACHE / f"hkex_titles_{safe}.csv"
     if path.exists() and not refresh:
-        return pd.read_csv(path)
+        df = pd.read_csv(path)
+        if "title" in df.columns:
+            df["is_risk"] = df["title"].map(title_has_risk)
+        return df
     stock = stock_map.get(c)
     if stock is None:
         return pd.DataFrame()
@@ -718,7 +750,7 @@ def fetch_hkex_titles(ts_code: str, stock_map: dict[str, dict], refresh: bool = 
                     "date_time": compact(it.get("DATE_TIME") or ""),
                     "title": title,
                     "url": it.get("FILE_LINK") or "",
-                    "is_risk": any(k in title for k in RISK_KEYWORDS),
+                    "is_risk": title_has_risk(title),
                 }
             )
         df = pd.DataFrame(rows)
@@ -811,9 +843,14 @@ def risk_grade(row: dict[str, Any]) -> tuple[str, str]:
     if str(row.get("logic_status")) == "需复核":
         score += 2
         reasons.append("买入逻辑需复核")
-    if to_float(row.get("position_weight")) > 0.08 and any(k in str(row.get("theme")) for k in ["地产", "创新药", "AI硬件", "特殊高息", "资源周期"]):
+    high_vol = any(k in str(row.get("theme")) for k in HIGH_VOL_THEMES)
+    weight = to_float(row.get("position_weight"))
+    if high_vol and pd.notna(weight) and weight >= 0.06:
         score += 2
         reasons.append("高波动/事件型仓位偏重")
+    elif high_vol and pd.notna(weight) and weight >= 0.04:
+        score += 1
+        reasons.append("高波动/事件型仓位需设验证点")
     if to_float(row.get("risk_announcement_count")) > 0:
         score += 1
         reasons.append("公告风险关键词")
@@ -837,6 +874,8 @@ def position_comment(row: dict[str, Any]) -> str:
     w = to_float(row.get("position_weight"))
     status = str(row.get("logic_status"))
     risk = str(row.get("risk_level"))
+    theme = str(row.get("theme") or "")
+    high_vol = any(k in theme for k in HIGH_VOL_THEMES)
     if pd.isna(w):
         return "仓位无法计算"
     if w >= 0.12:
@@ -853,6 +892,10 @@ def position_comment(row: dict[str, Any]) -> str:
         return f"{bucket}，风险不匹配，建议降权/复核"
     if status == "需复核" and w >= 0.03:
         return f"{bucket}，逻辑待复核前不宜加仓"
+    if high_vol and w >= 0.04:
+        return f"{bucket}，事件/周期仓需设验证点"
+    if high_vol and w >= 0.025:
+        return f"{bucket}，事件/周期仓需持续跟踪"
     if bucket in {"过重", "偏重"}:
         return f"{bucket}，需确认组合集中度"
     return f"{bucket}，仓位大体匹配"
@@ -862,10 +905,14 @@ def make_decision(row: dict[str, Any]) -> str:
     status = str(row.get("logic_status"))
     risk = str(row.get("risk_level"))
     w = to_float(row.get("position_weight"))
+    theme = str(row.get("theme") or "")
+    high_vol = any(k in theme for k in HIGH_VOL_THEMES)
     if status == "需复核" or risk == "高":
         return "优先复核/降权候选"
     if risk == "中":
         return "持有观察，暂停加仓"
+    if high_vol and pd.notna(w) and w >= 0.04:
+        return "持有观察，设验证点"
     if pd.notna(w) and w < 0.015 and status == "暂未打破":
         return "小仓可继续跟踪"
     return "可继续持有"
@@ -888,6 +935,94 @@ def compute_ba_discount(row: dict[str, Any], quote_map: dict[str, dict], fx: dic
         return np.nan
     b_cny = b_price * fx.get(str(currency), 1.0)
     return 1.0 - b_cny / a_price
+
+
+def portfolio_bucket(theme: str, asset_class: str) -> str:
+    text = str(theme or "")
+    if asset_class == "ETF":
+        return "红利ETF"
+    if "通信" in text:
+        return "通信公用"
+    if any(k in text for k in ["物业", "地产"]):
+        return "地产链"
+    if any(k in text for k in ["创新药", "医药"]):
+        return "医药"
+    if any(k in text for k in ["资源", "铝", "能源"]):
+        return "资源能源"
+    if any(k in text for k in ["互联网", "游戏", "科技", "AI"]):
+        return "科技互联网"
+    if any(k in text for k in ["家电", "食品", "纺织", "轮胎", "汽车", "中药", "红利消费"]):
+        return "制造/消费/出海"
+    if "B/A" in text:
+        return "B/A折价"
+    return text or "其他"
+
+
+def group_exposure(df: pd.DataFrame, by: str, total: float, limit: int = 12) -> list[dict[str, Any]]:
+    grouped = (
+        df.groupby(by, dropna=False)["market_value_cny"]
+        .sum()
+        .sort_values(ascending=False)
+        .reset_index()
+        .head(limit)
+    )
+    return [
+        {
+            "name": str(r[by]),
+            "market_value_cny": float(r["market_value_cny"]),
+            "weight": float(r["market_value_cny"] / total) if total else np.nan,
+        }
+        for _, r in grouped.iterrows()
+    ]
+
+
+def portfolio_diagnostics(df: pd.DataFrame, total: float) -> dict[str, Any]:
+    ranked = df.sort_values("position_weight", ascending=False).reset_index(drop=True)
+    top1 = float(ranked["position_weight"].head(1).sum())
+    top5 = float(ranked["position_weight"].head(5).sum())
+    top10 = float(ranked["position_weight"].head(10).sum())
+    need_review = float(ranked.loc[ranked["logic_status"].eq("需复核"), "position_weight"].sum())
+    watch = float(ranked.loc[ranked["logic_status"].eq("未破但需跟踪"), "position_weight"].sum())
+    high_vol = float(ranked.loc[ranked["theme"].astype(str).map(lambda x: any(k in x for k in HIGH_VOL_THEMES)), "position_weight"].sum())
+    property_chain = float(ranked.loc[ranked["theme"].astype(str).str.contains("物业|地产", na=False), "position_weight"].sum())
+    dividend_core = float(
+        ranked.loc[
+            ranked["theme"].astype(str).str.contains("红利ETF|通信公用|家电红利|能源红利", na=False),
+            "position_weight",
+        ].sum()
+    )
+    alerts: list[str] = []
+    if top1 >= 0.10:
+        alerts.append("第一大单票超过10%，需要明确单票上限")
+    elif top1 >= 0.08:
+        alerts.append("第一大持仓接近9%，加仓前先看组合集中度")
+    if top5 >= 0.35:
+        alerts.append("前五大持仓超过35%，组合集中度偏高")
+    elif top5 >= 0.30:
+        alerts.append("前五大持仓约三成，集中度可接受但不低")
+    if high_vol >= 0.25:
+        alerts.append("事件/周期/地产链等高波动主题超过四分之一，需要逐项设置验证点")
+    if property_chain >= 0.10:
+        alerts.append("地产链暴露超过10%，需持续跟踪销售和回款")
+    if need_review > 0:
+        alerts.append(f"需复核逻辑仓位合计{pct_text(need_review)}，应先复核再加仓")
+    if dividend_core >= 0.30:
+        alerts.append("红利/公用/家电等现金流防守底仓占比约三成以上")
+    return {
+        "top1_weight": top1,
+        "top5_weight": top5,
+        "top10_weight": top10,
+        "need_review_weight": need_review,
+        "watch_weight": watch,
+        "high_vol_weight": high_vol,
+        "property_chain_weight": property_chain,
+        "dividend_core_weight": dividend_core,
+        "alerts": alerts or ["组合层面暂无硬性集中度警报"],
+        "bucket_exposure": group_exposure(df, "portfolio_bucket", total),
+        "theme_exposure": group_exposure(df, "theme", total),
+        "market_exposure": group_exposure(df, "standard_market", total),
+        "currency_exposure": group_exposure(df, "quote_currency", total),
+    }
 
 
 def build() -> tuple[pd.DataFrame, dict[str, Any]]:
@@ -1040,6 +1175,7 @@ def build() -> tuple[pd.DataFrame, dict[str, Any]]:
     df = pd.DataFrame(rows)
     total_mv_cny = pd.to_numeric(df["market_value_cny"], errors="coerce").sum()
     df["position_weight"] = pd.to_numeric(df["market_value_cny"], errors="coerce") / total_mv_cny if total_mv_cny else np.nan
+    df["portfolio_bucket"] = df.apply(lambda r: portfolio_bucket(r.get("theme"), r.get("asset_class")), axis=1)
     for i, r in df.iterrows():
         rg, rr = risk_grade(r.to_dict())
         df.at[i, "risk_level"] = rg
@@ -1064,6 +1200,7 @@ def build() -> tuple[pd.DataFrame, dict[str, Any]]:
         "total_mv_cny": total_mv_cny,
         "quote_times": sorted({str(x) for x in df["quote_time"].dropna().tolist() if str(x)}),
     }
+    meta["portfolio"] = portfolio_diagnostics(df, total_mv_cny)
     return df, meta
 
 
@@ -1079,6 +1216,7 @@ def render_markdown(df: pd.DataFrame, meta: dict[str, Any]) -> str:
     summary_cols = [
         "std_code",
         "official_name",
+        "portfolio_bucket",
         "theme",
         "position_weight",
         "quote_price",
@@ -1105,6 +1243,15 @@ def render_markdown(df: pd.DataFrame, meta: dict[str, Any]) -> str:
     )
     theme["weight"] = theme["weight"].map(lambda x: pct_text(x))
     theme["market_value_cny"] = theme["market_value_cny"].map(lambda x: f"{x/10000:.1f}万")
+    portfolio = meta.get("portfolio", {})
+
+    def exposure_frame(items: list[dict[str, Any]]) -> pd.DataFrame:
+        out = pd.DataFrame(items)
+        if out.empty:
+            return pd.DataFrame(columns=["name", "market_value_cny", "weight"])
+        out["market_value_cny"] = out["market_value_cny"].map(lambda x: f"{x/10000:.1f}万")
+        out["weight"] = out["weight"].map(lambda x: pct_text(x))
+        return out
 
     def markdown_table(data: pd.DataFrame) -> str:
         cols = list(data.columns)
@@ -1127,6 +1274,18 @@ def render_markdown(df: pd.DataFrame, meta: dict[str, Any]) -> str:
             "- 成本价：按 `当前价 / (1 + 手写浮盈亏%)` 倒推，未计交易费、分红再投资和多次买卖影响。",
             "- 结论标签不是投资建议，只是把现有买入逻辑和可得数据做一致性检查。",
             "",
+            "## 组合诊断",
+            "",
+            f"- 前1/5/10大持仓权重：{pct_text(portfolio.get('top1_weight'))} / {pct_text(portfolio.get('top5_weight'))} / {pct_text(portfolio.get('top10_weight'))}",
+            f"- 需复核逻辑仓位：{pct_text(portfolio.get('need_review_weight'))}；未破但需跟踪仓位：{pct_text(portfolio.get('watch_weight'))}",
+            f"- 高波动/事件型主题仓位：{pct_text(portfolio.get('high_vol_weight'))}；红利/公用/家电/能源底仓：{pct_text(portfolio.get('dividend_core_weight'))}",
+            "",
+            "\n".join(f"- {x}" for x in portfolio.get("alerts", [])),
+            "",
+            "## 组合桶暴露",
+            "",
+            markdown_table(exposure_frame(portfolio.get("bucket_exposure", []))),
+            "",
             "## 主题仓位",
             "",
             markdown_table(theme),
@@ -1143,6 +1302,7 @@ def render_html(df: pd.DataFrame, meta: dict[str, Any]) -> str:
     total = meta["total_mv_cny"]
     risk_counts = df["risk_level"].value_counts().to_dict()
     logic_counts = df["logic_status"].value_counts().to_dict()
+    portfolio = meta.get("portfolio", {})
     theme = (
         df.groupby("theme", dropna=False)["market_value_cny"]
         .sum()
@@ -1155,17 +1315,40 @@ def render_html(df: pd.DataFrame, meta: dict[str, Any]) -> str:
         f"<tr><td>{esc(r['theme'])}</td><td>{r['market_value_cny']/10000:.1f}万</td><td>{pct_text(r['weight'])}</td></tr>"
         for _, r in theme.iterrows()
     )
+
+    def exposure_rows(items: list[dict[str, Any]]) -> str:
+        return "\n".join(
+            f"<tr><td>{esc(x.get('name'))}</td><td>{to_float(x.get('market_value_cny'))/10000:.1f}万</td><td>{pct_text(x.get('weight'))}</td></tr>"
+            for x in items
+        )
+
+    bucket_rows = exposure_rows(portfolio.get("bucket_exposure", []))
+    market_rows = exposure_rows(portfolio.get("market_exposure", []))
+    currency_rows = exposure_rows(portfolio.get("currency_exposure", []))
+    alerts_html = "".join(f"<li>{esc(x)}</li>" for x in portfolio.get("alerts", []))
+    adverse = df[
+        (pd.to_numeric(df["risk_announcement_count"], errors="coerce").fillna(0) > 0)
+        | df["logic_status"].eq("需复核")
+        | df["risk_level"].ne("低")
+    ].copy()
+    adverse_rows = "\n".join(
+        f"<tr><td>{esc(r['official_name'])}<br><small>{esc(r['std_code'])}</small></td><td>{pct_text(r.get('position_weight'))}</td><td>{esc(r.get('logic_status'))}</td><td>{esc(r.get('risk_reason') or r.get('logic_reason'))}</td></tr>"
+        for _, r in adverse.head(12).iterrows()
+    ) or '<tr><td colspan="4">暂无高优先级不利事项</td></tr>'
+
     cards = []
     for _, r in df.iterrows():
         risk_cls = {"高": "bad", "中": "warn", "低": "good"}.get(str(r.get("risk_level")), "")
         logic_cls = {"需复核": "bad", "未破但需跟踪": "warn", "暂未打破": "good"}.get(str(r.get("logic_status")), "")
         recent = [x for x in str(r.get("recent_announcements") or "").split(" || ") if x][:3]
+        risk_recent = [x for x in str(r.get("risk_announcements") or "").split(" || ") if x][:3]
         recent_html = "".join(f"<li>{esc(x)}</li>" for x in recent) or "<li>暂无抓取到近期公告标题</li>"
+        risk_html = "".join(f"<li>{esc(x)}</li>" for x in risk_recent) or "<li>未抓取到风险关键词公告标题</li>"
         cards.append(
             f"""
     <article class="card">
       <div class="head">
-        <div><b>{esc(r['official_name'])}</b><span>{esc(r['std_code'])}</span></div>
+        <div><b>{esc(r['official_name'])}</b><span>{esc(r['std_code'])} · {esc(r.get('portfolio_bucket'))}</span></div>
         <div class="pill {risk_cls}">风险 {esc(r.get('risk_level'))}</div>
       </div>
       <div class="grid">
@@ -1180,6 +1363,9 @@ def render_html(df: pd.DataFrame, meta: dict[str, Any]) -> str:
       <div class="decision">{esc(r.get('decision'))}</div>
       <details>
         <summary>公告与数据口径</summary>
+        <p><b>风险关键词公告</b></p>
+        <ul>{risk_html}</ul>
+        <p><b>近期公告</b></p>
         <ul>{recent_html}</ul>
         <p>{esc(r.get('financial_coverage'))}；{esc(r.get('instrument_note'))}</p>
       </details>
@@ -1208,6 +1394,9 @@ def render_html(df: pd.DataFrame, meta: dict[str, Any]) -> str:
     .metric label,.grid label{{display:block;font-size:12px;color:var(--muted);margin-bottom:4px}}
     .metric strong{{font-size:18px}}
     .note{{background:#fff8e6;border:1px solid #ead498;color:#3c2a00;border-radius:8px;padding:10px;font-size:13px;line-height:1.55;margin-bottom:12px}}
+    .alerts{{background:#fff;border:1px solid var(--line);border-radius:8px;padding:10px;margin-bottom:12px}}
+    .alerts ul{{margin:0;padding-left:18px;font-size:13px;line-height:1.6}}
+    .expo{{display:grid;grid-template-columns:1fr;gap:10px;margin-bottom:12px}}
     .panel{{padding:10px;margin-bottom:12px;overflow:auto}}
     table{{width:100%;border-collapse:collapse;font-size:13px}}
     th,td{{border-bottom:1px solid var(--line);padding:8px;text-align:left;white-space:nowrap}}
@@ -1229,7 +1418,7 @@ def render_html(df: pd.DataFrame, meta: dict[str, Any]) -> str:
     .warn{{color:var(--warn);background:#fff4da}}
     .bad{{color:var(--bad);background:#fdecea}}
     .logic .good,.logic .warn,.logic .bad{{background:transparent;font-weight:700}}
-    @media(min-width:760px){{.summary{{grid-template-columns:repeat(4,minmax(0,1fr))}}.cards{{grid-template-columns:repeat(2,minmax(0,1fr))}}.grid{{grid-template-columns:repeat(3,minmax(0,1fr))}}}}
+    @media(min-width:760px){{.summary{{grid-template-columns:repeat(4,minmax(0,1fr))}}.cards{{grid-template-columns:repeat(2,minmax(0,1fr))}}.grid{{grid-template-columns:repeat(3,minmax(0,1fr))}}.expo{{grid-template-columns:repeat(3,minmax(0,1fr))}}}}
   </style>
 </head>
 <body>
@@ -1248,11 +1437,36 @@ def render_html(df: pd.DataFrame, meta: dict[str, Any]) -> str:
     </nav>
     <section class="summary">
       <div class="metric"><label>估算总市值</label><strong>{total/10000:.1f}万 CNY</strong></div>
-      <div class="metric"><label>高风险</label><strong>{risk_counts.get('高',0)} 个</strong></div>
-      <div class="metric"><label>中风险</label><strong>{risk_counts.get('中',0)} 个</strong></div>
-      <div class="metric"><label>需复核逻辑</label><strong>{logic_counts.get('需复核',0)} 个</strong></div>
+      <div class="metric"><label>前五大权重</label><strong>{pct_text(portfolio.get('top5_weight'))}</strong></div>
+      <div class="metric"><label>高波动主题</label><strong>{pct_text(portfolio.get('high_vol_weight'))}</strong></div>
+      <div class="metric"><label>需复核仓位</label><strong>{pct_text(portfolio.get('need_review_weight'))}</strong></div>
     </section>
     <div class="note">成本价按当前价和手写浮盈亏倒推，不能替代真实成交记录。对港股/新加坡股，Tushare 财报字段存在滞后和口径差异；事件驱动逻辑需要继续用公告、年报和行业数据二次验证。</div>
+    <section class="alerts">
+      <h2>组合诊断</h2>
+      <ul>{alerts_html}</ul>
+    </section>
+    <section class="expo">
+      <div class="panel">
+        <h2>组合桶</h2>
+        <table><thead><tr><th>类别</th><th>市值</th><th>权重</th></tr></thead><tbody>{bucket_rows}</tbody></table>
+      </div>
+      <div class="panel">
+        <h2>市场</h2>
+        <table><thead><tr><th>市场</th><th>市值</th><th>权重</th></tr></thead><tbody>{market_rows}</tbody></table>
+      </div>
+      <div class="panel">
+        <h2>币种</h2>
+        <table><thead><tr><th>币种</th><th>市值</th><th>权重</th></tr></thead><tbody>{currency_rows}</tbody></table>
+      </div>
+    </section>
+    <section class="panel">
+      <h2>优先复核/不利事项</h2>
+      <table>
+        <thead><tr><th>标的</th><th>仓位</th><th>逻辑</th><th>原因</th></tr></thead>
+        <tbody>{adverse_rows}</tbody>
+      </table>
+    </section>
     <section class="panel">
       <table>
         <thead><tr><th>主题</th><th>市值(CNY)</th><th>权重</th></tr></thead>
