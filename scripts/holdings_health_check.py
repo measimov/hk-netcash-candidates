@@ -371,6 +371,16 @@ def fetch_yahoo_quote(symbol: str) -> dict[str, Any]:
             "price": float(price),
             "quote_time": qtime,
             "currency": meta.get("currency") or "SGD",
+            "volume": meta.get("regularMarketVolume"),
+            "fifty_two_week_high": meta.get("fiftyTwoWeekHigh"),
+            "fifty_two_week_low": meta.get("fiftyTwoWeekLow"),
+            "chart_previous_close": meta.get("chartPreviousClose"),
+            "one_year_return": (float(price) / float(meta.get("chartPreviousClose")) - 1.0)
+            if meta.get("chartPreviousClose") and float(meta.get("chartPreviousClose")) > 0
+            else np.nan,
+            "drawdown_from_52w_high": (float(price) / float(meta.get("fiftyTwoWeekHigh")) - 1.0)
+            if meta.get("fiftyTwoWeekHigh") and float(meta.get("fiftyTwoWeekHigh")) > 0
+            else np.nan,
             "div_cash_ttm": div_cash,
             "source": "yahoo",
         }
@@ -1149,10 +1159,19 @@ def build() -> tuple[pd.DataFrame, dict[str, Any]]:
                 "dividend_cash_ttm": div_cash,
                 "revenue_trend": "Tushare不覆盖",
                 "profit_trend": "Tushare不覆盖",
-                "recent_announcements": "",
+                "recent_announcements": (
+                    f"Yahoo行情：52周高/低 {money_text(quote.get('fifty_two_week_high'), inst.quote_currency)} / "
+                    f"{money_text(quote.get('fifty_two_week_low'), inst.quote_currency)}；"
+                    f"一年价格变化 {pct_text(quote.get('one_year_return'))}；"
+                    f"较52周高点 {pct_text(quote.get('drawdown_from_52w_high'))}"
+                ),
                 "risk_announcements": "",
                 "risk_announcement_count": 0,
-                "financial_coverage": "Yahoo行情/分红事件；需SGX财报补验",
+                "financial_coverage": "Yahoo行情/分红事件；Tushare不覆盖SGX，需SGX公告和财报专项补验",
+                "one_year_return": quote.get("one_year_return"),
+                "drawdown_from_52w_high": quote.get("drawdown_from_52w_high"),
+                "fifty_two_week_high": quote.get("fifty_two_week_high"),
+                "fifty_two_week_low": quote.get("fifty_two_week_low"),
             }
         row.update(metrics)
         total_mv_quote = to_float(row.get("total_mv_quote"))
