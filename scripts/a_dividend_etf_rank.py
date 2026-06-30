@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Rank A-share listed dividend ETFs by live distribution yield and quality."""
+"""Rank Shanghai/Shenzhen-listed dividend ETFs by live distribution yield."""
 
 from __future__ import annotations
 
@@ -24,7 +24,7 @@ DEFAULT_OUTPUT_DIR = Path(__file__).resolve().parents[1]
 OUT = Path(os.environ.get("HK_NETCASH_OUTPUT_DIR", DEFAULT_OUTPUT_DIR)).resolve()
 
 DIVIDEND_PATTERNS = ("红利", "股息", "高息", "高股息", "分红")
-EXCLUDE_PATTERNS = ("港股", "恒生", "H股", "纳指", "纳斯达克", "日经", "德国", "东南亚", "美国", "全球")
+EXCLUDE_PATTERNS = ("纳指", "纳斯达克", "日经", "德国", "东南亚", "美国", "全球")
 SINA_URL = "https://hq.sinajs.cn/list={symbols}"
 UA = {"User-Agent": "Mozilla/5.0", "Referer": "https://finance.sina.com.cn"}
 
@@ -100,7 +100,22 @@ def is_dividend_etf(row: pd.Series) -> bool:
 def strategy_tag(row: pd.Series) -> str:
     text = norm_text(row.get("name", "")) + norm_text(row.get("benchmark", ""))
     tags = []
-    for key in ["上证红利", "深证红利", "中证红利", "红利低波", "央企红利", "国企红利", "高股息", "红利质量", "红利价值"]:
+    for key in [
+        "上证红利",
+        "深证红利",
+        "中证红利",
+        "红利低波",
+        "央企红利",
+        "国企红利",
+        "高股息",
+        "红利质量",
+        "红利价值",
+        "恒生高股息",
+        "恒生红利",
+        "港股通高股息",
+        "港股红利",
+        "H股红利",
+    ]:
         if key in text:
             tags.append(key)
     if "A股" in text and "A股红利" not in tags:
@@ -272,7 +287,7 @@ def render_html(df: pd.DataFrame, generated_at: str, quote_range: str) -> str:
     table_html = table.to_html(index=False, escape=True, classes="rank-table")
     return f"""<!doctype html>
 <html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>A股红利ETF实时股息率</title>
+<title>沪深上市红利ETF实时股息率</title>
 <style>
 body{{margin:0;background:#f7f8fa;color:#17202a;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC',Arial,sans-serif}}
 header{{position:sticky;top:0;background:rgba(247,248,250,.94);backdrop-filter:blur(10px);border-bottom:1px solid #dbe1e8;padding:12px 14px;z-index:2}}
@@ -282,7 +297,7 @@ h1{{font-size:20px;margin:0 0 4px}}.meta{{color:#637083;font-size:13px;line-heig
 .grid{{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:10px}}.grid div{{background:#f3f6f8;border-radius:6px;padding:8px;min-width:0}}label{{display:block;color:#637083;font-size:12px;margin-bottom:3px}}strong{{font-size:14px;overflow-wrap:anywhere}}p{{color:#3d4a5c;font-size:13px;line-height:1.5}}
 .table-wrap{{overflow:auto;background:white;border:1px solid #dbe1e8;border-radius:8px;margin-top:18px}}table{{width:100%;border-collapse:collapse;font-size:13px;min-width:980px}}th,td{{padding:8px;border-bottom:1px solid #dbe1e8;text-align:right;white-space:nowrap}}th:nth-child(2),th:nth-child(3),th:nth-child(4),td:nth-child(2),td:nth-child(3),td:nth-child(4){{text-align:left}}th{{position:sticky;top:0;background:#eef2f5}}
 @media(min-width:780px){{.cards{{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}}.card{{margin:0}}.grid{{grid-template-columns:repeat(4,minmax(0,1fr))}}}}
-</style></head><body><header><h1>A股红利ETF实时股息率</h1><div class="meta">生成：{generated_at}；实时行情：{quote_range}。股息率 = 近12个月每份现金分红 / 实时价格，分红来自 Tushare fund_div，价格来自新浪实时行情。</div></header>
+</style></head><body><header><h1>沪深上市红利ETF实时股息率</h1><div class="meta">生成：{generated_at}；实时行情：{quote_range}。覆盖在沪深交易所上市的红利/高股息 ETF，含恒生、港股通、H 股相关红利 ETF。股息率 = 近12个月每份现金分红 / 实时价格，分红来自 Tushare fund_div，价格来自新浪实时行情。</div></header>
 <main><div class="links"><a href="index.html">返回港股主榜</a><a href="a_dividend_etf_rank.csv">CSV</a><a href="a_dividend_etf_rank.md">Markdown</a></div><section class="cards">{''.join(cards)}</section><section class="table-wrap">{table_html}</section></main></body></html>"""
 
 
@@ -312,10 +327,11 @@ def render_md(df: pd.DataFrame, generated_at: str, quote_range: str) -> str:
     show["score"] = show["score"].map(lambda x: fmt_num(x, 1))
     return "\n".join(
         [
-            "# A股红利ETF实时股息率与多维排名",
+            "# 沪深上市红利ETF实时股息率与多维排名",
             "",
             f"- 生成时间: {generated_at}",
             f"- 实时行情范围: {quote_range}",
+            "- 覆盖在沪深交易所上市的红利/高股息 ETF，含恒生、港股通、H 股相关红利 ETF。",
             "- 股息率 = 近12个月每份现金分红 / 实时价格；未分红 ETF 的 TTM 股息率为 0。",
             "- 综合分 = 股息率35% + 流动性20% + 费率15% + 折溢价10% + 近3年分红连续性10% + 上市年限10%。",
             "",

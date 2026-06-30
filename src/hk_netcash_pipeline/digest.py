@@ -124,7 +124,7 @@ def deterministic_summary(payload: dict) -> str:
             f"net_cash/mv={row.get('net_cash_to_mv'):.2f}"
         )
     if etfs:
-        lines.extend(["", "## A股红利ETF前五", ""])
+        lines.extend(["", "## 沪深红利ETF前五", ""])
         for idx, row in enumerate(etfs, start=1):
             lines.append(
                 f"{idx}. {row.get('ts_code')} {row.get('name')} "

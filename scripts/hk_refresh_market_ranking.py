@@ -181,6 +181,7 @@ def recompute_primary(universe: pd.DataFrame, max_codes: int, pull_missing: bool
             "total_mv_hkd",
             "float_mv_hkd",
             "turnover_hkd",
+            "liquidity_ref_hkd",
             "pb",
             "pe_ttm",
             "pe_dynamic",
@@ -205,8 +206,10 @@ def recompute_primary(universe: pd.DataFrame, max_codes: int, pull_missing: bool
     )
     ranked = metrics.loc[financial_gate].copy()
     ranked["strict_net_cash"] = ranked["cash_like"] > ranked["total_liabilities"]
+    ranked["liquidity_bucket_hkd"] = ranked.get("liquidity_ref_hkd", ranked["turnover_hkd"])
+    ranked["liquidity_bucket_hkd"] = ranked["liquidity_bucket_hkd"].where(ranked["liquidity_bucket_hkd"].notna(), ranked["turnover_hkd"])
     ranked["liquidity_bucket"] = pd.cut(
-        ranked["turnover_hkd"],
+        ranked["liquidity_bucket_hkd"],
         bins=[-math.inf, 2e5, 1e6, 1e7, 5e7, math.inf],
         labels=["极低", "低", "中低", "中", "高"],
     )

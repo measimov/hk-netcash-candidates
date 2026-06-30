@@ -432,8 +432,11 @@ def compute_metrics(ts_code: str, fin: dict[str, pd.DataFrame], market_cap_hkd: 
 
 def build_prefilter(universe: pd.DataFrame) -> pd.DataFrame:
     df = universe.copy()
-    for col in ["total_mv_hkd", "turnover_hkd", "pe_ttm", "pe_dynamic", "pb", "price_hkd"]:
+    for col in ["total_mv_hkd", "turnover_hkd", "ts_avg_amount_hkd", "ts_median_amount_hkd", "pe_ttm", "pe_dynamic", "pb", "price_hkd"]:
+        if col not in df.columns:
+            df[col] = np.nan
         df[col] = pd.to_numeric(df[col], errors="coerce")
+    df["liquidity_ref_hkd"] = df[["turnover_hkd", "ts_median_amount_hkd", "ts_avg_amount_hkd"]].max(axis=1, skipna=True)
     name = df["name"].fillna(df["em_name"]).fillna("")
     bad = name.str.upper().apply(lambda x: any(part.upper() in x for part in BAD_NAME_PARTS))
     pe = df["pe_ttm"].where(df["pe_ttm"].notna(), df["pe_dynamic"])
@@ -443,7 +446,7 @@ def build_prefilter(universe: pd.DataFrame) -> pd.DataFrame:
         & df["total_mv_hkd"].between(2e8, 8e10)
         & df["pb"].between(0.05, 1.8)
         & ((pe.between(0.5, 25)) | pe.isna())
-        & df["turnover_hkd"].fillna(0).between(5e4, 1.5e8)
+        & df["liquidity_ref_hkd"].fillna(0).between(5e4, 1.5e8)
         & ~bad
     )
     out = df.loc[mask].copy()
@@ -451,7 +454,7 @@ def build_prefilter(universe: pd.DataFrame) -> pd.DataFrame:
     out["prefilter_rank"] = (
         out["pb"].rank(pct=True, ascending=True).fillna(0.7) * 0.35
         + out["total_mv_hkd"].rank(pct=True, ascending=True).fillna(0.7) * 0.30
-        + out["turnover_hkd"].rank(pct=True, ascending=True).fillna(0.7) * 0.20
+        + out["liquidity_ref_hkd"].rank(pct=True, ascending=True).fillna(0.7) * 0.20
         + out["prefilter_pe"].rank(pct=True, ascending=True).fillna(0.7) * 0.15
     )
     return out.sort_values("prefilter_rank")
@@ -532,7 +535,7 @@ def main() -> None:
         if metric is None:
             continue
         m = metric.__dict__
-        for key in ["name", "fullname", "market", "list_date", "price_hkd", "total_mv_hkd", "float_mv_hkd", "turnover_hkd", "pb", "pe_ttm", "pe_dynamic", "ts_avg_amount_hkd", "ts_median_amount_hkd"]:
+        for key in ["name", "fullname", "market", "list_date", "price_hkd", "total_mv_hkd", "float_mv_hkd", "turnover_hkd", "liquidity_ref_hkd", "pb", "pe_ttm", "pe_dynamic", "ts_avg_amount_hkd", "ts_median_amount_hkd"]:
             m[key] = row.get(key)
         metrics_rows.append(m)
 
@@ -550,8 +553,10 @@ def main() -> None:
     )
     ranked = metrics.loc[financial_gate].copy()
     ranked["strict_net_cash"] = ranked["cash_like"] > ranked["total_liabilities"]
+    ranked["liquidity_bucket_hkd"] = ranked.get("liquidity_ref_hkd", ranked["turnover_hkd"])
+    ranked["liquidity_bucket_hkd"] = ranked["liquidity_bucket_hkd"].where(ranked["liquidity_bucket_hkd"].notna(), ranked["turnover_hkd"])
     ranked["liquidity_bucket"] = pd.cut(
-        ranked["turnover_hkd"],
+        ranked["liquidity_bucket_hkd"],
         bins=[-math.inf, 2e5, 1e6, 1e7, 5e7, math.inf],
         labels=["极低", "低", "中低", "中", "高"],
     )

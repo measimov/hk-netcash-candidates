@@ -40,6 +40,12 @@ def esc(x) -> str:
     return html.escape(str(x), quote=True)
 
 
+def rank_text(x) -> str:
+    if pd.isna(x):
+        return "未入池"
+    return str(int(x))
+
+
 def load(code: str, ep: str) -> pd.DataFrame:
     path = OUT / "financial_cache" / f"{code.replace('.', '_')}.json"
     obj = json.loads(path.read_text())
@@ -109,6 +115,25 @@ def verdict(row: pd.Series) -> tuple[str, str]:
     )
 
 
+def pick(df: pd.DataFrame, code: str) -> pd.Series:
+    hit = df.loc[df["ts_code"].eq(code)] if "ts_code" in df.columns else pd.DataFrame()
+    return hit.iloc[0] if not hit.empty else pd.Series(dtype=object)
+
+
+def value(row: pd.Series, *names: str, default=np.nan):
+    for name in names:
+        if name in row.index and pd.notna(row[name]):
+            return row[name]
+    return default
+
+
+def one_based_rank(df: pd.DataFrame, code: str):
+    if "ts_code" not in df.columns:
+        return np.nan
+    idx = df.index[df["ts_code"].eq(code)]
+    return int(idx[0]) + 1 if len(idx) else np.nan
+
+
 def main() -> None:
     ranked = pd.read_csv(OUT / "hk_ranked_candidates.csv")
     quality = pd.read_csv(OUT / "expanded_quality_candidates.csv")
@@ -118,40 +143,45 @@ def main() -> None:
 
     rows = []
     for code in CODES:
-        r = ranked.loc[ranked["ts_code"].eq(code)].iloc[0]
-        q = quality.loc[quality["ts_code"].eq(code)].iloc[0]
-        g = gov.loc[gov["ts_code"].eq(code)].iloc[0]
-        v, reason = verdict(r)
+        r = pick(ranked, code)
+        q = pick(quality, code)
+        g = pick(gov, code)
+        base = r if not r.empty else q
+        if base.empty:
+            base = g if not g.empty else pd.Series({"ts_code": code, "name": code})
+        v, reason = verdict(r if not r.empty else pd.Series({"ts_code": code}))
+        pool_status = "当前主榜/质量池命中" if not r.empty or not q.empty else "当前未入主榜或质量池，仅保留专项历史复核"
         rows.append(
             {
                 "ts_code": code,
-                "name": r["name"],
+                "name": value(base, "name", default=code),
                 "verdict": v,
                 "reason": reason,
-                "quote_time": r.get("quote_time"),
-                "price_hkd": r["price_hkd"],
-                "market_cap_hkd": r["total_mv_hkd"],
-                "turnover_hkd": r["turnover_hkd"],
-                "pb": r["pb"],
-                "pe_ttm": r["pe_ttm"],
-                "cash_to_liab": r["cash_to_liab"],
-                "net_cash_to_mv": r["net_cash_to_mv"],
-                "shareholder_return_yield": r["dividend_paid_yield_est"],
-                "profit_latest": r["profit_latest"],
-                "profit_positive_years": r["profit_positive_years"],
-                "cfo_to_profit_latest": r["cfo_to_profit_latest"],
-                "oneoff_ratio_latest": r["oneoff_ratio_latest"],
-                "screen_score": r["score"],
-                "primary_rank": int(ranked.index[ranked["ts_code"].eq(code)][0]) + 1,
-                "quality_tier": q["tier"],
-                "quality_score": q["quality_score"],
-                "quality_rank": int(quality.index[quality["ts_code"].eq(code)][0]) + 1,
-                "hard_flags": q["hard_flags"],
-                "governance_grade": g["governance_grade"],
-                "governance_score": g["governance_score"],
-                "governance_notes": g["governance_notes"],
-                "final_score_after_governance": g["final_score_after_governance"],
-                "governance_rank": int(gov.index[gov["ts_code"].eq(code)][0]) + 1,
+                "pool_status": pool_status,
+                "quote_time": value(r, "quote_time", default=""),
+                "price_hkd": value(r, "price_hkd"),
+                "market_cap_hkd": value(r, "total_mv_hkd", "market_cap_hkd"),
+                "turnover_hkd": value(r, "turnover_hkd"),
+                "pb": value(r, "pb"),
+                "pe_ttm": value(r, "pe_ttm"),
+                "cash_to_liab": value(r, "cash_to_liab", default=value(q, "cash_to_liab")),
+                "net_cash_to_mv": value(r, "net_cash_to_mv", default=value(q, "net_cash_to_mv")),
+                "shareholder_return_yield": value(r, "dividend_paid_yield_est", "shareholder_return_yield", default=value(q, "shareholder_return_yield")),
+                "profit_latest": value(r, "profit_latest"),
+                "profit_positive_years": value(r, "profit_positive_years"),
+                "cfo_to_profit_latest": value(r, "cfo_to_profit_latest", default=value(q, "cfo_profit_avg4")),
+                "oneoff_ratio_latest": value(r, "oneoff_ratio_latest", default=value(q, "oneoff_latest")),
+                "screen_score": value(r, "score", default=value(q, "screen_score")),
+                "primary_rank": one_based_rank(ranked, code),
+                "quality_tier": value(q, "tier", default="未入当前质量池"),
+                "quality_score": value(q, "quality_score"),
+                "quality_rank": one_based_rank(quality, code),
+                "hard_flags": value(q, "hard_flags", default=""),
+                "governance_grade": value(g, "governance_grade", default="未入当前治理过滤池"),
+                "governance_score": value(g, "governance_score"),
+                "governance_notes": value(g, "governance_notes", default=""),
+                "final_score_after_governance": value(g, "final_score_after_governance"),
+                "governance_rank": one_based_rank(gov, code),
             }
         )
     summary = pd.DataFrame(rows)
@@ -188,6 +218,7 @@ def main() -> None:
 <article class="card">
   <h2>{esc(r['ts_code'])} {esc(r['name'])}</h2>
   <p><b>{esc(r['verdict'])}</b></p>
+  <p>{esc(r['pool_status'])}</p>
   <p>{esc(r['reason'])}</p>
   <div class="grid">
     <div><label>价格/时间</label><strong>{float(r['price_hkd']):.3f} · {esc(r['quote_time'])}</strong></div>
@@ -197,7 +228,7 @@ def main() -> None:
     <div><label>净现金/市值</label><strong>{pct(r['net_cash_to_mv'])}</strong></div>
     <div><label>股东回报率</label><strong>{pct(r['shareholder_return_yield'])}</strong></div>
     <div><label>质量/治理</label><strong>{esc(r['quality_tier'])} / {esc(r['governance_grade'])}</strong></div>
-    <div><label>治理后排名</label><strong>{int(r['governance_rank'])}</strong></div>
+    <div><label>治理后排名</label><strong>{rank_text(r['governance_rank'])}</strong></div>
   </div>
   <p class="risk">{esc(r['hard_flags'])}；{esc(r['governance_notes'])}</p>
 </article>"""
