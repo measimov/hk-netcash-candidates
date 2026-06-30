@@ -167,7 +167,8 @@ dividend_yield_ttm = div_cash_ttm / realtime_price
 - 对每个历史交易日计算当日过去 365 天每份现金分红合计，再除以当日收盘价。
 - `hist_yield_max` 为自上市以来滚动 TTM 股息率最高值。
 - `yield_pctile_all / 1y / 2y / 5y / 10y` 为当前实时股息率在对应历史窗口中的分位。
-- 分位越低，表示当前股息率越低，通常意味着价格相对历史股息回报越贵；分位越高，表示当前股息率处于历史较高区间。
+- 分位越低，表示当前股息率越低；这可能来自价格偏贵，也可能来自当前 TTM 分红低于历史峰值。
+- 因此额外输出 `hist_yield_max_ttm_cash / hist_yield_max_close / current_ttm_cash_to_peak / yield_valuation_hint`，用于拆分“价格因素”和“分红额变化因素”。
 - 若有效历史样本少于 252 个交易日，仅标记为“样本较短”，不直接给出偏贵/偏便宜判断。
 
 实时价格：

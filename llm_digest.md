@@ -15,11 +15,11 @@
 
 ## 沪深红利ETF前五
 
-1. 515180.SH 易方达中证红利ETF yield=4.80% amount=2.95亿 score=87.2
-2. 515080.SH 招商中证红利ETF yield=4.99% amount=3.88亿 score=86.1
-3. 159307.SZ 博时中证红利低波动100ETF yield=5.34% amount=0.87亿 score=85.7
-4. 563020.SH 易方达中证红利低波动ETF yield=4.53% amount=2.66亿 score=85.4
-5. 515450.SH 南方标普中国A股大盘红利低波50ETF yield=5.74% amount=1.34亿 score=80.0
+1. 515180.SH 易方达中证红利ETF yield=4.80% amount=3.36亿 score=87.8
+2. 515080.SH 招商中证红利ETF yield=4.98% amount=4.11亿 score=87.6
+3. 563020.SH 易方达中证红利低波动ETF yield=4.53% amount=3.14亿 score=85.9
+4. 159307.SZ 博时中证红利低波动100ETF yield=5.35% amount=0.97亿 score=84.8
+5. 515450.SH 南方标普中国A股大盘红利低波50ETF yield=5.73% amount=1.46亿 score=81.7
 
 ## 特殊高分红观察池前五
 

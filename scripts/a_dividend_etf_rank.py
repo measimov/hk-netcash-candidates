@@ -240,14 +240,33 @@ def yield_position_label(percentile: float, obs: int = 0) -> str:
     if obs < 252:
         return "样本较短"
     if percentile < 0.2:
-        return "股息率历史低位/偏贵"
+        return "股息率历史低位"
     if percentile < 0.4:
         return "股息率中低位"
     if percentile < 0.6:
         return "股息率中位"
     if percentile < 0.8:
         return "股息率中高位"
-    return "股息率历史高位/偏便宜"
+    return "股息率历史高位"
+
+
+def yield_valuation_hint(percentile: float, obs: int, current_cash: float, peak_cash: float) -> str:
+    if pd.isna(percentile):
+        return "暂无当前TTM分红"
+    if obs < 252:
+        return "样本较短，仅供参考"
+    cash_ratio = np.nan
+    if pd.notna(peak_cash) and float(peak_cash) > 0:
+        cash_ratio = float(current_cash) / float(peak_cash)
+    if percentile < 0.2:
+        if pd.notna(cash_ratio) and cash_ratio < 0.65:
+            return "低分位主要由TTM分红下降驱动"
+        return "股息率低位，可能偏贵"
+    if percentile >= 0.8:
+        if pd.notna(cash_ratio) and cash_ratio < 0.65:
+            return "股息率高位，但分红未回峰值"
+        return "股息率高位，偏便宜信号"
+    return "股息率中位区间"
 
 
 def historical_yield_stats(
@@ -264,6 +283,8 @@ def historical_yield_stats(
     base = {
         "hist_yield_max": np.nan,
         "hist_yield_max_date": "",
+        "hist_yield_max_ttm_cash": np.nan,
+        "hist_yield_max_close": np.nan,
         "hist_yield_obs": 0,
         "yield_pctile_all": np.nan,
         "yield_pctile_1y": np.nan,
@@ -271,7 +292,9 @@ def historical_yield_stats(
         "yield_pctile_5y": np.nan,
         "yield_pctile_10y": np.nan,
         "yield_to_hist_max": np.nan,
+        "current_ttm_cash_to_peak": np.nan,
         "yield_position_label": "暂无TTM分红",
+        "yield_valuation_hint": "暂无当前TTM分红",
     }
     start_date = str(list_date or "")
     if not re.fullmatch(r"\d{8}", start_date):
@@ -329,13 +352,24 @@ def historical_yield_stats(
     out = dict(base)
     out["hist_yield_max"] = float(valid.loc[max_idx, "hist_yield_ttm"])
     out["hist_yield_max_date"] = str(valid.loc[max_idx, "trade_date"])
+    out["hist_yield_max_ttm_cash"] = float(valid.loc[max_idx, "hist_div_cash_ttm"])
+    out["hist_yield_max_close"] = float(valid.loc[max_idx, "close"])
     out["hist_yield_obs"] = int(len(valid))
     out["yield_pctile_all"] = current_yield_percentile(valid["hist_yield_ttm"], current_yield)
     for label, days in [("1y", 365), ("2y", 365 * 2), ("5y", 365 * 5), ("10y", 365 * 10)]:
         subset = valid[valid["trade_ts"] >= current_ts - pd.Timedelta(days=days)]
         out[f"yield_pctile_{label}"] = current_yield_percentile(subset["hist_yield_ttm"], current_yield)
     out["yield_to_hist_max"] = current_yield / out["hist_yield_max"] if out["hist_yield_max"] else np.nan
+    out["current_ttm_cash_to_peak"] = (
+        float(current_div_cash_ttm) / out["hist_yield_max_ttm_cash"] if out["hist_yield_max_ttm_cash"] else np.nan
+    )
     out["yield_position_label"] = yield_position_label(out["yield_pctile_all"], out["hist_yield_obs"])
+    out["yield_valuation_hint"] = yield_valuation_hint(
+        out["yield_pctile_all"],
+        out["hist_yield_obs"],
+        current_div_cash_ttm,
+        out["hist_yield_max_ttm_cash"],
+    )
     return out
 
 
@@ -379,9 +413,12 @@ def render_html(df: pd.DataFrame, generated_at: str, quote_range: str) -> str:
   <div class="grid">
     <div><label>实时股息率</label><strong>{fmt_pct(row['dividend_yield_ttm'])}</strong></div>
     <div><label>历史最高股息率</label><strong>{fmt_pct(row['hist_yield_max'])}</strong></div>
+    <div><label>峰值TTM分红</label><strong>{fmt_num(row['hist_yield_max_ttm_cash'], 4)}</strong></div>
+    <div><label>当前/峰值TTM</label><strong>{fmt_pct(row['current_ttm_cash_to_peak'])}</strong></div>
     <div><label>成立以来分位</label><strong>{fmt_pct(row['yield_pctile_all'])}</strong></div>
     <div><label>历史样本</label><strong>{int(row['hist_yield_obs']) if pd.notna(row['hist_yield_obs']) else 0}天</strong></div>
-    <div><label>估值提示</label><strong>{esc(row['yield_position_label'])}</strong></div>
+    <div><label>股息率位置</label><strong>{esc(row['yield_position_label'])}</strong></div>
+    <div><label>分位解释</label><strong>{esc(row['yield_valuation_hint'])}</strong></div>
     <div><label>现价</label><strong>{fmt_num(row['price'], 3)}</strong></div>
     <div><label>TTM分红</label><strong>{fmt_num(row['div_cash_ttm'], 4)}</strong></div>
     <div><label>成交额</label><strong>{yi(row['amount_cny'])}</strong></div>
@@ -403,6 +440,9 @@ def render_html(df: pd.DataFrame, generated_at: str, quote_range: str) -> str:
             "dividend_yield_ttm",
             "hist_yield_max",
             "hist_yield_max_date",
+            "hist_yield_max_ttm_cash",
+            "hist_yield_max_close",
+            "current_ttm_cash_to_peak",
             "yield_pctile_all",
             "yield_pctile_1y",
             "yield_pctile_2y",
@@ -410,6 +450,7 @@ def render_html(df: pd.DataFrame, generated_at: str, quote_range: str) -> str:
             "yield_pctile_10y",
             "hist_yield_obs",
             "yield_position_label",
+            "yield_valuation_hint",
             "div_cash_ttm",
             "amount_cny",
             "total_fee_rate",
@@ -419,8 +460,19 @@ def render_html(df: pd.DataFrame, generated_at: str, quote_range: str) -> str:
         ]
     ].copy()
     table["price"] = table["price"].map(lambda x: fmt_num(x, 3))
-    for col in ["dividend_yield_ttm", "hist_yield_max", "yield_pctile_all", "yield_pctile_1y", "yield_pctile_2y", "yield_pctile_5y", "yield_pctile_10y"]:
+    for col in [
+        "dividend_yield_ttm",
+        "hist_yield_max",
+        "current_ttm_cash_to_peak",
+        "yield_pctile_all",
+        "yield_pctile_1y",
+        "yield_pctile_2y",
+        "yield_pctile_5y",
+        "yield_pctile_10y",
+    ]:
         table[col] = table[col].map(fmt_pct)
+    for col in ["hist_yield_max_ttm_cash", "hist_yield_max_close"]:
+        table[col] = table[col].map(lambda x: fmt_num(x, 4))
     table["div_cash_ttm"] = table["div_cash_ttm"].map(lambda x: fmt_num(x, 4))
     table["amount_cny"] = table["amount_cny"].map(yi)
     for col in ["total_fee_rate", "premium_rate"]:
@@ -436,13 +488,17 @@ def render_html(df: pd.DataFrame, generated_at: str, quote_range: str) -> str:
             "dividend_yield_ttm": "实时股息率",
             "hist_yield_max": "历史最高股息率",
             "hist_yield_max_date": "最高日期",
+            "hist_yield_max_ttm_cash": "峰值TTM分红/份",
+            "hist_yield_max_close": "峰值日收盘价",
+            "current_ttm_cash_to_peak": "当前/峰值TTM",
             "yield_pctile_all": "成立以来分位",
             "yield_pctile_1y": "1年分位",
             "yield_pctile_2y": "2年分位",
             "yield_pctile_5y": "5年分位",
             "yield_pctile_10y": "10年分位",
             "hist_yield_obs": "历史样本天数",
-            "yield_position_label": "估值提示",
+            "yield_position_label": "股息率位置",
+            "yield_valuation_hint": "分位解释",
             "div_cash_ttm": "TTM分红/份",
             "amount_cny": "实时成交额",
             "total_fee_rate": "总费率",
@@ -463,9 +519,9 @@ h1{{font-size:20px;margin:0 0 4px}}.meta{{color:#637083;font-size:13px;line-heig
 .links{{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0 16px}}.links a{{background:#176b87;color:white;text-decoration:none;padding:8px 10px;border-radius:6px;font-size:14px}}
 .card{{background:white;border:1px solid #dbe1e8;border-radius:8px;padding:12px;margin:10px 0}}.head{{display:flex;gap:8px;align-items:center}}.head b{{font-size:20px;min-width:42px}}.head span{{font-weight:700;flex:1}}.head em{{font-style:normal;color:#176b87;font-weight:700}}
 .grid{{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:10px}}.grid div{{background:#f3f6f8;border-radius:6px;padding:8px;min-width:0}}label{{display:block;color:#637083;font-size:12px;margin-bottom:3px}}strong{{font-size:14px;overflow-wrap:anywhere}}p{{color:#3d4a5c;font-size:13px;line-height:1.5}}
-.table-wrap{{overflow:auto;background:white;border:1px solid #dbe1e8;border-radius:8px;margin-top:18px}}table{{width:100%;border-collapse:collapse;font-size:13px;min-width:1480px}}th,td{{padding:8px;border-bottom:1px solid #dbe1e8;text-align:right;white-space:nowrap}}th:nth-child(2),th:nth-child(3),th:nth-child(4),th:nth-child(12),td:nth-child(2),td:nth-child(3),td:nth-child(4),td:nth-child(12){{text-align:left}}th{{position:sticky;top:0;background:#eef2f5}}
+.table-wrap{{overflow:auto;background:white;border:1px solid #dbe1e8;border-radius:8px;margin-top:18px}}table{{width:100%;border-collapse:collapse;font-size:13px;min-width:1720px}}th,td{{padding:8px;border-bottom:1px solid #dbe1e8;text-align:right;white-space:nowrap}}th:nth-child(2),th:nth-child(3),th:nth-child(4),th:nth-child(17),th:nth-child(18),td:nth-child(2),td:nth-child(3),td:nth-child(4),td:nth-child(17),td:nth-child(18){{text-align:left}}th{{position:sticky;top:0;background:#eef2f5}}
 @media(min-width:780px){{.cards{{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}}.card{{margin:0}}.grid{{grid-template-columns:repeat(4,minmax(0,1fr))}}}}
-</style></head><body><header><h1>沪深上市红利ETF实时股息率</h1><div class="meta">生成：{generated_at}；实时行情：{quote_range}。覆盖在沪深交易所上市的红利/高股息 ETF，含恒生、港股通、H 股相关红利 ETF。股息率 = 近12个月每份现金分红 / 实时价格；历史分位按 Tushare fund_daily 每日收盘价与当日滚动 TTM 分红重算，分位越低通常代表当前股息率越低、价格相对股息回报越贵。</div></header>
+</style></head><body><header><h1>沪深上市红利ETF实时股息率</h1><div class="meta">生成：{generated_at}；实时行情：{quote_range}。覆盖在沪深交易所上市的红利/高股息 ETF，含恒生、港股通、H 股相关红利 ETF。股息率 = 近12个月每份现金分红 / 实时价格；历史分位按 Tushare fund_daily 每日收盘价与当日滚动 TTM 分红重算。低分位需要拆分判断：可能是价格偏贵，也可能是当前TTM分红低于历史峰值。</div></header>
 <main><div class="links"><a href="index.html">返回港股主榜</a><a href="a_dividend_etf_rank.csv">CSV</a><a href="a_dividend_etf_rank.md">Markdown</a></div><section class="cards">{''.join(cards)}</section><section class="table-wrap">{table_html}</section></main></body></html>"""
 
 
@@ -480,6 +536,9 @@ def render_md(df: pd.DataFrame, generated_at: str, quote_range: str) -> str:
             "dividend_yield_ttm",
             "hist_yield_max",
             "hist_yield_max_date",
+            "hist_yield_max_ttm_cash",
+            "hist_yield_max_close",
+            "current_ttm_cash_to_peak",
             "yield_pctile_all",
             "yield_pctile_1y",
             "yield_pctile_2y",
@@ -487,6 +546,7 @@ def render_md(df: pd.DataFrame, generated_at: str, quote_range: str) -> str:
             "yield_pctile_10y",
             "hist_yield_obs",
             "yield_position_label",
+            "yield_valuation_hint",
             "div_cash_ttm",
             "amount_cny",
             "total_fee_rate",
@@ -496,8 +556,19 @@ def render_md(df: pd.DataFrame, generated_at: str, quote_range: str) -> str:
         ]
     ].copy()
     show["price"] = show["price"].map(lambda x: fmt_num(x, 3))
-    for col in ["dividend_yield_ttm", "hist_yield_max", "yield_pctile_all", "yield_pctile_1y", "yield_pctile_2y", "yield_pctile_5y", "yield_pctile_10y"]:
+    for col in [
+        "dividend_yield_ttm",
+        "hist_yield_max",
+        "current_ttm_cash_to_peak",
+        "yield_pctile_all",
+        "yield_pctile_1y",
+        "yield_pctile_2y",
+        "yield_pctile_5y",
+        "yield_pctile_10y",
+    ]:
         show[col] = show[col].map(fmt_pct)
+    for col in ["hist_yield_max_ttm_cash", "hist_yield_max_close"]:
+        show[col] = show[col].map(lambda x: fmt_num(x, 4))
     show["div_cash_ttm"] = show["div_cash_ttm"].map(lambda x: fmt_num(x, 4))
     show["amount_cny"] = show["amount_cny"].map(yi)
     for col in ["total_fee_rate", "premium_rate"]:
@@ -511,7 +582,7 @@ def render_md(df: pd.DataFrame, generated_at: str, quote_range: str) -> str:
             f"- 实时行情范围: {quote_range}",
             "- 覆盖在沪深交易所上市的红利/高股息 ETF，含恒生、港股通、H 股相关红利 ETF。",
             "- 股息率 = 近12个月每份现金分红 / 实时价格；未分红 ETF 的 TTM 股息率为 0。",
-            "- 历史股息率 = 历史当日过去365天每份现金分红 / 当日收盘价；当前分位越低，通常代表当前股息率越低、价格相对股息回报越贵。",
+            "- 历史股息率 = 历史当日过去365天每份现金分红 / 当日收盘价；低分位需要拆分判断，可能是价格偏贵，也可能是当前TTM分红低于历史峰值。",
             "- 综合分 = 股息率35% + 流动性20% + 费率15% + 折溢价10% + 近3年分红连续性10% + 上市年限10%。",
             "",
             df_to_markdown(show, index=False),
@@ -614,6 +685,8 @@ def main() -> None:
         "dividend_yield_ttm",
         "hist_yield_max",
         "hist_yield_max_date",
+        "hist_yield_max_ttm_cash",
+        "hist_yield_max_close",
         "hist_yield_obs",
         "yield_pctile_all",
         "yield_pctile_1y",
@@ -621,7 +694,9 @@ def main() -> None:
         "yield_pctile_5y",
         "yield_pctile_10y",
         "yield_to_hist_max",
+        "current_ttm_cash_to_peak",
         "yield_position_label",
+        "yield_valuation_hint",
         "list_date",
         "last_div_date",
     ]
@@ -640,6 +715,8 @@ def main() -> None:
         "dividend_yield_ttm",
         "hist_yield_max",
         "hist_yield_max_date",
+        "hist_yield_max_ttm_cash",
+        "hist_yield_max_close",
         "hist_yield_obs",
         "yield_pctile_all",
         "yield_pctile_1y",
@@ -647,7 +724,9 @@ def main() -> None:
         "yield_pctile_5y",
         "yield_pctile_10y",
         "yield_to_hist_max",
+        "current_ttm_cash_to_peak",
         "yield_position_label",
+        "yield_valuation_hint",
         "div_count_ttm",
         "div_cash_3y",
         "div_count_3y",
